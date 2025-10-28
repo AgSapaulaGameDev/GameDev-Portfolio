@@ -3,191 +3,188 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gelo’s Portfolio</title>
+  <title>Gelo's Portfolio</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      scroll-behavior: smooth;
-      position: relative;
-      overflow-x: hidden;
-    }
-    .hero {
-      background: linear-gradient(to right, #ff8a00, #e52e71);
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background: #000;
       color: white;
-      text-align: center;
-      padding: 100px 20px;
+      font-family: 'Poppins', sans-serif;
     }
-    .navbar-brand {
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .hero {
+      text-align: center;
+      position: relative;
+      top: 35%;
+      transform: translateY(-50%);
+    }
+
+    .hero h1 {
+      font-size: 3rem;
       font-weight: bold;
     }
-    .project-card img {
-      height: 200px;
-      object-fit: cover;
-    }
-    footer {
-      background: #222;
-      color: white;
-      text-align: center;
-      padding: 20px;
+
+    .hero p {
+      font-size: 1.5rem;
+      color: #ccc;
     }
 
-    /* Spark effect */
-    .spark {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #fff;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: spark 0.4s ease-out forwards;
-    }
-
-    @keyframes spark {
-      0% {
-        opacity: 1;
-        transform: scale(1) translate(0, 0);
-      }
-      100% {
-        opacity: 0;
-        transform: scale(0.5) translate(var(--x), var(--y));
-      }
+    .btn {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-      <a class="navbar-brand" href="#">Gelo’s Portfolio</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
-          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+  <!-- Particle Canvas -->
+  <canvas id="particle-bg"></canvas>
 
-  <!-- Hero Section -->
-  <section class="hero" id="home">
-    <div class="container">
-      <h1 class="display-4">Hello, I'm Gelo 👋</h1>
-      <p class="lead">Game Developer • Designer • Programmer</p>
-      <a href="#projects" class="btn btn-light btn-lg mt-3">View My Work</a>
-    </div>
-  </section>
+  <!-- Hero Content -->
+  <div class="hero">
+    <h1>Hello, I'm Gelo 👋</h1>
+    <p>Game Developer • Designer • Programmer</p>
+    <a href="#projects" class="btn btn-light btn-lg">View My Work</a>
+  </div>
 
-  <!-- About Section -->
-  <section id="about" class="py-5">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-md-4">
-          <img src="https://via.placeholder.com/300" alt="Profile" class="img-fluid rounded-circle shadow">
-        </div>
-        <div class="col-md-8">
-          <h2>About Me</h2>
-          <p>Hello! I’m Gelo, a passionate game developer and IT student specializing in creating fun and educational experiences using Unity and C#. I love turning creative ideas into interactive games that inspire and entertain players around the world.</p>
-          <a href="#contact" class="btn btn-primary mt-3">Get in Touch</a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <script type="module">
+    import { Renderer, Camera, Geometry, Program, Mesh } from 'https://cdn.jsdelivr.net/npm/ogl@0.0.32/dist/ogl.mjs';
 
-  <!-- Projects Section -->
-  <section id="projects" class="py-5 bg-light">
-    <div class="container">
-      <h2 class="text-center mb-4">My Projects</h2>
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div class="card project-card shadow">
-            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Project 1">
-            <div class="card-body">
-              <h5 class="card-title">Filipino Dessert Game</h5>
-              <p class="card-text">A Unity-based 3D cooking game that promotes Filipino culture through interactive gameplay.</p>
-              <a href="#" class="btn btn-outline-primary">View Project</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card project-card shadow">
-            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Project 2">
-            <div class="card-body">
-              <h5 class="card-title">Bouncing Ball Game</h5>
-              <p class="card-text">A fun MonoGame project featuring physics-based ball movement and interactive elements.</p>
-              <a href="#" class="btn btn-outline-primary">View Project</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card project-card shadow">
-            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Project 3">
-            <div class="card-body">
-              <h5 class="card-title">EmberWorks Studio</h5>
-              <p class="card-text">My indie game development team focused on creating immersive and meaningful experiences.</p>
-              <a href="#" class="btn btn-outline-primary">View Project</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    const vertex = `
+      attribute vec3 position;
+      attribute vec4 random;
+      attribute vec3 color;
 
-  <!-- Contact Section -->
-  <section id="contact" class="py-5">
-    <div class="container">
-      <h2 class="text-center mb-4">Contact Me</h2>
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <form>
-            <div class="mb-3">
-              <label class="form-label">Name</label>
-              <input type="text" class="form-control" placeholder="Your Name" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" placeholder="Your Email" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Message</label>
-              <textarea class="form-control" rows="4" placeholder="Your Message" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Send Message</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
+      uniform mat4 modelMatrix;
+      uniform mat4 viewMatrix;
+      uniform mat4 projectionMatrix;
+      uniform float uTime;
+      uniform float uSpread;
+      uniform float uBaseSize;
+      uniform float uSizeRandomness;
 
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 Gelo’s Portfolio | Built with Bootstrap 5</p>
-  </footer>
+      varying vec4 vRandom;
+      varying vec3 vColor;
 
-  <!-- Spark Effect Script -->
-  <script>
-    document.addEventListener("click", (e) => {
-      for (let i = 0; i < 8; i++) {
-        const spark = document.createElement("span");
-        spark.classList.add("spark");
-        spark.style.left = e.pageX + "px";
-        spark.style.top = e.pageY + "px";
-        const angle = Math.random() * 2 * Math.PI;
-        const radius = 15;
-        const x = Math.cos(angle) * radius + "px";
-        const y = Math.sin(angle) * radius + "px";
-        spark.style.setProperty("--x", x);
-        spark.style.setProperty("--y", y);
-        document.body.appendChild(spark);
-        setTimeout(() => spark.remove(), 400);
+      void main() {
+        vRandom = random;
+        vColor = color;
+        vec3 pos = position * uSpread;
+        pos.z *= 10.0;
+        vec4 mPos = modelMatrix * vec4(pos, 1.0);
+        float t = uTime;
+        mPos.x += sin(t * random.z + 6.28 * random.w) * mix(0.1, 1.5, random.x);
+        mPos.y += sin(t * random.y + 6.28 * random.x) * mix(0.1, 1.5, random.w);
+        mPos.z += sin(t * random.w + 6.28 * random.y) * mix(0.1, 1.5, random.z);
+
+        vec4 mvPos = viewMatrix * mPos;
+        gl_PointSize = (uBaseSize * (1.0 + uSizeRandomness * (random.x - 0.5))) / length(mvPos.xyz);
+        gl_Position = projectionMatrix * mvPos;
       }
-    });
-  </script>
+    `;
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    const fragment = `
+      precision highp float;
+      uniform float uTime;
+      varying vec4 vRandom;
+      varying vec3 vColor;
+
+      void main() {
+        vec2 uv = gl_PointCoord.xy;
+        float d = length(uv - vec2(0.5));
+        if (d > 0.5) discard;
+        gl_FragColor = vec4(vColor + 0.2 * sin(uv.yxx + uTime + vRandom.y * 6.28), 1.0);
+      }
+    `;
+
+    const renderer = new Renderer({ alpha: true });
+    const gl = renderer.gl;
+    document.body.appendChild(gl.canvas);
+    const camera = new Camera(gl, { fov: 15 });
+    camera.position.set(0, 0, 20);
+
+    const resize = () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+    };
+    window.addEventListener('resize', resize);
+    resize();
+
+    const count = 300;
+    const positions = new Float32Array(count * 3);
+    const randoms = new Float32Array(count * 4);
+    const colors = new Float32Array(count * 3);
+
+    const palette = ['#ffffff', '#ff8a00', '#e52e71'];
+
+    const hexToRgb = hex => {
+      hex = hex.replace(/^#/, '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      const int = parseInt(hex, 16);
+      return [(int >> 16 & 255) / 255, (int >> 8 & 255) / 255, (int & 255) / 255];
+    };
+
+    for (let i = 0; i < count; i++) {
+      let x, y, z, len;
+      do {
+        x = Math.random() * 2 - 1;
+        y = Math.random() * 2 - 1;
+        z = Math.random() * 2 - 1;
+        len = x * x + y * y + z * z;
+      } while (len > 1 || len === 0);
+
+      const r = Math.cbrt(Math.random());
+      positions.set([x * r, y * r, z * r], i * 3);
+      randoms.set([Math.random(), Math.random(), Math.random(), Math.random()], i * 4);
+      const col = hexToRgb(palette[Math.floor(Math.random() * palette.length)]);
+      colors.set(col, i * 3);
+    }
+
+    const geometry = new Geometry(gl, {
+      position: { size: 3, data: positions },
+      random: { size: 4, data: randoms },
+      color: { size: 3, data: colors },
+    });
+
+    const program = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        uTime: { value: 0 },
+        uSpread: { value: 10 },
+        uBaseSize: { value: 100 },
+        uSizeRandomness: { value: 1 },
+      },
+      transparent: true,
+      depthTest: false,
+    });
+
+    const particles = new Mesh(gl, { mode: gl.POINTS, geometry, program });
+
+    let lastTime = performance.now();
+    function update(t) {
+      requestAnimationFrame(update);
+      const delta = t - lastTime;
+      lastTime = t;
+      program.uniforms.uTime.value += delta * 0.001;
+      particles.rotation.y += 0.002;
+      particles.rotation.x += 0.001;
+      renderer.render({ scene: particles, camera });
+    }
+    requestAnimationFrame(update);
+  </script>
 </body>
 </html>
