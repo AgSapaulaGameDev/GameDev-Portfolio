@@ -8,6 +8,8 @@
   <style>
     body {
       scroll-behavior: smooth;
+      position: relative;
+      overflow-x: hidden;
     }
     .hero {
       background: linear-gradient(to right, #ff8a00, #e52e71);
@@ -27,6 +29,28 @@
       color: white;
       text-align: center;
       padding: 20px;
+    }
+
+    /* Spark effect */
+    .spark {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: spark 0.4s ease-out forwards;
+    }
+
+    @keyframes spark {
+      0% {
+        opacity: 1;
+        transform: scale(1) translate(0, 0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.5) translate(var(--x), var(--y));
+      }
     }
   </style>
 </head>
@@ -141,8 +165,28 @@
 
   <!-- Footer -->
   <footer>
-    <p>© 2025 Ian’s Portfolio | Built with Bootstrap 5</p>
+    <p>© 2025 Gelo’s Portfolio | Built with Bootstrap 5</p>
   </footer>
+
+  <!-- Spark Effect Script -->
+  <script>
+    document.addEventListener("click", (e) => {
+      for (let i = 0; i < 8; i++) {
+        const spark = document.createElement("span");
+        spark.classList.add("spark");
+        spark.style.left = e.pageX + "px";
+        spark.style.top = e.pageY + "px";
+        const angle = Math.random() * 2 * Math.PI;
+        const radius = 15;
+        const x = Math.cos(angle) * radius + "px";
+        const y = Math.sin(angle) * radius + "px";
+        spark.style.setProperty("--x", x);
+        spark.style.setProperty("--y", y);
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 400);
+      }
+    });
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
