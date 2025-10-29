@@ -8,13 +8,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
+    /* Custom Properties */
     :root {
       --bg: #0b0f1a;
       --card: #111827;
       --accent: #7c3aed;
       --muted: #94a3b8;
+      --gradient-1: linear-gradient(135deg, var(--bg), #060a12, #0f172a);
+      --gradient-2: linear-gradient(90deg, #7c3aed, #9f67ff);
       --max-width: 1200px;
       color-scheme: dark;
+    }
+
+    /* Container Layout */
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
     }
 
     * {
@@ -70,6 +80,28 @@
 
     nav a:hover {
       color: white;
+    }
+
+    /* Enhanced Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0;
+      position: relative;
+    }
+
+    .hero-content {
+      flex: 1;
+      max-width: 600px;
+    }
+
+    .hero-image {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
     }
 
     /* Hero Section */
@@ -235,8 +267,9 @@
 
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      padding: 40px 0;
     }
 
     /* Enhanced Project Cards */
@@ -364,6 +397,14 @@
     }
 
     /* CONTACT */
+    #contact .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+      backdrop-filter: blur(6px);
+    }
+
     form {
       display: grid;
       gap: 12px;
@@ -378,15 +419,6 @@
       border-radius: 8px;
       color: white;
       font-family: inherit;
-      transition: all 0.3s ease;
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    input:focus, textarea:focus {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: var(--accent);
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
     }
 
     textarea {
@@ -408,14 +440,37 @@
 
     @media (max-width: 900px) {
       .hero {
-        grid-template-columns: 1fr;
+        flex-direction: column;
         text-align: center;
+        padding: 80px 0;
       }
 
-      nav {
-        flex-direction: column;
-        gap: 10px;
+      .contact-grid {
+        grid-template-columns: 1fr;
       }
+
+      .hero-content, .hero-image {
+        max-width: 100%;
+      }
+    }
+
+    /* Animation Enhancements */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .hero-image img {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Glassmorphism Effects */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
     }
 
     /* Scrollbar Styling */
@@ -460,7 +515,7 @@
 
   <div class="container">
     <section class="hero" id="about">
-      <div>
+      <div class="hero-content">
         <h1>Hi — I'm Gelo.</h1>
         <p>
           I’m a passionate game developer focused on creating immersive 3D experiences from modelling and animation to
@@ -483,10 +538,12 @@
           <a href="https://linkedin.com/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
         </div>
       </div>
-      <img src="Images/download.jpg" alt="Profile Photo">
+      <div class="hero-image">
+        <img src="Images/download.jpg" alt="Profile Photo">
+      </div>
     </section>
 
-    <section id="projects">
+    <section id="projects" class="glass-card">
       <h2>Portfolio</h2>
       <div class="filter-buttons">
         <button class="filter-btn active" data-filter="all">All</button>
@@ -535,7 +592,7 @@
     </section>
 
     <section id="skills">
-      <div class="card">
+      <div class="skills-grid">
         <h2>Skills</h2>
         <div class="skills">
           <span class="chip">3D Modelling</span>
