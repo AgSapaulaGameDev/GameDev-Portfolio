@@ -1,349 +1,1417 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Crafting Immersive Gaming Experiences</title>
-  <meta name="description" content="Portfolio — Game developer, 3D artist, animator." />
-  <link rel="icon"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2312191f'/%3E%3Ctext x='50' y='55' font-size='36' text-anchor='middle' fill='%23fff' font-family='Arial'%3EGF%3C/text%3E%3C/svg%3E">
-  <style>
-    :root {
-      --bg: #0f1720;
-      --card: #0b1220;
-      --muted: #9aa4b2;
-      --accent: #7c3aed
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameDev Portfolio - Game Developer & Designer</title>
+    <meta name="description" content="Passionate game developer specializing in 3D design, animation, and interactive gameplay. Expert in Unity, Unreal Engine, and Blender.">
+    
+    <style>
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * {
-      box-sizing: border-box
-    }
+        :root {
+            --background: hsl(220, 25%, 8%);
+            --foreground: hsl(210, 40%, 98%);
+            --card: hsl(220, 25%, 10%);
+            --card-foreground: hsl(210, 40%, 98%);
+            --primary: hsl(188, 95%, 50%);
+            --primary-foreground: hsl(220, 25%, 8%);
+            --secondary: hsl(220, 20%, 15%);
+            --secondary-foreground: hsl(210, 40%, 98%);
+            --muted: hsl(220, 20%, 20%);
+            --muted-foreground: hsl(215, 20%, 65%);
+            --border: hsl(220, 20%, 20%);
+            --radius: 0.5rem;
+        }
 
-    body {
-      margin: 0;
-      font-family: Inter, Segoe UI, Arial;
-      background: linear-gradient(180deg, #071226 0%, #071018 60%), var(--bg);
-      color: #e6eef8;
-      line-height: 1.5
-    }
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-    .wrap {
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 24px
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px
-    }
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(34, 40, 56, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+        }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px
-    }
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+        }
 
-    .logo img {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px
-    }
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
 
-    nav a {
-      color: var(--muted);
-      text-decoration: none;
-      margin-left: 18px
-    }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 28px;
-      align-items: center;
-      margin-top: 28px
-    }
+        .nav-link {
+            background: none;
+            border: none;
+            color: var(--foreground);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
 
-    .hero h1 {
-      font-size: 38px;
-      margin: 0 0 12px
-    }
+        .nav-link:hover {
+            color: var(--primary);
+        }
 
-    .hero p {
-      color: var(--muted);
-      margin: 0 0 18px
-    }
+        .nav-button {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-    .cta {
-      display: inline-flex;
-      gap: 8px
-    }
+        .nav-button:hover {
+            background: hsl(188, 95%, 45%);
+            box-shadow: 0 0 30px hsla(188, 95%, 50%, 0.5);
+        }
 
-    .btn {
-      background: var(--accent);
-      color: white;
-      padding: 10px 14px;
-      border-radius: 8px;
-      text-decoration: none
-    }
+        .mobile-menu-button {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--foreground);
+            cursor: pointer;
+        }
 
-    .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-      padding: 18px;
-      border-radius: 12px
-    }
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
 
-    .profile {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: center
-    }
+        .mobile-nav.open {
+            display: flex;
+        }
 
-    .profile img {
-      width: 100%;
-      border-radius: 8px
-    }
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 5rem;
+        }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 20px
-    }
+        .hero-content {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            max-width: 4xl;
+        }
 
-    .project {
-      background: var(--card);
-      padding: 12px;
-      border-radius: 10px
-    }
+        .hero-subtitle {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+        }
 
-    .project img {
-      width: 100%;
-      height: 130px;
-      object-fit: cover;
-      border-radius: 6px
-    }
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1s forwards;
+        }
 
-    h2.section {
-      margin-top: 36px;
-      margin-bottom: 8px
-    }
+        .hero-title .primary {
+            color: var(--primary);
+        }
 
-    .skills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px
-    }
+        .hero-description {
+            font-size: 1.125rem;
+            color: var(--muted-foreground);
+            margin-bottom: 3rem;
+            max-width: 32rem;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1.5s forwards;
+        }
 
-    .skill {
-      background: rgba(255, 255, 255, 0.03);
-      padding: 8px 10px;
-      border-radius: 8px;
-      color: var(--muted)
-    }
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 2s forwards;
+        }
 
-    footer {
-      margin: 48px 0 24px;
-      color: var(--muted);
-      font-size: 14px;
-      text-align: center
-    }
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-    form .row {
-      display: flex;
-      gap: 8px
-    }
+        .btn-primary:hover {
+            background: hsl(188, 95%, 45%);
+            box-shadow: 0 0 30px hsla(188, 95%, 50%, 0.5);
+        }
 
-    input,
-    textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      background: transparent;
-      color: inherit
-    }
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 0.75rem 2rem;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-    @media(max-width:880px) {
-      .hero {
-        grid-template-columns: 1fr
-      }
+        .btn-outline:hover {
+            background: hsla(188, 95%, 50%, 0.1);
+        }
 
-      .logo img {
-        width: 40px;
-        height: 40px
-      }
-    }
-  </style>
+        .hero-social {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 2.5s forwards;
+        }
+
+        .social-link {
+            color: var(--muted-foreground);
+            transition: color 0.3s;
+        }
+
+        .social-link:hover {
+            color: var(--primary);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator-inner {
+            width: 1.5rem;
+            height: 2.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+
+        .scroll-dot {
+            width: 0.25rem;
+            height: 0.75rem;
+            background: var(--primary);
+            border-radius: 0.125rem;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-alt {
+            background: hsla(220, 20%, 15%, 0.3);
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title .primary {
+            color: var(--primary);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px hsla(188, 95%, 50%, 0.2);
+        }
+
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 4rem;
+        }
+
+        .about-image {
+            display: flex;
+            justify-content: center;
+        }
+
+        .profile-image {
+            width: 16rem;
+            height: 16rem;
+            border-radius: 1rem;
+            border: 2px solid hsla(188, 95%, 50%, 0.5);
+            object-fit: cover;
+            transition: border-color 0.3s;
+        }
+
+        .profile-image:hover {
+            border-color: var(--primary);
+        }
+
+        .about-text {
+            font-size: 1.125rem;
+            color: var(--muted-foreground);
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-card-icon {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .skill-card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+        }
+
+        .skill-card-description {
+            color: var(--muted-foreground);
+        }
+
+        /* Projects Section */
+        .project-filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .filter-button {
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--secondary);
+            color: var(--foreground);
+        }
+
+        .filter-button.active {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            box-shadow: 0 0 20px hsla(188, 95%, 50%, 0.5);
+        }
+
+        .filter-button:hover {
+            background: hsla(220, 20%, 12%, 0.8);
+        }
+
+        .filter-button.active:hover {
+            background: hsl(188, 95%, 45%);
+        }
+
+        .project-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px hsla(188, 95%, 50%, 0.2);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 12rem;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .project-card:hover .project-image {
+            transform: scale(1.1);
+        }
+
+        .project-content {
+            padding: 1.5rem;
+        }
+
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-description {
+            color: var(--muted-foreground);
+            margin-bottom: 1rem;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid hsla(188, 95%, 50%, 0.5);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+        }
+
+        .category-badge {
+            background: hsla(188, 95%, 50%, 0.9);
+            color: var(--primary-foreground);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+        }
+
+        /* Skills Section */
+        .skill-progress {
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-name {
+            font-weight: 500;
+        }
+
+        .skill-level {
+            color: var(--primary);
+        }
+
+        .progress-bar {
+            height: 0.5rem;
+            background: var(--secondary);
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 0.25rem;
+            transition: width 1s ease-out;
+        }
+
+        .tools-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .tool-tag {
+            background: var(--secondary);
+            color: var(--foreground);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .tool-tag:hover {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        /* Contact Section */
+        .contact-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: var(--radius);
+            background: hsla(188, 95%, 50%, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .contact-form {
+            background: hsla(34, 40, 56, 0.5);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: hsla(220, 25%, 8%, 0.5);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--foreground);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px hsla(188, 95%, 50%, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 8rem;
+            resize: vertical;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #10b981;
+        }
+
+        .status-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        /* Canvas Styles */
+        .canvas-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .canvas-trail {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            mix-blend-mode: screen;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(2rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40%, 43% {
+                transform: translateX(-50%) translateY(-1rem);
+            }
+            70% {
+                transform: translateX(-50%) translateY(-0.5rem);
+            }
+            90% {
+                transform: translateX(-50%) translateY(-0.25rem);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-button {
+                display: block;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-primary,
+            .btn-outline {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .about-content {
+                text-align: center;
+            }
+
+            .contact-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-12 { margin-bottom: 3rem; }
+        .mt-4 { margin-top: 1rem; }
+        .relative { position: relative; }
+        .font-bold { font-weight: bold; }
+        .font-semibold { font-weight: 600; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .hidden { display: none; }
+    </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header>
-      <div class="logo">
-        <img
-          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='18' fill='%237c3aed'/%3E%3Ctext x='60' y='72' font-size='48' text-anchor='middle' font-family='Arial' fill='white'%3ESF%3C/text%3E%3C/svg%3E"
-          alt="logo" />
-        <div>
-          <div style="font-weight:700">GAME DEVELOPER & DESIGNER</div>
-          <div style="font-size:12px;color:var(--muted)">Crafting Immersive Gaming Experiences</div>
-        </div>
-      </div>
-      <nav>
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#skills">Skills</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
+    <!-- Mouse Trail Canvas -->
+    <canvas id="mouseTrail" class="canvas-trail"></canvas>
 
-    <main>
-      <section class="hero">
-        <div>
-          <h1>Crafting Immersive Gaming Experiences</h1>
-          <p>Passionate game developer specializing in 3D design, animation, and interactive gameplay. Transforming
-            creative visions into engaging digital realities.</p>
-          <div class="cta">
-            <a class="btn" href="#projects">View My Work</a>
-            <a class="btn" href="#contact"
-              style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)">Get In Touch</a>
-          </div>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container nav-content">
+            <div class="nav-logo">GameDev</div>
+            
+            <div class="nav-links">
+                <button class="nav-link" onclick="scrollToSection('about')">About</button>
+                <button class="nav-link" onclick="scrollToSection('projects')">Projects</button>
+                <button class="nav-link" onclick="scrollToSection('skills')">Skills</button>
+                <button class="nav-link" onclick="scrollToSection('contact')">Contact</button>
+                <button class="nav-button" onclick="scrollToSection('contact')">Get In Touch</button>
+            </div>
+
+            <button class="mobile-menu-button" onclick="toggleMobileMenu()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
         </div>
 
-        <aside class="card profile">
-          <img src="https://preview--spectral-forge-unifier.lovable.app/placeholder.svg" alt="Profile" />
-          <div style="text-align:center">
-            <strong>I'm a passionate game developer</strong>
-            <p style="color:var(--muted);margin:8px 0 0">Expertise in Unity, Unreal, Blender, and C#. I design, model,
-              animate, and build playable experiences.</p>
-          </div>
-        </aside>
-      </section>
-
-      <h2 class="section" id="projects">Featured Projects</h2>
-      <div class="grid">
-        <article class="project">
-          <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1200&q=80"
-            alt="Fantasy RPG Adventure">
-          <h3>Fantasy RPG Adventure</h3>
-          <p style="color:var(--muted);font-size:14px">Open-world RPG with dynamic combat, quests, and rich world
-            building.</p>
-        </article>
-
-        <article class="project">
-          <img src="https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=1200&q=80"
-            alt="Sci-Fi Character Model">
-          <h3>Sci-Fi Character Model</h3>
-          <p style="color:var(--muted);font-size:14px">High-poly futuristic character with PBR textures and rigging.</p>
-        </article>
-
-        <article class="project">
-          <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80"
-            alt="Combat Animation Set">
-          <h3>Combat Animation Set</h3>
-          <p style="color:var(--muted);font-size:14px">Complete combat animations with smooth transitions and impact
-            effects.</p>
-        </article>
-
-        <article class="project">
-          <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=1200&q=80" alt="Puzzle Platformer">
-          <h3>Puzzle Platformer</h3>
-          <p style="color:var(--muted);font-size:14px">2D puzzle game with novel mechanics and stylized art direction.
-          </p>
-        </article>
-
-        <article class="project">
-          <img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1200&q=80"
-            alt="Environment Assets Pack">
-          <h3>Environment Assets Pack</h3>
-          <p style="color:var(--muted);font-size:14px">Modular assets for fantasy and medieval settings, optimized for
-            runtime.</p>
-        </article>
-
-        <article class="project">
-          <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&q=80" alt="Cinematic Cutscene">
-          <h3>Cinematic Cutscene</h3>
-          <p style="color:var(--muted);font-size:14px">Story-driven animated sequence with camera choreography and FX.
-          </p>
-        </article>
-      </div>
-
-      <h2 class="section" id="skills">Technical Skills</h2>
-      <div class="card">
-        <div style="display:flex;gap:18px;flex-wrap:wrap">
-          <div style="flex:1;min-width:220px">
-            <h4>Game Engines</h4>
-            <div class="skills">
-              <span class="skill">Unity — 90%</span>
-              <span class="skill">Unreal Engine — 85%</span>
-              <span class="skill">Godot — 70%</span>
-            </div>
-          </div>
-
-          <div style="flex:1;min-width:220px">
-            <h4>3D Software</h4>
-            <div class="skills">
-              <span class="skill">Blender — 95%</span>
-              <span class="skill">Maya — 80%</span>
-              <span class="skill">Substance Painter — 85%</span>
-            </div>
-          </div>
-
-          <div style="flex:1;min-width:220px">
-            <h4>Programming</h4>
-            <div class="skills">
-              <span class="skill">C# — 90%</span>
-              <span class="skill">C++ — 85%</span>
-              <span class="skill">Python — 80%</span>
-            </div>
-          </div>
+        <div id="mobileNav" class="mobile-nav">
+            <button class="nav-link" onclick="scrollToSection('about')">About</button>
+            <button class="nav-link" onclick="scrollToSection('projects')">Projects</button>
+            <button class="nav-link" onclick="scrollToSection('skills')">Skills</button>
+            <button class="nav-link" onclick="scrollToSection('contact')">Contact</button>
         </div>
-      </div>
+    </nav>
 
-      <h2 class="section" id="contact">Get In Touch</h2>
-      <div class="card">
-        <p style="color:var(--muted)">Whether you have a project in mind or want to collaborate, let's talk. Response
-          time: Usually within 24 hours.</p>
-        <form id="contactForm" style="margin-top:12px">
-          <div class="row">
-            <input type="text" placeholder="Name" id="name" required />
-            <input type="email" placeholder="Email" id="email" required />
-          </div>
-          <div style="margin-top:8px">
-            <input type="text" placeholder="Subject" id="subject" />
-          </div>
-          <div style="margin-top:8px">
-            <textarea id="message" rows="5" placeholder="Message" required></textarea>
-          </div>
-          <div style="margin-top:10px;display:flex;gap:8px">
-            <button class="btn" type="submit">Send Message</button>
-            <a href="mailto:hello@gamedev.com" style="color:var(--muted);align-self:center;text-decoration:none">Or
-              email: hello@gamedev.com</a>
-          </div>
-        </form>
-      </div>
-    </main>
+    <!-- Hero Section -->
+    <section class="hero">
+        <canvas id="fallingBlocks" class="canvas-bg"></canvas>
+        
+        <div class="container hero-content">
+            <div class="hero-subtitle">Game Developer & Designer</div>
+            
+            <h1 class="hero-title">
+                Crafting Immersive <br>
+                <span class="primary">Gaming Experiences</span>
+            </h1>
+            
+            <p class="hero-description">
+                Passionate game developer specializing in 3D design, animation, and interactive gameplay. 
+                Transforming creative visions into engaging digital realities.
+            </p>
+            
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="scrollToSection('projects')">View My Work</button>
+                <button class="btn-outline" onclick="scrollToSection('contact')">Get In Touch</button>
+            </div>
+            
+            <div class="hero-social">
+                <a href="https://github.com" target="_blank" class="social-link">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="social-link">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                <a href="https://twitter.com" target="_blank" class="social-link">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                    </svg>
+                </a>
+                <a href="mailto:hello@gamedev.com" class="social-link">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </div>
 
-    <footer>
-      <div>© <span id="year"></span> Game Developer — Available for remote work worldwide • <a
-          href="https://github.com/" style="color:var(--muted)">GitHub</a> • <a href="https://linkedin.com/"
-          style="color:var(--muted)">LinkedIn</a></div>
-    </footer>
-  </div>
+        <div class="scroll-indicator">
+            <div class="scroll-indicator-inner">
+                <div class="scroll-dot"></div>
+            </div>
+        </div>
+    </section>
 
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-    document.getElementById('contactForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      // lightweight client-only behaviour: show success and clear
-      alert('Thanks — your message has been composed in the browser. Replace this with a real backend to send.');
-      this.reset();
-    });
-  </script>
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <h2 class="section-title">
+                About <span class="primary">Me</span>
+            </h2>
+            
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" alt="Profile" class="profile-image">
+                </div>
+                
+                <div>
+                    <p class="about-text">
+                        I'm a passionate game developer with expertise in creating immersive 3D experiences—from 
+                        detailed modeling and fluid animation to fully playable, engaging games.
+                    </p>
+                    <p class="about-text">
+                        With extensive experience in project management and team leadership, I bring both technical 
+                        skills and collaborative energy to every project. I thrive in dynamic environments and am 
+                        always pushing myself to learn, grow, and deliver exceptional results.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="grid grid-3">
+                <div class="card">
+                    <div class="skill-card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 12C2 12 7 7 12 7s10 5 10 5-5 5-10 5S2 12 2 12z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </div>
+                    <h3 class="skill-card-title">Game Development</h3>
+                    <p class="skill-card-description">Expert in Unity and Unreal Engine, crafting engaging gameplay mechanics and systems.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="skill-card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="skill-card-title">3D Design & Animation</h3>
+                    <p class="skill-card-description">Skilled in Blender for creating stunning models, textures, and character animations.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="skill-card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h2v2H7V7zm4 0h2v2h-2V7zm4 0h2v2h-2V7zM7 11h2v2H7v-2zm4 0h6v2h-6v-2zM7 15h10v2H7v-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="skill-card-title">Programming</h3>
+                    <p class="skill-card-description">Proficient in C#, C++, and Python for building robust game systems and tools.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">
+                Featured <span class="primary">Projects</span>
+            </h2>
+            
+            <div class="project-filters">
+                <button class="filter-button active" onclick="filterProjects('All')">All</button>
+                <button class="filter-button" onclick="filterProjects('Games')">Games</button>
+                <button class="filter-button" onclick="filterProjects('3D Models')">3D Models</button>
+                <button class="filter-button" onclick="filterProjects('Animations')">Animations</button>
+            </div>
+            
+            <div id="projectsGrid" class="grid grid-3">
+                <!-- Projects will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="container">
+            <h2 class="section-title">
+                Technical <span class="primary">Skills</span>
+            </h2>
+            
+            <div class="grid grid-2 mb-12">
+                <div class="card">
+                    <h3 class="text-2xl font-bold mb-6">Game Engines</h3>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Unity</span>
+                            <span class="skill-level">90%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Unreal Engine</span>
+                            <span class="skill-level">85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Godot</span>
+                            <span class="skill-level">70%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-2xl font-bold mb-6">3D Software</h3>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Blender</span>
+                            <span class="skill-level">95%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Maya</span>
+                            <span class="skill-level">80%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Substance Painter</span>
+                            <span class="skill-level">85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-2xl font-bold mb-6">Programming</h3>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">C#</span>
+                            <span class="skill-level">90%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">C++</span>
+                            <span class="skill-level">85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Python</span>
+                            <span class="skill-level">80%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-2xl font-bold mb-6">Design</h3>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Game Design</span>
+                            <span class="skill-level">90%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">Level Design</span>
+                            <span class="skill-level">85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-header">
+                            <span class="skill-name">UI/UX Design</span>
+                            <span class="skill-level">75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <h3 class="text-2xl font-bold mb-8">Additional Tools & Technologies</h3>
+                <div class="tools-grid">
+                    <span class="tool-tag">Git</span>
+                    <span class="tool-tag">Perforce</span>
+                    <span class="tool-tag">Jira</span>
+                    <span class="tool-tag">Photoshop</span>
+                    <span class="tool-tag">After Effects</span>
+                    <span class="tool-tag">ZBrush</span>
+                    <span class="tool-tag">Houdini</span>
+                    <span class="tool-tag">Shader Graph</span>
+                    <span class="tool-tag">Blueprint</span>
+                    <span class="tool-tag">Motion Capture</span>
+                    <span class="tool-tag">Audio Design</span>
+                    <span class="tool-tag">Version Control</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="text-center mb-12">
+                <h2 class="section-title">
+                    Get In <span class="primary relative">Touch</span>
+                </h2>
+            </div>
+
+            <div class="contact-content">
+                <div>
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold mb-4">Let's Create Something Amazing</h3>
+                        <p class="text-lg" style="color: var(--muted-foreground);">
+                            Whether you have a project in mind or just want to chat about game development, 
+                            I'd love to hear from you. Let's bring your vision to life!
+                        </p>
+                    </div>
+
+                    <div class="mb-8">
+                        <div class="contact-info">
+                            <div class="contact-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-semibold mb-1">Email</div>
+                                <a href="mailto:hello@gamedev.com" style="color: var(--muted-foreground); text-decoration: none;">
+                                    hello@gamedev.com
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="contact-info">
+                            <div class="contact-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-semibold mb-1">Phone</div>
+                                <a href="tel:+1234567890" style="color: var(--muted-foreground); text-decoration: none;">
+                                    +1 (234) 567-890
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="contact-info">
+                            <div class="contact-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-semibold mb-1">Location</div>
+                                <div style="color: var(--muted-foreground);">Available for remote work worldwide</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <p style="color: var(--muted-foreground); margin-bottom: 0.5rem;">Response time: Usually within 24 hours</p>
+                        <div class="status-indicator">
+                            <span class="status-dot"></span>
+                            Available for new projects
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <form onsubmit="handleFormSubmit(event)">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" id="name" class="form-input" placeholder="Your name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-input" placeholder="your.email@example.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea id="message" class="form-input form-textarea" placeholder="Tell me about your project..." required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary" style="width: 100%;">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Projects data
+        const projects = [
+            {
+                id: 1,
+                title: "Fantasy RPG Adventure",
+                description: "Open-world RPG with dynamic combat system and quest mechanics.",
+                category: "Games",
+                image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80",
+                tags: ["Unity", "C#", "Blender"]
+            },
+            {
+                id: 2,
+                title: "Sci-Fi Character Model",
+                description: "High-poly futuristic character with PBR textures and rigging.",
+                category: "3D Models",
+                image: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&q=80",
+                tags: ["Blender", "Substance Painter"]
+            },
+            {
+                id: 3,
+                title: "Combat Animation Set",
+                description: "Full combat animation set with smooth transitions and impacts.",
+                category: "Animations",
+                image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80",
+                tags: ["Maya", "Motion Capture"]
+            },
+            {
+                id: 4,
+                title: "Puzzle Platformer",
+                description: "2D puzzle game with innovative mechanics and stylized art.",
+                category: "Games",
+                image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&q=80",
+                tags: ["Unity", "C#"]
+            },
+            {
+                id: 5,
+                title: "Environment Assets Pack",
+                description: "Modular environment pieces for fantasy and medieval settings.",
+                category: "3D Models",
+                image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80",
+                tags: ["Blender", "Texturing"]
+            },
+            {
+                id: 6,
+                title: "Cinematic Cutscene",
+                description: "Story-driven animated sequence with camera work and effects.",
+                category: "Animations",
+                image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
+                tags: ["Unreal Engine", "Sequencer"]
+            }
+        ];
+
+        let currentFilter = 'All';
+
+        // Smooth scrolling function
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                closeMobileMenu();
+            }
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileNav = document.getElementById('mobileNav');
+            mobileNav.classList.toggle('open');
+        }
+
+        function closeMobileMenu() {
+            const mobileNav = document.getElementById('mobileNav');
+            mobileNav.classList.remove('open');
+        }
+
+        // Project filtering
+        function filterProjects(category) {
+            currentFilter = category;
+            
+            // Update filter buttons
+            const buttons = document.querySelectorAll('.filter-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+                if (button.textContent === category) {
+                    button.classList.add('active');
+                }
+            });
+
+            // Filter and display projects
+            const filteredProjects = category === 'All' ? projects : projects.filter(p => p.category === category);
+            displayProjects(filteredProjects);
+        }
+
+        // Display projects
+        function displayProjects(projectsToShow) {
+            const grid = document.getElementById('projectsGrid');
+            grid.innerHTML = projectsToShow.map(project => `
+                <div class="project-card">
+                    <div class="relative">
+                        <img src="${project.image}" alt="${project.title}" class="project-image">
+                        <div class="category-badge">${project.category}</div>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">${project.title}</h3>
+                        <p class="project-description">${project.description}</p>
+                        <div class="project-tags">
+                            ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Form submission
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            // Simple form validation and feedback
+            if (name && email && message) {
+                alert('Message sent successfully! I\'ll get back to you soon.');
+                
+                // Reset form
+                document.getElementById('name').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('message').value = '';
+            }
+        }
+
+        // Falling blocks animation
+        function initFallingBlocks() {
+            const canvas = document.getElementById('fallingBlocks');
+            const ctx = canvas.getContext('2d');
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const colors = ['#06b6d4', '#0891b2', '#0e7490', '#155e75'];
+            const blocks = [];
+
+            // Create initial blocks
+            for (let i = 0; i < 15; i++) {
+                blocks.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * -canvas.height,
+                    size: 20 + Math.random() * 30,
+                    speed: 0.5 + Math.random() * 1.5,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.02,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                blocks.forEach(block => {
+                    ctx.save();
+                    ctx.translate(block.x + block.size / 2, block.y + block.size / 2);
+                    ctx.rotate(block.rotation);
+
+                    // Draw block with glow effect
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = block.color;
+                    ctx.fillStyle = block.color + '40';
+                    ctx.fillRect(-block.size / 2, -block.size / 2, block.size, block.size);
+
+                    // Draw border
+                    ctx.strokeStyle = block.color;
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(-block.size / 2, -block.size / 2, block.size, block.size);
+
+                    ctx.restore();
+
+                    // Update position
+                    block.y += block.speed;
+                    block.rotation += block.rotationSpeed;
+
+                    // Reset block when it goes off screen
+                    if (block.y > canvas.height + block.size) {
+                        block.y = -block.size;
+                        block.x = Math.random() * canvas.width;
+                        block.rotation = Math.random() * Math.PI * 2;
+                    }
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // Mouse trail animation
+        function initMouseTrail() {
+            const canvas = document.getElementById('mouseTrail');
+            const ctx = canvas.getContext('2d');
+            const points = [];
+            let mouse = { x: 0, y: 0 };
+
+            function setCanvasSize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            setCanvasSize();
+            window.addEventListener('resize', setCanvasSize);
+
+            // Track mouse movement
+            window.addEventListener('mousemove', (e) => {
+                mouse = { x: e.clientX, y: e.clientY };
+                
+                points.push({
+                    x: e.clientX,
+                    y: e.clientY,
+                    age: 0
+                });
+
+                if (points.length > 30) {
+                    points.shift();
+                }
+            });
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Update points
+                for (let i = points.length - 1; i >= 0; i--) {
+                    points[i].age += 1;
+                    if (points[i].age > 30) {
+                        points.splice(i, 1);
+                    }
+                }
+
+                if (points.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(points[0].x, points[0].y);
+
+                    for (let i = 1; i < points.length; i++) {
+                        const point = points[i];
+                        const prevPoint = points[i - 1];
+                        
+                        const xc = (point.x + prevPoint.x) / 2;
+                        const yc = (point.y + prevPoint.y) / 2;
+                        ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, xc, yc);
+                    }
+
+                    const gradient = ctx.createLinearGradient(
+                        points[0].x, points[0].y,
+                        points[points.length - 1].x, points[points.length - 1].y
+                    );
+                    
+                    gradient.addColorStop(0, 'rgba(6, 182, 212, 0)');
+                    gradient.addColorStop(0.5, 'rgba(6, 182, 212, 0.5)');
+                    gradient.addColorStop(1, 'rgba(6, 182, 212, 0.8)');
+
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.stroke();
+
+                    // Draw dots
+                    points.forEach((point) => {
+                        const opacity = 1 - point.age / 30;
+                        const size = 3 * (1 - point.age / 30);
+                        
+                        ctx.beginPath();
+                        ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(6, 182, 212, ${opacity})`;
+                        ctx.fill();
+                        
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = 'rgba(6, 182, 212, 0.5)';
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    });
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize projects
+            displayProjects(projects);
+            
+            // Initialize animations
+            initFallingBlocks();
+            initMouseTrail();
+            
+            // Animate progress bars when they come into view
+            const observeProgressBars = () => {
+                const progressBars = document.querySelectorAll('.progress-fill');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.width = entry.target.style.width;
+                        }
+                    });
+                });
+                
+                progressBars.forEach(bar => observer.observe(bar));
+            };
+            
+            observeProgressBars();
+        });
+    </script>
 </body>
-
 </html>
