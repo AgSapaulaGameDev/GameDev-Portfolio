@@ -5031,34 +5031,22 @@ void ACutsceneManager::PlayCutscene()
         ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.fillRect(20, 25, 200 * healthPercent, 6);
         
-        // Enhanced text with shadows
-        ctx.fillStyle = '#000000';
-        ctx.font = '14px Arial';
-        ctx.fillText(`Health: ${character.health}/${character.maxHealth}`, 26, 39);
-        
+        // Enhanced text without shadows
         ctx.fillStyle = colors.uiText;
+        ctx.font = '14px Arial';
         ctx.fillText(`Health: ${character.health}/${character.maxHealth}`, 25, 38);
         
         // Score with enhanced styling
-        ctx.fillStyle = '#000000';
-        ctx.fillText(`Score: ${character.score}`, 26, 58);
-        
         ctx.fillStyle = colors.coin;
         ctx.fillText(`Score: ${character.score}`, 25, 57);
         
         // Status indicators with better styling
         if (character.invulnerable) {
-          ctx.fillStyle = '#000000';
-          ctx.fillText('INVULNERABLE', 26, 77);
-          
           ctx.fillStyle = colors.attack;
           ctx.fillText('INVULNERABLE', 25, 76);
         }
         
         if (character.attacking) {
-          ctx.fillStyle = '#000000';
-          ctx.fillText('ATTACKING!', 141, 77);
-          
           ctx.fillStyle = colors.healthBad;
           ctx.fillText('ATTACKING!', 140, 76);
         }
@@ -5074,10 +5062,6 @@ void ACutsceneManager::PlayCutscene()
         const scale = 0.4;
         const w = 20;
         const h = 25;
-        
-        // Shadow
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.fillRect(x + 2, y + h - 1, w - 4, 2);
         
         // Head
         ctx.fillStyle = colors.characterSkin;
