@@ -672,100 +672,6 @@
         bottom: 0.1rem;
       }
 
-      /* Project preview modal spacing tweak for mobile */
-      .hero-social {
-        margin-bottom: 4rem;
-      }
-
-
-    /* Project preview modal */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(2,6,23,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      padding: 1rem;
-    }
-
-    .modal-backdrop.open {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--card);
-      color: var(--card-foreground);
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
-      max-width: 900px;
-      width: 100%;
-      max-height: 90vh;
-      overflow: auto;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      position: relative;
-      padding: 1rem;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: transparent;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-
-    .modal-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      align-items: start;
-    }
-
-    .modal-image {
-      width: 100%;
-      height: auto;
-      border-radius: 0.5rem;
-      object-fit: cover;
-      border: 1px solid var(--border);
-    }
-
-    .modal-content h3 {
-      margin-top: 0;
-      color: var(--primary);
-    }
-
-    .modal-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-    }
-
-    .modal-tag {
-      background: transparent;
-      color: var(--primary);
-      border: 1px solid hsla(188, 95%, 50%, 0.5);
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.375rem;
-      font-size: 0.875rem;
-    }
-
-    @media (max-width: 600px) {
-      .modal-grid { grid-template-columns: 1fr; }
-      .modal { padding: 0.75rem; }
-      .modal-close { top: 0.35rem; right: 0.35rem; }
-    }
       .hero-social {
         margin-bottom: 4rem;
       }
@@ -849,7 +755,7 @@
       bottom: 0;
       background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(8px);
-      z-index: 100;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -859,200 +765,247 @@
       transition: all 0.3s ease;
     }
 
-    .modal-overlay.show {
+    .modal-overlay.active {
       opacity: 1;
       visibility: visible;
     }
 
-    .modal-content {
+    .modal {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      max-width: 800px;
+      max-width: 90vw;
       max-height: 90vh;
-      width: 100%;
+      width: 800px;
       overflow-y: auto;
       position: relative;
-      transform: scale(0.9) translateY(2rem);
+      transform: scale(0.8);
       transition: transform 0.3s ease;
     }
 
-    .modal-overlay.show .modal-content {
-      transform: scale(1) translateY(0);
+    .modal-overlay.active .modal {
+      transform: scale(1);
     }
 
-    .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: rgba(0, 0, 0, 0.5);
-      border: none;
-      color: var(--foreground);
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      transition: all 0.3s;
-    }
-
-    .modal-close:hover {
-      background: rgba(0, 0, 0, 0.8);
-      color: var(--primary);
-    }
-
-    .modal-image {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-      border-radius: var(--radius) var(--radius) 0 0;
-    }
-
-    .modal-body {
+    .modal-header {
       padding: 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .modal-title {
-      font-size: 1.75rem;
+      font-size: 1.5rem;
       font-weight: bold;
-      margin-bottom: 1rem;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--foreground);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: var(--radius);
+      transition: background 0.3s;
+    }
+
+    .modal-close:hover {
+      background: var(--secondary);
+    }
+
+    .modal-content {
+      padding: 2rem;
+    }
+
+    .modal-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-tab {
+      background: none;
+      border: none;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+      font-size: 1rem;
+    }
+
+    .modal-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .modal-tab:hover {
       color: var(--foreground);
     }
 
-    .modal-category {
-      display: inline-block;
-      background: var(--primary);
-      color: var(--primary-foreground);
-      padding: 0.25rem 0.75rem;
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .project-detail-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
       border-radius: var(--radius);
-      font-size: 0.875rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-description {
-      font-size: 1.125rem;
-      color: var(--muted-foreground);
-      line-height: 1.6;
-      margin-bottom: 2rem;
-    }
-
-    .modal-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .modal-tag {
-      background: transparent;
-      color: var(--primary);
-      border: 1px solid hsla(188, 95%, 50%, 0.5);
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius);
-      font-size: 0.875rem;
-    }
-
-    .modal-details {
-      background: var(--secondary);
-      padding: 1.5rem;
-      border-radius: var(--radius);
-      margin-bottom: 2rem;
-    }
-
-    .modal-details h4 {
-      font-size: 1.25rem;
-      font-weight: bold;
       margin-bottom: 1rem;
-      color: var(--primary);
     }
 
-    .modal-details-grid {
+    .image-gallery {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
+      margin-bottom: 1rem;
     }
 
-    .modal-detail-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .modal-detail-label {
-      font-size: 0.875rem;
-      color: var(--muted-foreground);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .modal-detail-value {
-      font-weight: 500;
-      color: var(--foreground);
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .modal-btn {
-      flex: 1;
-      min-width: 150px;
-      padding: 0.75rem 1.5rem;
+    .gallery-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
       border-radius: var(--radius);
-      font-size: 1rem;
       cursor: pointer;
-      transition: all 0.3s;
-      text-decoration: none;
-      text-align: center;
-      display: inline-block;
+      transition: transform 0.3s;
     }
 
-    .modal-btn-primary {
+    .gallery-image:hover {
+      transform: scale(1.05);
+    }
+
+    .video-container {
+      width: 100%;
+      height: 300px;
+      background: var(--secondary);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .video-placeholder {
+      text-align: center;
+      color: var(--muted-foreground);
+    }
+
+    .code-block {
+      background: var(--secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      overflow-x: auto;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-language {
+      font-size: 0.875rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .copy-button {
       background: var(--primary);
       color: var(--primary-foreground);
       border: none;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 0.3s;
     }
 
-    .modal-btn-primary:hover {
+    .copy-button:hover {
       background: hsl(188, 95%, 45%);
-      box-shadow: 0 0 20px hsla(188, 95%, 50%, 0.5);
     }
 
-    .modal-btn-secondary {
+    .code-content {
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--foreground);
+      white-space: pre-wrap;
+    }
+
+    .project-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .project-link {
+      background: var(--primary);
+      color: var(--primary-foreground);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .project-link:hover {
+      background: hsl(188, 95%, 45%);
+      box-shadow: 0 0 30px hsla(188, 95%, 50%, 0.5);
+    }
+
+    .project-link.secondary {
       background: transparent;
       color: var(--primary);
       border: 1px solid var(--primary);
     }
 
-    .modal-btn-secondary:hover {
+    .project-link.secondary:hover {
       background: hsla(188, 95%, 50%, 0.1);
     }
 
     @media (max-width: 768px) {
+      .modal {
+        width: 95vw;
+        max-height: 95vh;
+      }
+
+      .modal-header {
+        padding: 1rem;
+      }
+
       .modal-content {
-        margin: 1rem;
-        max-height: calc(100vh - 2rem);
+        padding: 1rem;
       }
 
-      .modal-image {
-        height: 200px;
+      .modal-tabs {
+        flex-wrap: wrap;
       }
 
-      .modal-body {
-        padding: 1.5rem;
-      }
-
-      .modal-actions {
+      .project-links {
         flex-direction: column;
-      }
-
-      .modal-btn {
-        min-width: auto;
       }
     }
   </style>
@@ -1149,24 +1102,6 @@
     </div>
   </section>
 
-  <!-- Project preview modal -->
-  <div id="projectModalBackdrop" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
-      <button class="modal-close" id="projectModalClose" aria-label="Close preview">×</button>
-
-      <div class="modal-grid">
-        <div>
-          <img id="projectModalImage" src="" alt="" class="modal-image">
-        </div>
-        <div class="modal-content">
-          <h3 id="projectModalTitle">Project Title</h3>
-          <p id="projectModalDescription">Project description goes here.</p>
-          <div id="projectModalTags" class="modal-tags"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- About Section -->
   <section id="about" class="section">
     <div class="container">
@@ -1254,43 +1189,70 @@
 
   <!-- Project Modal -->
   <div id="projectModal" class="modal-overlay">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeProjectModal()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-      <img id="modalImage" class="modal-image" src="" alt="">
-      <div class="modal-body">
-        <h3 id="modalTitle" class="modal-title"></h3>
-        <span id="modalCategory" class="modal-category"></span>
-        <p id="modalDescription" class="modal-description"></p>
-        <div id="modalTags" class="modal-tags"></div>
-        <div class="modal-details">
-          <h4>Project Details</h4>
-          <div class="modal-details-grid">
-            <div class="modal-detail-item">
-              <span class="modal-detail-label">Status</span>
-              <span id="modalStatus" class="modal-detail-value"></span>
-            </div>
-            <div class="modal-detail-item">
-              <span class="modal-detail-label">Duration</span>
-              <span id="modalDuration" class="modal-detail-value"></span>
-            </div>
-            <div class="modal-detail-item">
-              <span class="modal-detail-label">Team Size</span>
-              <span id="modalTeamSize" class="modal-detail-value"></span>
-            </div>
-            <div class="modal-detail-item">
-              <span class="modal-detail-label">Platform</span>
-              <span id="modalPlatform" class="modal-detail-value"></span>
-            </div>
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">Project Title</h2>
+        <button class="modal-close" onclick="closeProjectModal()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="modal-content">
+        <div class="modal-tabs">
+          <button class="modal-tab active" onclick="switchTab('overview')">Overview</button>
+          <button class="modal-tab" onclick="switchTab('images')">Images</button>
+          <button class="modal-tab" onclick="switchTab('videos')">Videos</button>
+          <button class="modal-tab" onclick="switchTab('code')">Code</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overviewTab" class="tab-content active">
+          <img id="modalMainImage" src="" alt="" class="project-detail-image">
+          <p id="modalDescription" class="text-lg mb-4" style="color: var(--muted-foreground);"></p>
+          <div id="modalTags" class="project-tags mb-4"></div>
+          <div id="modalFeatures"></div>
+          <div class="project-links">
+            <a href="#" class="project-link" id="liveDemoLink">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15,3 21,3 21,9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              Live Demo
+            </a>
+            <a href="#" class="project-link secondary" id="sourceCodeLink">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+              Source Code
+            </a>
           </div>
         </div>
-        <div class="modal-actions">
-          <a id="modalLiveLink" class="modal-btn modal-btn-primary" href="#" target="_blank">View Live Demo</a>
-          <a id="modalCodeLink" class="modal-btn modal-btn-secondary" href="#" target="_blank">View Source Code</a>
+
+        <!-- Images Tab -->
+        <div id="imagesTab" class="tab-content">
+          <div id="imageGallery" class="image-gallery"></div>
+        </div>
+
+        <!-- Videos Tab -->
+        <div id="videosTab" class="tab-content">
+          <div id="videoContainer" class="video-container">
+            <div class="video-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5,3 19,12 5,21"></polygon>
+              </svg>
+              <p>Project demo video will be available soon</p>
+            </div>
+          </div>
+          <p style="color: var(--muted-foreground);">Gameplay footage and development process videos showcase the project in action.</p>
+        </div>
+
+        <!-- Code Tab -->
+        <div id="codeTab" class="tab-content">
+          <div id="codeBlocks"></div>
         </div>
       </div>
     </div>
@@ -1557,91 +1519,623 @@
         id: 1,
         title: "Fantasy RPG Adventure",
         description: "Open-world RPG with dynamic combat system and quest mechanics.",
-        fullDescription: "A comprehensive fantasy RPG featuring an expansive open world, dynamic combat system, and intricate quest mechanics. Players can explore vast landscapes, engage in real-time combat with magical abilities, and make choices that impact the story. The game includes character progression, crafting systems, and multiplayer dungeons. Built with advanced AI for NPCs and dynamic weather systems that affect gameplay.",
         category: "Games",
         image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80",
         tags: ["Unity", "C#", "Blender"],
-        status: "Completed",
-        duration: "8 months",
-        teamSize: "5 developers",
-        platform: "PC, Console",
-        liveLink: "https://example.com/fantasy-rpg",
-        codeLink: "https://github.com/example/fantasy-rpg"
+        fullDescription: "An immersive open-world RPG featuring a dynamic combat system, branching questlines, and rich character development. Players explore a vast fantasy world filled with ancient mysteries, dangerous creatures, and epic adventures. The game features real-time combat with magical abilities, crafting systems, and multiple storyline paths that respond to player choices.",
+        features: [
+          "Dynamic real-time combat system with combo attacks",
+          "Open-world exploration with 50+ unique locations",
+          "Character progression with multiple skill trees",
+          "Crafting system with 200+ recipes",
+          "Branching storylines with multiple endings",
+          "Co-op multiplayer support for up to 4 players"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80",
+          "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&q=80",
+          "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80"
+        ],
+        code: [
+          {
+            language: "C#",
+            title: "Player Controller",
+            content: `public class PlayerController : MonoBehaviour
+{
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float jumpForce = 10f;
+    private Rigidbody rb;
+    private bool isGrounded;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
+    void Update()
+    {
+        HandleMovement();
+        HandleJump();
+    }
+
+    private void HandleMovement()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        
+        Vector3 movement = new Vector3(horizontal, 0, vertical) * moveSpeed;
+        rb.velocity = new Vector3(movement.x, rb.velocity.y, movement.z);
+    }
+
+    private void HandleJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Combat System",
+            content: `public class CombatSystem : MonoBehaviour
+{
+    [SerializeField] private int maxHealth = 100;
+    [SerializeField] private int currentHealth;
+    [SerializeField] private int attackDamage = 25;
+    
+    public UnityEvent OnHealthChanged;
+    public UnityEvent OnDeath;
+
+    void Start()
+    {
+        currentHealth = maxHealth;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        
+        OnHealthChanged.Invoke();
+        
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    public void Attack(GameObject target)
+    {
+        CombatSystem targetCombat = target.GetComponent<CombatSystem>();
+        if (targetCombat != null)
+        {
+            targetCombat.TakeDamage(attackDamage);
+        }
+    }
+
+    private void Die()
+    {
+        OnDeath.Invoke();
+        // Handle death logic
+    }
+}`
+          }
+        ],
+        liveDemo: "https://example.com/rpg-demo",
+        sourceCode: "https://github.com/example/fantasy-rpg"
       },
       {
         id: 2,
         title: "Sci-Fi Character Model",
         description: "High-poly futuristic character with PBR textures and rigging.",
-        fullDescription: "A meticulously crafted sci-fi character model featuring high-polygon geometry, physically-based rendering (PBR) textures, and professional rigging for animation. The character includes multiple texture sets, detailed facial expressions, and modular armor pieces. Created using industry-standard workflows with attention to topology, UV mapping, and material definition for optimal performance in real-time engines.",
         category: "3D Models",
         image: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&q=80",
         tags: ["Blender", "Substance Painter"],
-        status: "Completed",
-        duration: "3 weeks",
-        teamSize: "1 artist",
-        platform: "Unity, Unreal",
-        liveLink: "https://sketchfab.com/example/sci-fi-character",
-        codeLink: "https://github.com/example/character-assets"
+        fullDescription: "A highly detailed sci-fi character model created for next-gen game engines. Features advanced PBR materials, detailed facial rigging for animations, and modular armor components. The character is optimized for real-time rendering while maintaining high visual fidelity.",
+        features: [
+          "High-poly base mesh with clean topology",
+          "PBR textures at 4K resolution",
+          "Facial rigging with 50+ blend shapes",
+          "Modular armor system with 12 variants",
+          "LOD models for performance optimization",
+          "Compatible with Unity and Unreal Engine"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&q=80",
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80",
+          "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80"
+        ],
+        code: [
+          {
+            language: "Python",
+            title: "Blender Automation Script",
+            content: `import bpy
+import bmesh
+
+def create_character_base():
+    # Clear existing mesh
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete(use_global=False)
+    
+    # Add base mesh
+    bpy.ops.mesh.primitive_cube_add()
+    obj = bpy.context.active_object
+    
+    # Enter edit mode and create base topology
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode='EDIT')
+    
+    # Subdivide for detail
+    bpy.ops.mesh.subdivide(number_cuts=3)
+    
+    # Apply subdivision surface modifier
+    bpy.ops.object.mode_set(mode='OBJECT')
+    modifier = obj.modifiers.new(name="SubSurf", type='SUBSURF')
+    modifier.levels = 2
+    
+    return obj
+
+def setup_materials():
+    # Create PBR material
+    mat = bpy.data.materials.new(name="CharacterMaterial")
+    mat.use_nodes = True
+    
+    # Get material nodes
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    
+    # Clear default nodes
+    nodes.clear()
+    
+    # Add Principled BSDF
+    bsdf = nodes.new(type='ShaderNodeBsdfPrincipled')
+    output = nodes.new(type='ShaderNodeOutputMaterial')
+    
+    # Link BSDF to output
+    links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
+    
+    return mat
+
+# Execute script
+character = create_character_base()
+material = setup_materials()
+character.data.materials.append(material)`
+          }
+        ],
+        liveDemo: "https://sketchfab.com/3d-models/sci-fi-character",
+        sourceCode: "https://github.com/example/sci-fi-character"
       },
       {
         id: 3,
         title: "Combat Animation Set",
         description: "Full combat animation set with smooth transitions and impacts.",
-        fullDescription: "A comprehensive combat animation package featuring over 50 unique animations including attacks, blocks, dodges, and special moves. Each animation is hand-crafted with attention to timing, weight, and impact. The set includes seamless transition animations, root motion data, and integration scripts for popular game engines. Motion capture data was refined and enhanced for stylized combat gameplay.",
         category: "Animations",
         image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80",
         tags: ["Maya", "Motion Capture"],
-        status: "Completed",
-        duration: "6 weeks",
-        teamSize: "2 animators",
-        platform: "Unity, Unreal",
-        liveLink: "https://example.com/combat-animations",
-        codeLink: "https://github.com/example/combat-system"
+        fullDescription: "Professional combat animation package featuring fluid martial arts sequences, weapon combat, and impact reactions. Created using motion capture data and refined through keyframe animation for game-ready implementation.",
+        features: [
+          "24 unique combat animations",
+          "Seamless transition system",
+          "Root motion compatibility",
+          "Impact and reaction animations",
+          "Weapon-specific movesets",
+          "Optimized for game engines"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80",
+          "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
+          "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&q=80"
+        ],
+        code: [
+          {
+            language: "MEL",
+            title: "Animation Export Script",
+            content: `// Maya MEL script for batch animation export
+
+global proc exportAnimations() {
+    string $animations[] = {
+        "idle",
+        "walk",
+        "run",
+        "attack_combo1",
+        "attack_combo2",
+        "block",
+        "dodge_left",
+        "dodge_right",
+        "hit_reaction"
+    };
+    
+    string $exportPath = "C:/Projects/Animations/";
+    
+    for ($anim in $animations) {
+        // Set time range for animation
+        int $startFrame = getStartFrame($anim);
+        int $endFrame = getEndFrame($anim);
+        
+        playbackOptions -min $startFrame -max $endFrame;
+        currentTime $startFrame;
+        
+        // Export FBX
+        string $fileName = $exportPath + $anim + ".fbx";
+        FBXExport -f $fileName;
+        
+        print("Exported: " + $anim + "\\n");
+    }
+}
+
+global proc int getStartFrame(string $animName) {
+    // Return start frame based on animation name
+    if ($animName == "idle") return 1;
+    if ($animName == "walk") return 30;
+    if ($animName == "run") return 60;
+    // Add more mappings as needed
+    return 1;
+}
+
+global proc int getEndFrame(string $animName) {
+    // Return end frame based on animation name
+    if ($animName == "idle") return 29;
+    if ($animName == "walk") return 59;
+    if ($animName == "run") return 89;
+    // Add more mappings as needed
+    return 30;
+}
+
+// Execute export
+exportAnimations();`
+          }
+        ],
+        liveDemo: "https://example.com/animation-preview",
+        sourceCode: "https://github.com/example/combat-animations"
       },
       {
         id: 4,
         title: "Puzzle Platformer",
         description: "2D puzzle game with innovative mechanics and stylized art.",
-        fullDescription: "An innovative 2D puzzle platformer that challenges players with unique mechanics involving gravity manipulation, time control, and perspective shifts. Features hand-drawn art style with fluid animations and atmospheric sound design. The game includes 60+ levels, each introducing new puzzle elements and mechanics. Built with accessibility features and multiple difficulty modes to accommodate different player preferences.",
         category: "Games",
         image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&q=80",
         tags: ["Unity", "C#"],
-        status: "In Development",
-        duration: "4 months",
-        teamSize: "3 developers",
-        platform: "PC, Mobile",
-        liveLink: "https://example.com/puzzle-platformer",
-        codeLink: "https://github.com/example/puzzle-game"
+        fullDescription: "An innovative 2D puzzle platformer that challenges players with gravity-defying mechanics and mind-bending level design. Features hand-drawn art style and a compelling narrative about perception and reality.",
+        features: [
+          "40 unique puzzle levels",
+          "Gravity manipulation mechanics",
+          "Hand-drawn artistic style",
+          "Environmental storytelling",
+          "Dynamic difficulty adjustment",
+          "Speedrun mode with leaderboards"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&q=80",
+          "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80",
+          "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80"
+        ],
+        code: [
+          {
+            language: "C#",
+            title: "Gravity Controller",
+            content: `public class GravityController : MonoBehaviour
+{
+    public static GravityController Instance;
+    
+    [SerializeField] private float gravityStrength = 9.81f;
+    private Vector2 currentGravity = Vector2.down;
+    private List<Rigidbody2D> affectedBodies = new List<Rigidbody2D>();
+    
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+    
+    void Start()
+    {
+        Physics2D.gravity = currentGravity * gravityStrength;
+    }
+    
+    public void RotateGravity(float angle)
+    {
+        float radians = angle * Mathf.Deg2Rad;
+        currentGravity = new Vector2(
+            Mathf.Sin(radians),
+            -Mathf.Cos(radians)
+        );
+        
+        Physics2D.gravity = currentGravity * gravityStrength;
+        OnGravityChanged();
+    }
+    
+    private void OnGravityChanged()
+    {
+        // Notify all gravity-affected objects
+        foreach (var body in affectedBodies)
+        {
+            if (body != null)
+            {
+                var gravityAffected = body.GetComponent<GravityAffected>();
+                gravityAffected?.OnGravityChange(currentGravity);
+            }
+        }
+    }
+    
+    public void RegisterBody(Rigidbody2D body)
+    {
+        if (!affectedBodies.Contains(body))
+        {
+            affectedBodies.Add(body);
+        }
+    }
+    
+    public void UnregisterBody(Rigidbody2D body)
+    {
+        affectedBodies.Remove(body);
+    }
+}`
+          }
+        ],
+        liveDemo: "https://example.com/puzzle-game",
+        sourceCode: "https://github.com/example/puzzle-platformer"
       },
       {
         id: 5,
         title: "Environment Assets Pack",
         description: "Modular environment pieces for fantasy and medieval settings.",
-        fullDescription: "A comprehensive collection of modular environment assets designed for fantasy and medieval game settings. Includes over 100 pieces such as walls, floors, props, vegetation, and architectural elements. All assets are optimized for performance with LOD models and efficient texture atlases. The pack supports both stylized and realistic art styles with customizable materials and weather variants.",
         category: "3D Models",
         image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80",
         tags: ["Blender", "Texturing"],
-        status: "Completed",
-        duration: "10 weeks",
-        teamSize: "2 artists",
-        platform: "Unity, Unreal",
-        liveLink: "https://assetstore.unity.com/example/environment-pack",
-        codeLink: "https://github.com/example/environment-assets"
+        fullDescription: "A comprehensive collection of modular 3D environment assets designed for fantasy and medieval game settings. Includes buildings, props, vegetation, and terrain pieces that can be combined to create diverse game worlds.",
+        features: [
+          "100+ modular building pieces",
+          "Seamless tileable textures",
+          "Multiple texture variations",
+          "Optimized for mobile and desktop",
+          "Unity and Unreal prefabs included",
+          "Customizable material system"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80",
+          "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
+          "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80"
+        ],
+        code: [
+          {
+            language: "Python",
+            title: "Asset Batch Processor",
+            content: `import bpy
+import os
+from mathutils import Vector
+
+def batch_process_assets():
+    """Process all assets in the scene for game optimization"""
+    
+    assets_path = "D:/GameAssets/Environment/"
+    export_path = "D:/GameAssets/Processed/"
+    
+    # Ensure export directory exists
+    os.makedirs(export_path, exist_ok=True)
+    
+    for obj in bpy.context.scene.objects:
+        if obj.type == 'MESH':
+            process_mesh_asset(obj, export_path)
+    
+    print("Batch processing complete!")
+
+def process_mesh_asset(obj, export_path):
+    """Process individual mesh asset"""
+    
+    # Select only this object
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    
+    # Apply modifiers
+    apply_modifiers(obj)
+    
+    # Optimize geometry
+    optimize_mesh(obj)
+    
+    # Generate LODs
+    generate_lods(obj)
+    
+    # Setup materials
+    setup_game_materials(obj)
+    
+    # Export
+    filename = f"{obj.name}.fbx"
+    filepath = os.path.join(export_path, filename)
+    
+    bpy.ops.export_scene.fbx(
+        filepath=filepath,
+        use_selection=True,
+        object_types={'MESH'},
+        use_mesh_modifiers=True
+    )
+
+def optimize_mesh(obj):
+    """Optimize mesh for game performance"""
+    
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode='EDIT')
+    
+    # Remove doubles
+    bpy.ops.mesh.remove_doubles(threshold=0.001)
+    
+    # Recalculate normals
+    bpy.ops.mesh.normals_make_consistent(inside=False)
+    
+    # Triangulate for consistency
+    bpy.ops.mesh.quads_convert_to_tris()
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+def generate_lods(obj):
+    """Generate Level of Detail variants"""
+    
+    lod_levels = [0.75, 0.5, 0.25]  # Reduction ratios
+    
+    for i, ratio in enumerate(lod_levels):
+        # Duplicate object for LOD
+        lod_obj = obj.copy()
+        lod_obj.data = obj.data.copy()
+        lod_obj.name = f"{obj.name}_LOD{i+1}"
+        
+        bpy.context.collection.objects.link(lod_obj)
+        
+        # Apply decimation
+        bpy.context.view_layer.objects.active = lod_obj
+        modifier = lod_obj.modifiers.new(name="Decimate", type='DECIMATE')
+        modifier.ratio = ratio
+        
+        # Apply modifier
+        bpy.ops.object.modifier_apply(modifier="Decimate")
+
+# Execute batch processing
+batch_process_assets()`
+          }
+        ],
+        liveDemo: "https://example.com/environment-showcase",
+        sourceCode: "https://github.com/example/environment-assets"
       },
       {
         id: 6,
         title: "Cinematic Cutscene",
         description: "Story-driven animated sequence with camera work and effects.",
-        fullDescription: "A professionally crafted cinematic cutscene showcasing advanced storytelling through visual narrative. Features dynamic camera movements, particle effects, lighting design, and character performances. The sequence demonstrates expertise in cinematography, timing, and emotional pacing. Created using industry-standard tools with full post-production pipeline including color grading and audio integration.",
         category: "Animations",
         image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
         tags: ["Unreal Engine", "Sequencer"],
-        status: "Completed",
-        duration: "5 weeks",
-        teamSize: "4 artists",
-        platform: "PC, Console",
-        liveLink: "https://vimeo.com/example/cinematic-cutscene",
-        codeLink: "https://github.com/example/cutscene-assets"
+        fullDescription: "A dramatic cinematic sequence showcasing advanced storytelling techniques through camera work, lighting, and character animation. Created using Unreal Engine's Sequencer system with custom post-processing effects.",
+        features: [
+          "3-minute cinematic sequence",
+          "Dynamic camera movements",
+          "Professional voice acting",
+          "Custom lighting setups",
+          "Post-processing effects pipeline",
+          "Real-time rendering optimization"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
+          "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80",
+          "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&q=80"
+        ],
+        code: [
+          {
+            language: "Blueprint",
+            title: "Sequencer Controller",
+            content: `// Unreal Engine Blueprint (pseudo-code representation)
+
+Event BeginPlay
+├── Get Level Sequence Actor
+├── Bind to Sequence Events
+└── Setup Camera Blend Settings
+
+Function PlayCutscene(SequenceName)
+├── Disable Player Input
+├── Set Camera Blend Time = 2.0
+├── Play Level Sequence
+└── Bind to Sequence Finished Event
+
+Function OnSequenceFinished
+├── Enable Player Input
+├── Restore Player Camera
+└── Trigger Next Game Event
+
+// Custom camera blend function
+Function SmoothCameraTransition(FromCamera, ToCamera, BlendTime)
+├── Calculate Interpolation Curve
+├── Animate Camera Position
+├── Animate Camera Rotation
+└── Apply Camera Shake if needed
+
+// Lighting control during cutscene
+Function UpdateLighting(TimeStamp)
+├── Get Current Sequence Time
+├── Interpolate Light Intensity
+├── Adjust Post Process Volume
+└── Update Atmospheric Settings`
+          },
+          {
+            language: "C++",
+            title: "Cutscene Manager",
+            content: `#include "Engine/Engine.h"
+#include "LevelSequence.h"
+#include "LevelSequencePlayer.h"
+
+UCLASS()
+class GAME_API ACutsceneManager : public AActor
+{
+    GENERATED_BODY()
+
+public:
+    ACutsceneManager();
+
+protected:
+    virtual void BeginPlay() override;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cutscene")
+    ULevelSequence* CutsceneSequence;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cutscene")
+    ALevelSequenceActor* SequenceActor;
+
+    UFUNCTION(BlueprintCallable, Category = "Cutscene")
+    void PlayCutscene();
+
+    UFUNCTION(BlueprintCallable, Category = "Cutscene")
+    void StopCutscene();
+
+    UFUNCTION()
+    void OnCutsceneFinished();
+
+private:
+    ULevelSequencePlayer* SequencePlayer;
+    APlayerController* PlayerController;
+    
+    void DisablePlayerInput();
+    void EnablePlayerInput();
+    void SetupCameraBlending();
+};
+
+void ACutsceneManager::PlayCutscene()
+{
+    if (CutsceneSequence && SequenceActor)
+    {
+        // Disable player input
+        DisablePlayerInput();
+        
+        // Setup sequence player
+        FMovieSceneSequencePlaybackSettings PlaybackSettings;
+        PlaybackSettings.bAutoPlay = true;
+        PlaybackSettings.bPauseAtEnd = true;
+        
+        SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+            GetWorld(),
+            CutsceneSequence,
+            PlaybackSettings,
+            SequenceActor
+        );
+        
+        if (SequencePlayer)
+        {
+            // Bind to finished event
+            SequencePlayer->OnFinished.AddDynamic(this, &ACutsceneManager::OnCutsceneFinished);
+            
+            // Start playback
+            SequencePlayer->Play();
+        }
+    }
+}`
+          }
+        ],
+        liveDemo: "https://youtube.com/watch?v=example",
+        sourceCode: "https://github.com/example/cinematic-cutscene"
       }
     ];
 
@@ -1689,7 +2183,7 @@
     function displayProjects(projectsToShow) {
       const grid = document.getElementById('projectsGrid');
       grid.innerHTML = projectsToShow.map(project => `
-                <div class="project-card" onclick="openProjectModal(${project.id})" style="cursor: pointer;">
+                <div class="project-card" onclick="openProjectModal(${project.id})">
                     <div class="relative">
                         <img src="${project.image}" alt="${project.title}" class="project-image">
                         <div class="category-badge">${project.category}</div>
@@ -1705,60 +2199,198 @@
             `).join('');
     }
 
-    // Open project modal
+    // Project Modal Functions
     function openProjectModal(projectId) {
       const project = projects.find(p => p.id === projectId);
       if (!project) return;
 
       // Populate modal content
-      document.getElementById('modalImage').src = project.image;
-      document.getElementById('modalImage').alt = project.title;
       document.getElementById('modalTitle').textContent = project.title;
-      document.getElementById('modalCategory').textContent = project.category;
-      document.getElementById('modalDescription').textContent = project.fullDescription;
+      document.getElementById('modalMainImage').src = project.image;
+      document.getElementById('modalMainImage').alt = project.title;
+      document.getElementById('modalDescription').textContent = project.fullDescription || project.description;
       
-      // Populate tags
-      const modalTags = document.getElementById('modalTags');
-      modalTags.innerHTML = project.tags.map(tag => `<span class="modal-tag">${tag}</span>`).join('');
+      // Update tags
+      const tagsContainer = document.getElementById('modalTags');
+      tagsContainer.innerHTML = project.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
       
-      // Populate project details
-      document.getElementById('modalStatus').textContent = project.status;
-      document.getElementById('modalDuration').textContent = project.duration;
-      document.getElementById('modalTeamSize').textContent = project.teamSize;
-      document.getElementById('modalPlatform').textContent = project.platform;
+      // Update features
+      const featuresContainer = document.getElementById('modalFeatures');
+      if (project.features) {
+        featuresContainer.innerHTML = `
+          <div class="mb-4">
+            <h4 class="text-xl font-semibold mb-3">Key Features</h4>
+            <ul style="list-style: disc; margin-left: 1.5rem; color: var(--muted-foreground);">
+              ${project.features.map(feature => `<li class="mb-2">${feature}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      } else {
+        featuresContainer.innerHTML = '';
+      }
+
+      // Update links
+      document.getElementById('liveDemoLink').href = project.liveDemo || '#';
+      document.getElementById('sourceCodeLink').href = project.sourceCode || '#';
+
+      // Populate image gallery
+      populateImageGallery(project.images || [project.image]);
       
-      // Set action links
-      document.getElementById('modalLiveLink').href = project.liveLink;
-      document.getElementById('modalCodeLink').href = project.codeLink;
+      // Populate code blocks
+      populateCodeBlocks(project.code || []);
       
       // Show modal
       const modal = document.getElementById('projectModal');
-      modal.classList.add('show');
-      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Switch to overview tab
+      switchTab('overview');
     }
 
-    // Close project modal
     function closeProjectModal() {
       const modal = document.getElementById('projectModal');
-      modal.classList.remove('show');
-      document.body.style.overflow = 'auto'; // Restore scrolling
+      modal.classList.remove('active');
+      document.body.style.overflow = 'auto';
     }
 
-    // Close modal when clicking outside content
-    document.addEventListener('DOMContentLoaded', function() {
-      const modal = document.getElementById('projectModal');
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-          closeProjectModal();
-        }
-      });
+    function switchTab(tabName) {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      // Remove active class from all tabs
+      const tabs = document.querySelectorAll('.modal-tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      
+      // Show selected tab content
+      const selectedTab = document.getElementById(tabName + 'Tab');
+      if (selectedTab) {
+        selectedTab.classList.add('active');
+      }
+      
+      // Add active class to clicked tab
+      const clickedTab = event?.target;
+      if (clickedTab) {
+        clickedTab.classList.add('active');
+      } else {
+        // If called programmatically, find the tab by onclick attribute
+        tabs.forEach(tab => {
+          if (tab.getAttribute('onclick')?.includes(tabName)) {
+            tab.classList.add('active');
+          }
+        });
+      }
+    }
 
-      // Close modal with escape key
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-          closeProjectModal();
-        }
+    function populateImageGallery(images) {
+      const gallery = document.getElementById('imageGallery');
+      gallery.innerHTML = images.map(image => `
+        <img src="${image}" alt="Project Image" class="gallery-image" onclick="openImagePreview('${image}')">
+      `).join('');
+    }
+
+    function populateCodeBlocks(codeBlocks) {
+      const container = document.getElementById('codeBlocks');
+      
+      if (codeBlocks.length === 0) {
+        container.innerHTML = `
+          <div class="code-block">
+            <div style="text-align: center; color: var(--muted-foreground); padding: 2rem;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem;">
+                <polyline points="16,18 22,12 16,6"></polyline>
+                <polyline points="8,6 2,12 8,18"></polyline>
+              </svg>
+              <p>Source code will be available soon</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = codeBlocks.map((block, index) => `
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-language">${block.language}</span>
+            <button class="copy-button" onclick="copyCodeToClipboard(${index})">Copy</button>
+          </div>
+          <div class="code-content" id="codeContent${index}">${escapeHtml(block.content)}</div>
+          <div style="margin-top: 1rem; font-size: 0.875rem; color: var(--muted-foreground);">
+            ${block.title}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function copyCodeToClipboard(index) {
+      const codeContent = document.getElementById(`codeContent${index}`);
+      const text = codeContent.textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        // Show feedback
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
       });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function openImagePreview(imageSrc) {
+      // Create image preview overlay
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      `;
+      
+      const img = document.createElement('img');
+      img.src = imageSrc;
+      img.style.cssText = `
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+      `;
+      
+      overlay.appendChild(img);
+      document.body.appendChild(overlay);
+      
+      // Close on click
+      overlay.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+      });
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('projectModal').addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-overlay')) {
+        closeProjectModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeProjectModal();
+      }
     });
 
     // Form submission
