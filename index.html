@@ -633,102 +633,6 @@
       opacity: 0.3;
     }
 
-    /* Interactive 3D Cubes Background */
-    .cubes-background {
-      position: absolute;
-      inset: 0;
-      pointer-events: auto;
-      opacity: 0.4;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .cubes-container {
-      position: relative;
-      width: 50%;
-      aspect-ratio: 1 / 1;
-      height: auto;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .cubes-scene {
-      display: grid;
-      width: 100%;
-      height: 100%;
-      column-gap: 5%;
-      row-gap: 5%;
-      perspective: 99999999px;
-      grid-auto-rows: 1fr;
-      grid-template-columns: repeat(10, 1fr);
-      grid-template-rows: repeat(10, 1fr);
-    }
-
-    .cube {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      aspect-ratio: 1 / 1;
-      transform-style: preserve-3d;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.6, 1);
-    }
-
-    .cube::before {
-      content: '';
-      position: absolute;
-      top: -36px;
-      right: -36px;
-      bottom: -36px;
-      left: -36px;
-    }
-
-    .cube-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: hsl(248, 94%, 4%);
-      border: 1px solid hsla(188, 95%, 50%, 0.3);
-      opacity: 1;
-      transition: background-color 0.3s ease;
-    }
-
-    .cube-face--top {
-      transform: translateY(-50%) rotateX(90deg);
-    }
-
-    .cube-face--bottom {
-      transform: translateY(50%) rotateX(-90deg);
-    }
-
-    .cube-face--left {
-      transform: translateX(-50%) rotateY(-90deg);
-    }
-
-    .cube-face--right {
-      transform: translateX(50%) rotateY(90deg);
-    }
-
-    .cube-face--back,
-    .cube-face--front {
-      transform: rotateY(-90deg) translateX(50%) rotateY(90deg);
-    }
-
-    @media (max-width: 768px) {
-      .cubes-container {
-        width: 90%;
-      }
-      
-      .cubes-scene {
-        grid-template-columns: repeat(8, 1fr);
-        grid-template-rows: repeat(8, 1fr);
-      }
-    }
-
     .canvas-trail {
       position: fixed;
       inset: 0;
@@ -1784,7 +1688,7 @@
 
   <!-- Hero Section -->
   <section class="hero">
-    <div id="cubesBackground" class="cubes-background"></div>
+    <canvas id="fallingBlocks" class="canvas-bg"></canvas>
 
     <div class="container hero-content">
       <div class="hero-subtitle">Game Developer & Designer</div>
@@ -3299,219 +3203,114 @@ void ACutsceneManager::PlayCutscene()
       }
     }
 
-    // Interactive 3D Cubes Background
-    function initCubesBackground() {
-      const container = document.getElementById('cubesBackground');
-      if (!container) return;
+    // Falling blocks animation
+    function initFallingBlocks() {
+      const canvas = document.getElementById('fallingBlocks');
+      const ctx = canvas.getContext('2d');
 
-      const gridSize = window.innerWidth <= 768 ? 8 : 10;
-      const maxAngle = 45;
-      const radius = 3;
-      const enterDuration = 300;
-      const leaveDuration = 600;
-
-      // Create cubes container
-      const cubesContainer = document.createElement('div');
-      cubesContainer.className = 'cubes-container';
-      
-      const cubesScene = document.createElement('div');
-      cubesScene.className = 'cubes-scene';
-      cubesScene.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-      cubesScene.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
-
-      // Create cubes
-      for (let r = 0; r < gridSize; r++) {
-        for (let c = 0; c < gridSize; c++) {
-          const cube = document.createElement('div');
-          cube.className = 'cube';
-          cube.dataset.row = r;
-          cube.dataset.col = c;
-
-          // Create cube faces
-          const faces = ['top', 'bottom', 'left', 'right', 'front', 'back'];
-          faces.forEach(face => {
-            const faceElement = document.createElement('div');
-            faceElement.className = `cube-face cube-face--${face}`;
-            cube.appendChild(faceElement);
-          });
-
-          cubesScene.appendChild(cube);
-        }
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
       }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
 
-      cubesContainer.appendChild(cubesScene);
-      container.appendChild(cubesContainer);
-
-      // Animation state
-      let animationFrame = null;
-      let idleTimer = null;
-      let userActive = false;
-      let autoAnimation = { x: 0, y: 0, targetX: 0, targetY: 0 };
-
-      // Initialize auto animation
-      autoAnimation.x = Math.random() * gridSize;
-      autoAnimation.y = Math.random() * gridSize;
-      autoAnimation.targetX = Math.random() * gridSize;
-      autoAnimation.targetY = Math.random() * gridSize;
-
-      // Smooth animation function using CSS transitions
-      function animateCube(cube, rotateX, rotateY, duration = enterDuration) {
-        cube.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
-        cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      }
-
-      // Tilt cubes at specific position
-      function tiltAt(rowCenter, colCenter) {
-        const cubes = cubesScene.querySelectorAll('.cube');
-        cubes.forEach(cube => {
-          const r = parseInt(cube.dataset.row);
-          const c = parseInt(cube.dataset.col);
-          const dist = Math.hypot(r - rowCenter, c - colCenter);
-          
-          if (dist <= radius) {
-            const pct = 1 - dist / radius;
-            const angle = pct * maxAngle;
-            animateCube(cube, -angle, angle, enterDuration);
-          } else {
-            animateCube(cube, 0, 0, leaveDuration);
-          }
-        });
-      }
-
-      // Mouse/touch move handler
-      function onPointerMove(e) {
-        userActive = true;
-        if (idleTimer) clearTimeout(idleTimer);
-
-        const rect = cubesScene.getBoundingClientRect();
-        const cellW = rect.width / gridSize;
-        const cellH = rect.height / gridSize;
-        const colCenter = (e.clientX - rect.left) / cellW;
-        const rowCenter = (e.clientY - rect.top) / cellH;
-
-        if (animationFrame) cancelAnimationFrame(animationFrame);
-        animationFrame = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
-
-        idleTimer = setTimeout(() => {
-          userActive = false;
-        }, 3000);
-      }
-
-      // Reset all cubes
-      function resetAll() {
-        const cubes = cubesScene.querySelectorAll('.cube');
-        cubes.forEach(cube => animateCube(cube, 0, 0, leaveDuration));
-      }
-
-      // Click ripple effect
-      function onCubeClick(e) {
-        const rect = cubesScene.getBoundingClientRect();
-        const cellW = rect.width / gridSize;
-        const cellH = rect.height / gridSize;
-
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-        const colHit = Math.floor((clientX - rect.left) / cellW);
-        const rowHit = Math.floor((clientY - rect.top) / cellH);
-
-        const cubes = cubesScene.querySelectorAll('.cube');
-        const rings = {};
-
-        // Group cubes by distance rings
-        cubes.forEach(cube => {
-          const r = parseInt(cube.dataset.row);
-          const c = parseInt(cube.dataset.col);
-          const dist = Math.hypot(r - rowHit, c - colHit);
-          const ring = Math.round(dist);
-          if (!rings[ring]) rings[ring] = [];
-          rings[ring].push(cube);
-        });
-
-        // Animate ripple effect
-        Object.keys(rings)
-          .map(Number)
-          .sort((a, b) => a - b)
-          .forEach(ring => {
-            const delay = ring * 75; // 75ms delay per ring
-            
-            setTimeout(() => {
-              rings[ring].forEach(cube => {
-                const faces = cube.querySelectorAll('.cube-face');
-                faces.forEach(face => {
-                  // Flash to primary color
-                  face.style.backgroundColor = 'var(--primary)';
-                  face.style.transition = 'background-color 150ms ease-out';
-                  
-                  // Return to original color
-                  setTimeout(() => {
-                    face.style.backgroundColor = 'hsl(248, 94%, 4%)';
-                    face.style.transition = 'background-color 300ms ease-out';
-                  }, 150);
-                });
-              });
-            }, delay);
-          });
-      }
-
-      // Auto animation loop
-      function autoAnimationLoop() {
-        if (!userActive) {
-          const speed = 0.02;
-          const pos = autoAnimation;
-          
-          pos.x += (pos.targetX - pos.x) * speed;
-          pos.y += (pos.targetY - pos.y) * speed;
-          
-          tiltAt(pos.y, pos.x);
-          
-          // Set new target when close to current target
-          if (Math.hypot(pos.x - pos.targetX, pos.y - pos.targetY) < 0.1) {
-            pos.targetX = Math.random() * gridSize;
-            pos.targetY = Math.random() * gridSize;
-          }
-        }
-        
-        requestAnimationFrame(autoAnimationLoop);
-      }
-
-      // Touch handlers
-      function onTouchMove(e) {
-        e.preventDefault();
-        onPointerMove(e.touches[0]);
-      }
-
-      function onTouchStart() {
-        userActive = true;
-      }
-
-      function onTouchEnd() {
-        resetAll();
-      }
-
-      // Add event listeners
-      cubesScene.addEventListener('mousemove', onPointerMove);
-      cubesScene.addEventListener('mouseleave', resetAll);
-      cubesScene.addEventListener('click', onCubeClick);
-      cubesScene.addEventListener('touchmove', onTouchMove, { passive: false });
-      cubesScene.addEventListener('touchstart', onTouchStart, { passive: true });
-      cubesScene.addEventListener('touchend', onTouchEnd, { passive: true });
-
-      // Start auto animation
-      autoAnimationLoop();
-
-      // Cleanup function
-      return () => {
-        cubesScene.removeEventListener('mousemove', onPointerMove);
-        cubesScene.removeEventListener('mouseleave', resetAll);
-        cubesScene.removeEventListener('click', onCubeClick);
-        cubesScene.removeEventListener('touchmove', onTouchMove);
-        cubesScene.removeEventListener('touchstart', onTouchStart);
-        cubesScene.removeEventListener('touchend', onTouchEnd);
-        
-        if (animationFrame) cancelAnimationFrame(animationFrame);
-        if (idleTimer) clearTimeout(idleTimer);
+      // Tetris block shapes (each array represents a rotation state)
+      const tetrisShapes = {
+        I: [[[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]],
+        O: [[[1, 1], [1, 1]]],
+        T: [[[0, 1, 0], [1, 1, 1], [0, 0, 0]]],
+        L: [[[0, 0, 1], [1, 1, 1], [0, 0, 0]]],
+        J: [[[1, 0, 0], [1, 1, 1], [0, 0, 0]]],
+        S: [[[0, 1, 1], [1, 1, 0], [0, 0, 0]]],
+        Z: [[[1, 1, 0], [0, 1, 1], [0, 0, 0]]]
       };
+
+      const colors = {
+        I: '#06b6d4',
+        O: '#0891b2',
+        T: '#0e7490',
+        L: '#155e75',
+        J: '#164e63',
+        S: '#083344',
+        Z: '#042f2e'
+      };
+
+      const blocks = [];
+      const blockSize = 20; // Size of each cell in the tetris piece
+
+      // Create initial blocks
+      function createBlock() {
+        const shapeKeys = Object.keys(tetrisShapes);
+        const randomShape = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
+        const shape = tetrisShapes[randomShape];
+
+        return {
+          x: Math.random() * (canvas.width - blockSize * 4),
+          y: Math.random() * -canvas.height,
+          shape: shape[0],
+          color: colors[randomShape],
+          speed: 0.5 + Math.random() * 1.5,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.02
+        };
+      }
+
+      // Initialize blocks
+      for (let i = 0; i < 10; i++) {
+        blocks.push(createBlock());
+      }
+
+      function drawTetrisBlock(block) {
+        ctx.save();
+        ctx.translate(block.x + (block.shape.length * blockSize) / 2,
+          block.y + (block.shape.length * blockSize) / 2);
+        ctx.rotate(block.rotation);
+
+        // Draw the tetris piece
+        for (let row = 0; row < block.shape.length; row++) {
+          for (let col = 0; col < block.shape[row].length; col++) {
+            if (block.shape[row][col]) {
+              const x = (col - block.shape.length / 2) * blockSize;
+              const y = (row - block.shape.length / 2) * blockSize;
+
+              // Draw block with glow effect
+              ctx.shadowBlur = 20;
+              ctx.shadowColor = block.color;
+              ctx.fillStyle = block.color + '40';
+              ctx.fillRect(x, y, blockSize, blockSize);
+
+              // Draw border
+              ctx.strokeStyle = block.color;
+              ctx.lineWidth = 2;
+              ctx.strokeRect(x, y, blockSize, blockSize);
+            }
+          }
+        }
+
+        ctx.restore();
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        blocks.forEach(block => {
+          drawTetrisBlock(block);
+
+          // Update position
+          block.y += block.speed;
+          block.rotation += block.rotationSpeed;
+
+          // Reset block when it goes off screen
+          if (block.y > canvas.height + blockSize * 4) {
+            Object.assign(block, createBlock());
+          }
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
     }
 
     // Mouse trail animation
@@ -3611,7 +3410,7 @@ void ACutsceneManager::PlayCutscene()
       displayProjects(projects);
 
       // Initialize animations
-      initCubesBackground();
+      initFallingBlocks();
       initMouseTrail();
 
       // Animate progress bars when they come into view
