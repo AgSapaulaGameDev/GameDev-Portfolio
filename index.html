@@ -625,12 +625,15 @@
       border-radius: 50%;
     }
 
-    /* Canvas Styles */
+    /* Canvas Styles - Fixed aspect ratio */
     .canvas-bg {
       position: absolute;
       inset: 0;
       pointer-events: none;
       opacity: 0.3;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .canvas-trail {
@@ -3529,6 +3532,15 @@ void ACutsceneManager::PlayCutscene()
       function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        
+        // Prevent stretching by maintaining pixel ratio
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
       }
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
@@ -3539,46 +3551,55 @@ void ACutsceneManager::PlayCutscene()
       let enemies = [];
       let powerUps = [];
       let particles = [];
-      let mario = null;
+      let character = null;
 
-      // Colors and themes (avoiding blues for better text readability)
+      // Colors and themes (updated for character customization)
       const colors = {
-        mario: '#FF6B35',
-        marioHat: '#E53E3E',
-        marioShirt: '#38A169', 
+        // Character colors
+        characterTop: '#1A1A1A', // Black top
+        characterBottom: '#2563EB', // Blue bottom
+        characterSkin: '#FFDBAC',
+        characterShoes: '#654321',
+        
+        // Environment colors
         ground: '#8B4513',
         platform: '#654321',
         coin: '#FFD700',
         enemy: '#DC143C',
         powerUp: '#32CD32',
-        sky: '#FFF8DC', // Warm cream instead of blue
-        skyBottom: '#F7FAFC', // Light warm gray
+        sky: '#FFF8DC', // Warm cream
+        skyBottom: '#F7FAFC',
         cloud: '#FFFFFF',
         brick: '#D69E2E',
         brickDark: '#B7791F',
         pipe: '#38A169',
         pipeLight: '#68D391',
         hill: '#9AE6B4',
-        hillDark: '#68D391'
+        hillDark: '#68D391',
+        
+        // New environment elements
+        tree: '#22543D',
+        treeLeaves: '#38A169',
+        flower: '#E53E3E',
+        grass: '#48BB78'
       };
 
-      // Mario character (larger and more detailed)
-      class Mario {
+      // Character class (customized with black top and blue bottom)
+      class Character {
         constructor() {
           this.x = 150;
           this.y = canvas.height - 150;
-          this.width = 48; // Increased from 32
-          this.height = 48; // Increased from 32
-          this.vx = 1.5; // Slightly slower for better visibility
+          this.width = 40;
+          this.height = 50;
+          this.vx = 1.2;
           this.vy = 0;
           this.gravity = 0.6;
-          this.jumpPower = -15; // Higher jumps
+          this.jumpPower = -15;
           this.onGround = false;
           this.direction = 1;
           this.animFrame = 0;
-          this.animSpeed = 0.15; // Slower animation for better detail
+          this.animSpeed = 0.12;
           this.jumpCooldown = 0;
-          this.scale = 1.5; // Scale factor for larger appearance
         }
 
         update() {
@@ -3638,11 +3659,10 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
-          // Apply scale for larger Mario
           const drawX = this.x;
           const drawY = this.y;
-          const w = this.width * this.scale;
-          const h = this.height * this.scale;
+          const w = this.width;
+          const h = this.height;
           
           // Flip sprite based on direction
           if (this.direction < 0) {
@@ -3652,73 +3672,84 @@ void ACutsceneManager::PlayCutscene()
             ctx.translate(drawX, 0);
           }
 
-          // Draw Mario with enhanced details
+          // Draw character with black top and blue bottom
           const frame = Math.floor(this.animFrame);
           
           // Shadow
           ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-          ctx.fillRect(4, drawY + h - 4, w - 8, 6);
+          ctx.fillRect(4, drawY + h - 2, w - 8, 4);
           
-          // Hat (red)
-          ctx.fillStyle = colors.marioHat;
-          ctx.fillRect(6, drawY + 6, w - 12, 12);
+          // Head (skin tone)
+          ctx.fillStyle = colors.characterSkin;
+          ctx.fillRect(8, drawY + 4, w - 16, 14);
           
-          // Hat brim
-          ctx.fillStyle = '#B91C1C';
-          ctx.fillRect(2, drawY + 12, w - 4, 4);
-          
-          // Face (skin tone)
-          ctx.fillStyle = '#FFDBAC';
-          ctx.fillRect(8, drawY + 16, w - 16, 16);
-          
-          // Shirt (green instead of blue)
-          ctx.fillStyle = colors.marioShirt;
-          ctx.fillRect(6, drawY + 28, w - 12, 12);
-          
-          // Overalls (red)
-          ctx.fillStyle = colors.mario;
-          ctx.fillRect(10, drawY + 32, w - 20, 12);
-          
-          // Overalls straps
-          ctx.fillStyle = colors.mario;
-          ctx.fillRect(12, drawY + 20, 4, 12);
-          ctx.fillRect(w - 16, drawY + 20, 4, 12);
-          
-          // Buttons
-          ctx.fillStyle = '#FFD700';
-          ctx.fillRect(14, drawY + 24, 2, 2);
-          ctx.fillRect(w - 16, drawY + 24, 2, 2);
-          
-          // Legs (brown) with walking animation
+          // Hair/Head top
           ctx.fillStyle = '#8B4513';
+          ctx.fillRect(10, drawY + 2, w - 20, 8);
+          
+          // Black top (shirt/hoodie)
+          ctx.fillStyle = colors.characterTop;
+          ctx.fillRect(6, drawY + 18, w - 12, 16);
+          
+          // Top details (hoodie strings or design)
+          ctx.fillStyle = '#333333';
+          ctx.fillRect(12, drawY + 20, 2, 6);
+          ctx.fillRect(w - 14, drawY + 20, 2, 6);
+          
+          // Blue bottom (pants/jeans)
+          ctx.fillStyle = colors.characterBottom;
+          ctx.fillRect(8, drawY + 34, w - 16, 12);
+          
+          // Pants details (pockets)
+          ctx.fillStyle = '#1E40AF';
+          ctx.fillRect(10, drawY + 36, 4, 3);
+          ctx.fillRect(w - 14, drawY + 36, 4, 3);
+          
+          // Legs with walking animation
+          ctx.fillStyle = colors.characterBottom;
           if (this.onGround && Math.abs(this.vx) > 0) {
             // Walking animation
-            const legOffset = frame % 2 === 0 ? 0 : 3;
-            ctx.fillRect(12 + legOffset, drawY + 40, 8, 12);
-            ctx.fillRect(w - 20 - legOffset, drawY + 40, 8, 12);
+            const legOffset = frame % 2 === 0 ? 0 : 2;
+            ctx.fillRect(10 + legOffset, drawY + 46, 6, 8);
+            ctx.fillRect(w - 16 - legOffset, drawY + 46, 6, 8);
           } else {
             // Standing
-            ctx.fillRect(14, drawY + 40, 8, 12);
-            ctx.fillRect(w - 22, drawY + 40, 8, 12);
+            ctx.fillRect(12, drawY + 46, 6, 8);
+            ctx.fillRect(w - 18, drawY + 46, 6, 8);
           }
 
-          // Shoes (brown, darker)
-          ctx.fillStyle = '#654321';
-          ctx.fillRect(10, drawY + 48, 12, 6);
-          ctx.fillRect(w - 22, drawY + 48, 12, 6);
+          // Shoes
+          ctx.fillStyle = colors.characterShoes;
+          ctx.fillRect(8, drawY + 52, 10, 4);
+          ctx.fillRect(w - 18, drawY + 52, 10, 4);
 
           // Eyes
           ctx.fillStyle = '#000000';
-          ctx.fillRect(12, drawY + 20, 3, 3);
-          ctx.fillRect(w - 15, drawY + 20, 3, 3);
+          ctx.fillRect(10, drawY + 8, 2, 2);
+          ctx.fillRect(w - 12, drawY + 8, 2, 2);
 
-          // Mustache
-          ctx.fillStyle = '#8B4513';
-          ctx.fillRect(16, drawY + 26, w - 32, 3);
+          // Mouth
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(w/2 - 1, drawY + 12, 2, 1);
 
-          // Nose
-          ctx.fillStyle = '#FFDBAC';
-          ctx.fillRect(w/2 - 2, drawY + 22, 4, 4);
+          // Arms (animated with walking)
+          ctx.fillStyle = colors.characterTop;
+          if (this.onGround && Math.abs(this.vx) > 0) {
+            const armOffset = frame % 2 === 0 ? 0 : 1;
+            // Left arm
+            ctx.fillRect(2, drawY + 20 + armOffset, 4, 8);
+            // Right arm  
+            ctx.fillRect(w - 6, drawY + 20 - armOffset, 4, 8);
+          } else {
+            // Arms at rest
+            ctx.fillRect(2, drawY + 22, 4, 8);
+            ctx.fillRect(w - 6, drawY + 22, 4, 8);
+          }
+
+          // Hands
+          ctx.fillStyle = colors.characterSkin;
+          ctx.fillRect(2, drawY + 28, 4, 3);
+          ctx.fillRect(w - 6, drawY + 28, 4, 3);
 
           ctx.restore();
         }
@@ -3910,12 +3941,12 @@ void ACutsceneManager::PlayCutscene()
           // Floating animation
           this.y += Math.sin(Date.now() * 0.003 + this.floatOffset) * 0.5;
           
-          // Check collision with Mario
-          if (mario && !this.collected &&
-              mario.x < this.x + this.size &&
-              mario.x + mario.width > this.x &&
-              mario.y < this.y + this.size &&
-              mario.y + mario.height > this.y) {
+          // Check collision with character
+          if (character && !this.collected &&
+              character.x < this.x + this.size &&
+              character.x + character.width > this.x &&
+              character.y < this.y + this.size &&
+              character.y + character.height > this.y) {
             this.collected = true;
             createCoinParticles(this.x + this.size/2, this.y + this.size/2);
           }
@@ -4132,8 +4163,8 @@ void ACutsceneManager::PlayCutscene()
 
       // Initialize game world
       function initGameWorld() {
-        // Create Mario
-        mario = new Mario();
+        // Create character
+        character = new Character();
 
         // Create platforms (larger and more varied)
         platforms = [
@@ -4186,26 +4217,150 @@ void ACutsceneManager::PlayCutscene()
         ];
       }
 
-      // Draw background (warm colors instead of blue)
+      // Draw background with enhanced environment
       function drawBackground() {
-        // Warm sky gradient (avoiding blue)
+        // Sky gradient with more natural colors
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, colors.sky); // Warm cream
-        gradient.addColorStop(0.4, '#F7E6CC'); // Light peach
-        gradient.addColorStop(0.8, colors.skyBottom); // Light warm gray
-        gradient.addColorStop(1, '#E2E8F0'); // Subtle bottom
+        gradient.addColorStop(0, '#FFE5B4'); // Warm peach
+        gradient.addColorStop(0.3, '#FFF8DC'); // Warm cream
+        gradient.addColorStop(0.7, '#F0F8FF'); // Very light blue-white
+        gradient.addColorStop(1, '#E6F3FF'); // Subtle blue at bottom
         
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw sun in background
+        // Draw sun
         drawSun();
         
-        // Draw clouds in background
+        // Draw clouds
         drawClouds();
         
-        // Draw hills
+        // Draw background trees
+        drawBackgroundTrees();
+        
+        // Draw hills with grass
         drawHills();
+        
+        // Draw foreground vegetation
+        drawVegetation();
+      }
+
+      function drawBackgroundTrees() {
+        const trees = [
+          {x: 80, y: canvas.height - 200, size: 0.8},
+          {x: 200, y: canvas.height - 180, size: 1.0},
+          {x: 400, y: canvas.height - 220, size: 0.9},
+          {x: 700, y: canvas.height - 190, size: 1.1},
+          {x: 900, y: canvas.height - 210, size: 0.7},
+          {x: 1100, y: canvas.height - 180, size: 1.0},
+          {x: 1350, y: canvas.height - 200, size: 0.9},
+        ];
+
+        trees.forEach(tree => {
+          drawTree(tree.x, tree.y, tree.size);
+        });
+      }
+
+      function drawTree(x, y, scale) {
+        ctx.save();
+        
+        // Tree trunk
+        ctx.fillStyle = colors.tree;
+        const trunkWidth = 12 * scale;
+        const trunkHeight = 40 * scale;
+        ctx.fillRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
+        
+        // Tree leaves (multiple circles for natural look)
+        ctx.fillStyle = colors.treeLeaves;
+        const leafRadius = 25 * scale;
+        
+        // Main leaf cluster
+        ctx.beginPath();
+        ctx.arc(x, y - 10 * scale, leafRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Additional leaf clusters
+        ctx.beginPath();
+        ctx.arc(x - 15 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(x + 15 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Tree highlight
+        ctx.fillStyle = '#4AE54A';
+        ctx.beginPath();
+        ctx.arc(x - 8 * scale, y - 15 * scale, leafRadius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+      }
+
+      function drawVegetation() {
+        // Draw grass patches
+        for (let i = 0; i < canvas.width; i += 20) {
+          if (Math.random() < 0.7) {
+            drawGrass(i, canvas.height - 25);
+          }
+        }
+        
+        // Draw flowers
+        const flowers = [
+          {x: 150, y: canvas.height - 35},
+          {x: 350, y: canvas.height - 30},
+          {x: 550, y: canvas.height - 35},
+          {x: 750, y: canvas.height - 32},
+          {x: 950, y: canvas.height - 35},
+          {x: 1150, y: canvas.height - 30},
+        ];
+        
+        flowers.forEach(flower => {
+          drawFlower(flower.x, flower.y);
+        });
+      }
+
+      function drawGrass(x, y) {
+        ctx.strokeStyle = colors.grass;
+        ctx.lineWidth = 2;
+        
+        for (let i = 0; i < 3; i++) {
+          const grassX = x + i * 3;
+          const grassHeight = 5 + Math.random() * 8;
+          
+          ctx.beginPath();
+          ctx.moveTo(grassX, y);
+          ctx.lineTo(grassX + Math.random() * 2 - 1, y - grassHeight);
+          ctx.stroke();
+        }
+      }
+
+      function drawFlower(x, y) {
+        // Flower stem
+        ctx.strokeStyle = colors.grass;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - 8);
+        ctx.stroke();
+        
+        // Flower petals
+        ctx.fillStyle = colors.flower;
+        for (let i = 0; i < 5; i++) {
+          const angle = (i * Math.PI * 2) / 5;
+          const petalX = x + Math.cos(angle) * 3;
+          const petalY = y - 8 + Math.sin(angle) * 3;
+          
+          ctx.beginPath();
+          ctx.arc(petalX, petalY, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        // Flower center
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(x, y - 8, 1.5, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       function drawSun() {
@@ -4331,10 +4486,10 @@ void ACutsceneManager::PlayCutscene()
           enemy.draw();
         });
 
-        // Update and draw Mario
-        if (mario) {
-          mario.update();
-          mario.draw();
+        // Update and draw character
+        if (character) {
+          character.update();
+          character.draw();
         }
 
         // Update and draw particles
