@@ -3553,57 +3553,35 @@ void ACutsceneManager::PlayCutscene()
       let particles = [];
       let character = null;
 
-      // Colors and themes (refined art style palette)
+      // Colors and themes (updated for character customization)
       const colors = {
         // Character colors
-        characterTop: '#1A1A1A', // Rich black
-        characterBottom: '#2563EB', // Vibrant blue
-        characterSkin: '#FFDBAC', // Warm skin tone
-        characterShoes: '#654321', // Brown leather
+        characterTop: '#1A1A1A', // Black top
+        characterBottom: '#2563EB', // Blue bottom
+        characterSkin: '#FFDBAC',
+        characterShoes: '#654321',
         
-        // Environment colors (cohesive palette)
-        ground: '#8B4513', // Rich earth brown
-        platform: '#A0522D', // Sienna brown
-        coin: '#FFD700', // Pure gold
-        enemy: '#DC143C', // Crimson red
-        powerUp: '#32CD32', // Lime green
+        // Environment colors
+        ground: '#8B4513',
+        platform: '#654321',
+        coin: '#FFD700',
+        enemy: '#DC143C',
+        powerUp: '#32CD32',
+        sky: '#FFF8DC', // Warm cream
+        skyBottom: '#F7FAFC',
+        cloud: '#FFFFFF',
+        brick: '#D69E2E',
+        brickDark: '#B7791F',
+        pipe: '#38A169',
+        pipeLight: '#68D391',
+        hill: '#9AE6B4',
+        hillDark: '#68D391',
         
-        // Sky and atmosphere
-        sky: '#FFE5B4', // Warm peach
-        skyMid: '#FFF8DC', // Cream white
-        skyBottom: '#F0F8FF', // Very light blue
-        cloud: '#FFFFFF', // Pure white
-        cloudShadow: '#E6E6FA', // Light lavender
-        
-        // Platforms and structures
-        brick: '#CD853F', // Peru gold
-        brickDark: '#A0522D', // Darker sienna
-        brickLight: '#F4A460', // Sandy brown
-        pipe: '#228B22', // Forest green
-        pipeLight: '#32CD32', // Lime highlight
-        pipeDark: '#006400', // Dark green
-        
-        // Nature elements
-        tree: '#8B4513', // Brown trunk
-        treeLeaves: '#228B22', // Forest green
-        treeLeavesLight: '#32CD32', // Light green
-        treeLeavesShade: '#006400', // Dark green shade
-        hill: '#9AE6B4', // Light green
-        hillDark: '#68D391', // Medium green
-        hillShadow: '#48BB78', // Darker green
-        grass: '#48BB78', // Grass green
-        grassDark: '#38A169', // Dark grass
-        flower: '#E53E3E', // Red flowers
-        flowerCenter: '#FFD700', // Golden center
-        
-        // Effects and UI
-        particle: '#FFFFFF', // White sparkles
-        attack: '#FFFF00', // Yellow energy
-        healthGood: '#00AA00', // Green health
-        healthMid: '#FFAA00', // Orange health
-        healthBad: '#AA0000', // Red health
-        uiBackground: 'rgba(0, 0, 0, 0.7)', // Dark transparent
-        uiText: '#FFFFFF' // White text
+        // New environment elements
+        tree: '#22543D',
+        treeLeaves: '#38A169',
+        flower: '#E53E3E',
+        grass: '#48BB78'
       };
 
       // Character class (customized with black top and blue bottom)
@@ -3622,29 +3600,9 @@ void ACutsceneManager::PlayCutscene()
           this.animFrame = 0;
           this.animSpeed = 0.12;
           this.jumpCooldown = 0;
-          this.health = 100;
-          this.maxHealth = 100;
-          this.invulnerable = false;
-          this.invulnerabilityTime = 0;
-          this.score = 0;
-          this.attacking = false;
-          this.attackCooldown = 0;
         }
 
         update() {
-          // Handle invulnerability
-          if (this.invulnerable) {
-            this.invulnerabilityTime--;
-            if (this.invulnerabilityTime <= 0) {
-              this.invulnerable = false;
-            }
-          }
-
-          // Handle attack cooldown
-          if (this.attackCooldown > 0) {
-            this.attackCooldown--;
-          }
-
           // Horizontal movement
           this.x += this.vx * this.direction;
           
@@ -3680,19 +3638,12 @@ void ACutsceneManager::PlayCutscene()
             this.onGround = true;
           }
 
-          // Random jumping and attacking
+          // Random jumping
           this.jumpCooldown--;
           if (this.onGround && this.jumpCooldown <= 0 && Math.random() < 0.005) {
             this.vy = this.jumpPower;
             this.jumpCooldown = 60;
             createJumpParticles(this.x + this.width/2, this.y + this.height);
-          }
-
-          // Random attacking
-          if (this.attackCooldown <= 0 && Math.random() < 0.003) {
-            this.attacking = true;
-            this.attackCooldown = 30;
-            this.performAttack();
           }
 
           // Change direction occasionally
@@ -3703,87 +3654,6 @@ void ACutsceneManager::PlayCutscene()
           // Animation
           this.animFrame += this.animSpeed;
           if (this.animFrame >= 3) this.animFrame = 0;
-
-          // Check enemy collisions
-          this.checkEnemyCollisions();
-
-          // Check coin collisions
-          this.checkCoinCollisions();
-        }
-
-        checkEnemyCollisions() {
-          enemies.forEach((enemy, index) => {
-            if (!enemy.dead && 
-                this.x < enemy.x + enemy.width &&
-                this.x + this.width > enemy.x &&
-                this.y < enemy.y + enemy.height &&
-                this.y + this.height > enemy.y) {
-              
-              // Check if player is attacking
-              if (this.attacking) {
-                // Player kills enemy
-                enemy.die();
-                this.score += 100;
-                createEnemyDeathParticles(enemy.x + enemy.width/2, enemy.y + enemy.height/2);
-              } else if (!this.invulnerable) {
-                // Enemy damages player
-                this.takeDamage(20);
-                this.knockback(enemy);
-              }
-            }
-          });
-        }
-
-        checkCoinCollisions() {
-          coins.forEach(coin => {
-            if (!coin.collected &&
-                this.x < coin.x + coin.size &&
-                this.x + this.width > coin.x &&
-                this.y < coin.y + coin.size &&
-                this.y + this.height > coin.y) {
-              coin.collected = true;
-              this.score += 50;
-              createCoinParticles(coin.x + coin.size/2, coin.y + coin.size/2);
-            }
-          });
-        }
-
-        performAttack() {
-          // Create attack effect
-          createAttackEffect(this.x + (this.direction > 0 ? this.width : -20), this.y + this.height/2);
-        }
-
-        takeDamage(damage) {
-          this.health -= damage;
-          this.invulnerable = true;
-          this.invulnerabilityTime = 60; // 1 second of invulnerability
-          
-          if (this.health <= 0) {
-            this.health = 0;
-            // Handle player death
-            createPlayerDeathParticles(this.x + this.width/2, this.y + this.height/2);
-            // Respawn after delay
-            setTimeout(() => {
-              this.respawn();
-            }, 2000);
-          }
-        }
-
-        knockback(enemy) {
-          // Push player away from enemy
-          const pushDirection = this.x < enemy.x ? -1 : 1;
-          this.x += pushDirection * 20;
-          this.vy = -8; // Small jump from impact
-        }
-
-        respawn() {
-          this.health = this.maxHealth;
-          this.x = 150;
-          this.y = canvas.height - 150;
-          this.vx = 1.2;
-          this.vy = 0;
-          this.invulnerable = true;
-          this.invulnerabilityTime = 120; // 2 seconds of spawn protection
         }
 
         draw() {
@@ -3793,11 +3663,6 @@ void ACutsceneManager::PlayCutscene()
           const drawY = this.y;
           const w = this.width;
           const h = this.height;
-          
-          // Apply invulnerability flashing effect
-          if (this.invulnerable && Math.floor(this.invulnerabilityTime / 5) % 2 === 0) {
-            ctx.globalAlpha = 0.5;
-          }
           
           // Flip sprite based on direction
           if (this.direction < 0) {
@@ -3886,13 +3751,6 @@ void ACutsceneManager::PlayCutscene()
           ctx.fillRect(2, drawY + 28, 4, 3);
           ctx.fillRect(w - 6, drawY + 28, 4, 3);
 
-          // Attack effect
-          if (this.attacking && this.attackCooldown > 20) {
-            ctx.fillStyle = 'rgba(255, 255, 0, 0.7)';
-            const attackX = this.direction > 0 ? w : -20;
-            ctx.fillRect(attackX, drawY + h/2 - 5, 20, 10);
-          }
-
           ctx.restore();
         }
       }
@@ -3936,101 +3794,77 @@ void ACutsceneManager::PlayCutscene()
         }
 
         drawNormalPlatform() {
-          // Enhanced platform with consistent art style
-          // Main platform with gradient
-          const platformGradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
-          platformGradient.addColorStop(0, colors.brickLight);
-          platformGradient.addColorStop(0.3, colors.platform);
-          platformGradient.addColorStop(1, colors.brickDark);
-          
-          ctx.fillStyle = platformGradient;
+          // Enhanced brick-like platform with 3D effect
+          // Main platform color
+          ctx.fillStyle = colors.platform;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Enhanced brick texture with consistent spacing
-          ctx.strokeStyle = colors.brickDark;
+          // Top highlight
+          ctx.fillStyle = '#8B7355';
+          ctx.fillRect(this.x, this.y, this.width, 4);
+          
+          // Side shadow
+          ctx.fillStyle = '#5D4E37';
+          ctx.fillRect(this.x + this.width - 4, this.y + 4, 4, this.height - 4);
+          
+          // Add detailed brick texture
+          ctx.strokeStyle = colors.ground;
           ctx.lineWidth = 2;
           
-          const brickWidth = 32;
-          const brickHeight = 16;
+          const brickWidth = 30; // Larger bricks
+          const brickHeight = 15;
           
-          for (let row = 0; row < Math.ceil(this.height / brickHeight); row++) {
-            for (let col = 0; col < Math.ceil(this.width / brickWidth); col++) {
-              const offsetX = (row % 2) * (brickWidth / 2); // Offset every other row
-              const x = this.x + col * brickWidth + offsetX;
-              const y = this.y + row * brickHeight;
+          for (let x = 0; x < this.width; x += brickWidth) {
+            for (let y = 0; y < this.height; y += brickHeight) {
+              const actualWidth = Math.min(brickWidth, this.width - x);
+              const actualHeight = Math.min(brickHeight, this.height - y);
               
-              if (x < this.x + this.width && y < this.y + this.height) {
-                const actualWidth = Math.min(brickWidth, this.x + this.width - x);
-                const actualHeight = Math.min(brickHeight, this.y + this.height - y);
-                
-                // Brick outline
-                ctx.strokeRect(x, y, actualWidth, actualHeight);
-                
-                // Brick highlight
-                ctx.fillStyle = colors.brickLight;
-                ctx.fillRect(x + 2, y + 2, actualWidth - 4, 2);
-                
-                // Brick shadow
-                ctx.fillStyle = colors.brickDark;
-                ctx.fillRect(x + actualWidth - 3, y + 3, 2, actualHeight - 3);
-              }
+              // Brick outline
+              ctx.strokeRect(this.x + x, this.y + y, actualWidth, actualHeight);
+              
+              // Brick highlight
+              ctx.fillStyle = '#8B7355';
+              ctx.fillRect(this.x + x + 2, this.y + y + 2, actualWidth - 4, 2);
+              
+              // Brick shadow
+              ctx.fillStyle = '#5D4E37';
+              ctx.fillRect(this.x + x + actualWidth - 4, this.y + y + 4, 2, actualHeight - 4);
             }
           }
-          
-          // Top edge highlight
-          ctx.fillStyle = colors.brickLight;
-          ctx.fillRect(this.x, this.y, this.width, 3);
-          
-          // Bottom edge shadow
-          ctx.fillStyle = colors.brickDark;
-          ctx.fillRect(this.x, this.y + this.height - 3, this.width, 3);
         }
 
         drawBrickPlatform() {
-          // Enhanced question mark blocks with refined art style
-          // Main block with gradient
-          const blockGradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
-          blockGradient.addColorStop(0, '#F6E05E');
-          blockGradient.addColorStop(0.4, colors.brick);
-          blockGradient.addColorStop(1, colors.brickDark);
-          
-          ctx.fillStyle = blockGradient;
+          // Enhanced question mark blocks with 3D effect
+          // Main block
+          ctx.fillStyle = colors.brick;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Enhanced 3D borders
           // Top highlight
-          ctx.fillStyle = '#FFFACD';
-          ctx.fillRect(this.x, this.y, this.width, 4);
+          ctx.fillStyle = '#F6E05E';
+          ctx.fillRect(this.x, this.y, this.width, 6);
           
-          // Left highlight
-          ctx.fillRect(this.x, this.y, 4, this.height);
-          
-          // Bottom shadow
+          // Side shadow
           ctx.fillStyle = colors.brickDark;
-          ctx.fillRect(this.x, this.y + this.height - 4, this.width, 4);
+          ctx.fillRect(this.x + this.width - 6, this.y + 6, 6, this.height - 6);
           
-          // Right shadow
-          ctx.fillRect(this.x + this.width - 4, this.y, 4, this.height);
-          
-          // Question mark with shadow effect
-          ctx.fillStyle = '#000000';
-          ctx.font = 'bold 26px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText('?', this.x + this.width/2 + 2, this.y + this.height/2 + 10);
-          
+          // Question mark
           ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 24px Arial';
+          ctx.textAlign = 'center';
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 2;
+          ctx.strokeText('?', this.x + this.width/2, this.y + this.height/2 + 8);
           ctx.fillText('?', this.x + this.width/2, this.y + this.height/2 + 8);
           
-          // Inner decorative border
+          // Border with 3D effect
           ctx.strokeStyle = colors.brickDark;
-          ctx.lineWidth = 2;
-          ctx.strokeRect(this.x + 3, this.y + 3, this.width - 6, this.height - 6);
+          ctx.lineWidth = 3;
+          ctx.strokeRect(this.x, this.y, this.width, this.height);
           
-          // Animated glow effect
-          const glowIntensity = 0.3 + 0.2 * Math.sin(Date.now() * 0.003);
-          ctx.strokeStyle = `rgba(255, 215, 0, ${glowIntensity})`;
-          ctx.lineWidth = 1;
-          ctx.strokeRect(this.x - 1, this.y - 1, this.width + 2, this.height + 2);
+          // Inner border highlight
+          ctx.strokeStyle = '#F6E05E';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4);
         }
 
         drawPipe() {
@@ -4107,21 +3941,14 @@ void ACutsceneManager::PlayCutscene()
           // Floating animation
           this.y += Math.sin(Date.now() * 0.003 + this.floatOffset) * 0.5;
           
-          // Magnetic effect when player is nearby
-          if (character && !this.collected) {
-            const distance = Math.sqrt(
-              Math.pow(character.x - this.x, 2) + 
-              Math.pow(character.y - this.y, 2)
-            );
-            
-            if (distance < 50) {
-              // Pull coin towards player
-              const pullForce = 0.2;
-              const dx = character.x - this.x;
-              const dy = character.y - this.y;
-              this.x += dx * pullForce;
-              this.y += dy * pullForce;
-            }
+          // Check collision with character
+          if (character && !this.collected &&
+              character.x < this.x + this.size &&
+              character.x + character.width > this.x &&
+              character.y < this.y + this.size &&
+              character.y + character.height > this.y) {
+            this.collected = true;
+            createCoinParticles(this.x + this.size/2, this.y + this.size/2);
           }
         }
 
@@ -4173,7 +4000,7 @@ void ACutsceneManager::PlayCutscene()
         }
       }
 
-      // Enemy class (larger Goomba-style with enhanced AI)
+      // Enemy class (larger Goomba-style)
       class Enemy {
         constructor(x, y) {
           this.x = x;
@@ -4185,47 +4012,9 @@ void ACutsceneManager::PlayCutscene()
           this.animFrame = 0;
           this.animSpeed = 0.08; // Slower animation
           this.scale = 1.3; // Scale factor
-          this.dead = false;
-          this.deathTime = 0;
-          this.health = 1;
-          this.attackRange = 60;
-          this.chasing = false;
         }
 
         update() {
-          if (this.dead) {
-            this.deathTime++;
-            // Remove enemy after death animation
-            if (this.deathTime > 60) {
-              const index = enemies.indexOf(this);
-              if (index > -1) {
-                enemies.splice(index, 1);
-              }
-            }
-            return;
-          }
-
-          // AI: Check if player is nearby
-          if (character) {
-            const distanceToPlayer = Math.abs(this.x - character.x);
-            
-            if (distanceToPlayer < this.attackRange) {
-              // Chase the player
-              this.chasing = true;
-              if (character.x < this.x) {
-                this.vx = -Math.abs(this.vx) * 1.5; // Move left faster
-                this.direction = -1;
-              } else {
-                this.vx = Math.abs(this.vx) * 1.5; // Move right faster
-                this.direction = 1;
-              }
-            } else {
-              // Normal patrol behavior
-              this.chasing = false;
-              this.vx = this.direction * 0.8;
-            }
-          }
-
           this.x += this.vx;
           
           // Bounce off screen edges
@@ -4255,51 +4044,33 @@ void ACutsceneManager::PlayCutscene()
           }
         }
 
-        die() {
-          this.dead = true;
-          this.deathTime = 0;
-          this.vx = 0;
-        }
-
         draw() {
           ctx.save();
           
           const w = this.width * this.scale;
           const h = this.height * this.scale;
           
-          // Death animation
-          if (this.dead) {
-            ctx.globalAlpha = 1 - (this.deathTime / 60);
-            ctx.translate(0, this.deathTime * 0.5); // Fall down when dead
-          }
-          
           // Shadow
           ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
           ctx.fillRect(this.x - 2, this.y + h - 4, w + 4, 6);
           
-          // Goomba body with gradient (red when chasing)
+          // Goomba body with gradient
           const bodyGradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + h);
-          if (this.chasing) {
-            bodyGradient.addColorStop(0, '#FF8A8A');
-            bodyGradient.addColorStop(0.5, '#FF4444');
-            bodyGradient.addColorStop(1, '#CC0000');
-          } else {
-            bodyGradient.addColorStop(0, '#FF6B6B');
-            bodyGradient.addColorStop(0.5, colors.enemy);
-            bodyGradient.addColorStop(1, '#B91C1C');
-          }
+          bodyGradient.addColorStop(0, '#FF6B6B');
+          bodyGradient.addColorStop(0.5, colors.enemy);
+          bodyGradient.addColorStop(1, '#B91C1C');
           
           ctx.fillStyle = bodyGradient;
           ctx.fillRect(this.x + 3, this.y + 12, w - 6, h - 12);
           
           // Goomba head with better shape
-          ctx.fillStyle = this.chasing ? '#FF4444' : colors.enemy;
+          ctx.fillStyle = colors.enemy;
           ctx.beginPath();
           ctx.arc(this.x + w/2, this.y + 12, 15, 0, Math.PI);
           ctx.fill();
           
           // Head highlight
-          ctx.fillStyle = this.chasing ? '#FF8A8A' : '#FF6B6B';
+          ctx.fillStyle = '#FF6B6B';
           ctx.beginPath();
           ctx.arc(this.x + w/2 - 4, this.y + 8, 6, 0, Math.PI);
           ctx.fill();
@@ -4310,14 +4081,14 @@ void ACutsceneManager::PlayCutscene()
           ctx.fillRect(this.x + 8 + eyeOffset, this.y + 6, 6, 6);
           ctx.fillRect(this.x + w - 14 + eyeOffset, this.y + 6, 6, 6);
           
-          // Eye pupils (red when chasing)
-          ctx.fillStyle = this.chasing ? '#FF0000' : '#000000';
+          // Eye pupils
+          ctx.fillStyle = '#000000';
           ctx.fillRect(this.x + 10 + eyeOffset, this.y + 8, 2, 2);
           ctx.fillRect(this.x + w - 12 + eyeOffset, this.y + 8, 2, 2);
           
-          // Angry eyebrows (thicker when chasing)
-          ctx.strokeStyle = this.chasing ? '#CC0000' : '#8B0000';
-          ctx.lineWidth = this.chasing ? 4 : 3;
+          // Angry eyebrows (thicker)
+          ctx.strokeStyle = '#8B0000';
+          ctx.lineWidth = 3;
           ctx.beginPath();
           ctx.moveTo(this.x + 8, this.y + 3);
           ctx.lineTo(this.x + 14, this.y + 6);
@@ -4336,14 +4107,6 @@ void ACutsceneManager::PlayCutscene()
           ctx.fillStyle = '#8B4513';
           ctx.fillRect(this.x + 6, this.y + h - 6, 8, 6);
           ctx.fillRect(this.x + w - 14, this.y + h - 6, 8, 6);
-          
-          // Attack indicator when chasing
-          if (this.chasing && !this.dead) {
-            ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
-            ctx.beginPath();
-            ctx.arc(this.x + w/2, this.y + h/2, this.attackRange, 0, Math.PI * 2);
-            ctx.fill();
-          }
           
           ctx.restore();
         }
@@ -4381,7 +4144,7 @@ void ACutsceneManager::PlayCutscene()
         }
       }
 
-      // Particle creation functions (enhanced)
+      // Particle creation functions
       function createJumpParticles(x, y) {
         for (let i = 0; i < 8; i++) {
           const vx = (Math.random() - 0.5) * 6;
@@ -4395,32 +4158,6 @@ void ACutsceneManager::PlayCutscene()
           const vx = (Math.random() - 0.5) * 8;
           const vy = Math.random() * -6 - 2;
           particles.push(new Particle(x, y, vx, vy, colors.coin, 40));
-        }
-      }
-
-      function createEnemyDeathParticles(x, y) {
-        for (let i = 0; i < 15; i++) {
-          const vx = (Math.random() - 0.5) * 10;
-          const vy = Math.random() * -8 - 3;
-          particles.push(new Particle(x, y, vx, vy, colors.enemy, 50));
-        }
-      }
-
-      function createPlayerDeathParticles(x, y) {
-        for (let i = 0; i < 20; i++) {
-          const vx = (Math.random() - 0.5) * 12;
-          const vy = Math.random() * -10 - 4;
-          const particleColors = [colors.characterTop, colors.characterBottom, colors.characterSkin];
-          const color = particleColors[Math.floor(Math.random() * particleColors.length)];
-          particles.push(new Particle(x, y, vx, vy, color, 60));
-        }
-      }
-
-      function createAttackEffect(x, y) {
-        for (let i = 0; i < 8; i++) {
-          const vx = (Math.random() - 0.5) * 4;
-          const vy = (Math.random() - 0.5) * 4;
-          particles.push(new Particle(x, y, vx, vy, '#FFFF00', 20));
         }
       }
 
@@ -4480,94 +4217,32 @@ void ACutsceneManager::PlayCutscene()
         ];
       }
 
-      // Draw background with enhanced cohesive art style
+      // Draw background with enhanced environment
       function drawBackground() {
-        // Enhanced sky gradient with perfect color harmony
+        // Sky gradient with more natural colors
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, colors.sky); // Warm peach top
-        gradient.addColorStop(0.3, colors.skyMid); // Cream middle
-        gradient.addColorStop(0.7, colors.skyBottom); // Light blue bottom
-        gradient.addColorStop(1, '#E6F3FF'); // Subtle blue at horizon
+        gradient.addColorStop(0, '#FFE5B4'); // Warm peach
+        gradient.addColorStop(0.3, '#FFF8DC'); // Warm cream
+        gradient.addColorStop(0.7, '#F0F8FF'); // Very light blue-white
+        gradient.addColorStop(1, '#E6F3FF'); // Subtle blue at bottom
         
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw atmospheric elements in layers
-        drawDistantMountains();
+        // Draw sun
         drawSun();
+        
+        // Draw clouds
         drawClouds();
+        
+        // Draw background trees
         drawBackgroundTrees();
+        
+        // Draw hills with grass
         drawHills();
+        
+        // Draw foreground vegetation
         drawVegetation();
-        drawAtmosphericParticles();
-      }
-
-      function drawDistantMountains() {
-        // Add distant mountains for depth
-        ctx.fillStyle = 'rgba(173, 216, 230, 0.3)'; // Light blue mountains
-        
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height * 0.4);
-        ctx.quadraticCurveTo(canvas.width * 0.2, canvas.height * 0.25, canvas.width * 0.4, canvas.height * 0.35);
-        ctx.quadraticCurveTo(canvas.width * 0.6, canvas.height * 0.3, canvas.width * 0.8, canvas.height * 0.4);
-        ctx.quadraticCurveTo(canvas.width, canvas.height * 0.35, canvas.width, canvas.height * 0.45);
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      function drawSun() {
-        const sunX = canvas.width * 0.8;
-        const sunY = canvas.height * 0.15;
-        
-        // Enhanced sun with better rays
-        ctx.strokeStyle = 'rgba(255, 223, 186, 0.4)';
-        ctx.lineWidth = 3;
-        for (let i = 0; i < 12; i++) {
-          const angle = (i * Math.PI * 2) / 12;
-          const rayLength = 50 + Math.sin(Date.now() * 0.002 + i) * 5; // Animated rays
-          ctx.beginPath();
-          ctx.moveTo(sunX, sunY);
-          ctx.lineTo(
-            sunX + Math.cos(angle) * rayLength,
-            sunY + Math.sin(angle) * rayLength
-          );
-          ctx.stroke();
-        }
-        
-        // Enhanced sun with glow effect
-        const sunGradient = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 30);
-        sunGradient.addColorStop(0, '#FFF9C4');
-        sunGradient.addColorStop(0.5, '#FEF08A');
-        sunGradient.addColorStop(0.8, '#F59E0B');
-        sunGradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
-        
-        ctx.fillStyle = sunGradient;
-        ctx.beginPath();
-        ctx.arc(sunX, sunY, 30, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Sun core
-        ctx.fillStyle = '#FFFACD';
-        ctx.beginPath();
-        ctx.arc(sunX, sunY, 20, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      function drawAtmosphericParticles() {
-        // Add floating pollen/dust particles for atmosphere
-        const time = Date.now() * 0.001;
-        
-        for (let i = 0; i < 8; i++) {
-          const x = (canvas.width * 0.1 * i + time * 20 + Math.sin(time + i) * 30) % canvas.width;
-          const y = canvas.height * 0.3 + Math.sin(time * 0.7 + i * 0.5) * 50;
-          
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-          ctx.beginPath();
-          ctx.arc(x, y, 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
       }
 
       function drawBackgroundTrees() {
@@ -4589,211 +4264,102 @@ void ACutsceneManager::PlayCutscene()
       function drawTree(x, y, scale) {
         ctx.save();
         
-        // Enhanced tree with more realistic proportions
-        const trunkWidth = 14 * scale;
-        const trunkHeight = 45 * scale;
-        
-        // Tree trunk with bark texture
-        const trunkGradient = ctx.createLinearGradient(x - trunkWidth/2, y, x + trunkWidth/2, y);
-        trunkGradient.addColorStop(0, colors.tree);
-        trunkGradient.addColorStop(0.3, '#A0522D');
-        trunkGradient.addColorStop(0.7, colors.tree);
-        trunkGradient.addColorStop(1, '#654321');
-        
-        ctx.fillStyle = trunkGradient;
+        // Tree trunk
+        ctx.fillStyle = colors.tree;
+        const trunkWidth = 12 * scale;
+        const trunkHeight = 40 * scale;
         ctx.fillRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
         
-        // Bark texture lines
-        ctx.strokeStyle = '#654321';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 3; i++) {
-          const lineY = y + 10 + i * 12;
-          ctx.beginPath();
-          ctx.moveTo(x - trunkWidth/2 + 2, lineY);
-          ctx.lineTo(x + trunkWidth/2 - 2, lineY);
-          ctx.stroke();
-        }
-        
-        // Enhanced tree canopy with multiple leaf layers
-        const leafRadius = 28 * scale;
-        
-        // Shadow layer
-        ctx.fillStyle = colors.treeLeavesShade;
-        ctx.beginPath();
-        ctx.arc(x + 3, y - 8 * scale, leafRadius, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Main leaf clusters
+        // Tree leaves (multiple circles for natural look)
         ctx.fillStyle = colors.treeLeaves;
+        const leafRadius = 25 * scale;
         
-        // Central cluster
+        // Main leaf cluster
         ctx.beginPath();
-        ctx.arc(x, y - 12 * scale, leafRadius, 0, Math.PI * 2);
+        ctx.arc(x, y - 10 * scale, leafRadius, 0, Math.PI * 2);
         ctx.fill();
         
-        // Side clusters
+        // Additional leaf clusters
         ctx.beginPath();
-        ctx.arc(x - 18 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.arc(x + 18 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Top cluster
-        ctx.beginPath();
-        ctx.arc(x, y - 25 * scale, leafRadius * 0.7, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Light highlights on leaves
-        ctx.fillStyle = colors.treeLeavesLight;
-        ctx.beginPath();
-        ctx.arc(x - 8 * scale, y - 18 * scale, leafRadius * 0.4, 0, Math.PI * 2);
+        ctx.arc(x - 15 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.beginPath();
-        ctx.arc(x + 6 * scale, y - 15 * scale, leafRadius * 0.3, 0, Math.PI * 2);
+        ctx.arc(x + 15 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
         ctx.fill();
         
-        // Small decorative branches
-        ctx.strokeStyle = colors.tree;
-        ctx.lineWidth = 2 * scale;
+        // Tree highlight
+        ctx.fillStyle = '#4AE54A';
         ctx.beginPath();
-        ctx.moveTo(x - trunkWidth/4, y + trunkHeight * 0.3);
-        ctx.lineTo(x - trunkWidth * 0.8, y + trunkHeight * 0.2);
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(x + trunkWidth/4, y + trunkHeight * 0.5);
-        ctx.lineTo(x + trunkWidth * 0.7, y + trunkHeight * 0.4);
-        ctx.stroke();
+        ctx.arc(x - 8 * scale, y - 15 * scale, leafRadius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
         
         ctx.restore();
       }
 
       function drawVegetation() {
-        // Enhanced grass patches with variation
-        for (let i = 0; i < canvas.width; i += 15) {
-          if (Math.random() < 0.8) {
-            drawGrassCluster(i, canvas.height - 25);
+        // Draw grass patches
+        for (let i = 0; i < canvas.width; i += 20) {
+          if (Math.random() < 0.7) {
+            drawGrass(i, canvas.height - 25);
           }
         }
         
-        // Enhanced flowers with more variety
+        // Draw flowers
         const flowers = [
-          {x: 150, y: canvas.height - 35, type: 'red'},
-          {x: 180, y: canvas.height - 32, type: 'yellow'},
-          {x: 350, y: canvas.height - 30, type: 'red'},
-          {x: 380, y: canvas.height - 33, type: 'pink'},
-          {x: 550, y: canvas.height - 35, type: 'yellow'},
-          {x: 580, y: canvas.height - 31, type: 'red'},
-          {x: 750, y: canvas.height - 32, type: 'pink'},
-          {x: 780, y: canvas.height - 34, type: 'yellow'},
-          {x: 950, y: canvas.height - 35, type: 'red'},
-          {x: 980, y: canvas.height - 30, type: 'pink'},
-          {x: 1150, y: canvas.height - 30, type: 'yellow'},
-          {x: 1180, y: canvas.height - 33, type: 'red'},
+          {x: 150, y: canvas.height - 35},
+          {x: 350, y: canvas.height - 30},
+          {x: 550, y: canvas.height - 35},
+          {x: 750, y: canvas.height - 32},
+          {x: 950, y: canvas.height - 35},
+          {x: 1150, y: canvas.height - 30},
         ];
         
         flowers.forEach(flower => {
-          drawFlower(flower.x, flower.y, flower.type);
-        });
-        
-        // Add small bushes
-        const bushes = [
-          {x: 200, y: canvas.height - 40},
-          {x: 500, y: canvas.height - 38},
-          {x: 800, y: canvas.height - 42},
-          {x: 1100, y: canvas.height - 39},
-        ];
-        
-        bushes.forEach(bush => {
-          drawBush(bush.x, bush.y);
+          drawFlower(flower.x, flower.y);
         });
       }
 
-      function drawGrassCluster(x, y) {
-        // Enhanced grass with multiple blades and shading
-        const grassTypes = [colors.grass, colors.grassDark, '#5CBB5C'];
+      function drawGrass(x, y) {
+        ctx.strokeStyle = colors.grass;
+        ctx.lineWidth = 2;
         
-        for (let i = 0; i < 4; i++) {
-          const grassX = x + i * 3 + Math.random() * 2;
-          const grassHeight = 6 + Math.random() * 10;
-          const grassColor = grassTypes[Math.floor(Math.random() * grassTypes.length)];
-          
-          ctx.strokeStyle = grassColor;
-          ctx.lineWidth = 1.5;
+        for (let i = 0; i < 3; i++) {
+          const grassX = x + i * 3;
+          const grassHeight = 5 + Math.random() * 8;
           
           ctx.beginPath();
           ctx.moveTo(grassX, y);
-          ctx.quadraticCurveTo(
-            grassX + Math.random() * 2 - 1, 
-            y - grassHeight * 0.6,
-            grassX + Math.random() * 3 - 1.5, 
-            y - grassHeight
-          );
+          ctx.lineTo(grassX + Math.random() * 2 - 1, y - grassHeight);
           ctx.stroke();
         }
       }
 
-      function drawFlower(x, y, type) {
-        // Enhanced flowers with different colors and details
-        const flowerColors = {
-          red: colors.flower,
-          yellow: '#FFD700',
-          pink: '#FF69B4'
-        };
-        
-        // Flower stem with slight curve
-        ctx.strokeStyle = colors.grassDark;
+      function drawFlower(x, y) {
+        // Flower stem
+        ctx.strokeStyle = colors.grass;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.quadraticCurveTo(x + 1, y - 4, x, y - 8);
+        ctx.lineTo(x, y - 8);
         ctx.stroke();
         
-        // Flower petals (5 petals)
-        ctx.fillStyle = flowerColors[type] || colors.flower;
+        // Flower petals
+        ctx.fillStyle = colors.flower;
         for (let i = 0; i < 5; i++) {
           const angle = (i * Math.PI * 2) / 5;
-          const petalX = x + Math.cos(angle) * 4;
-          const petalY = y - 8 + Math.sin(angle) * 4;
+          const petalX = x + Math.cos(angle) * 3;
+          const petalY = y - 8 + Math.sin(angle) * 3;
           
           ctx.beginPath();
-          ctx.ellipse(petalX, petalY, 3, 2, angle, 0, Math.PI * 2);
+          ctx.arc(petalX, petalY, 2, 0, Math.PI * 2);
           ctx.fill();
         }
         
         // Flower center
-        ctx.fillStyle = colors.flowerCenter;
+        ctx.fillStyle = '#FFD700';
         ctx.beginPath();
-        ctx.arc(x, y - 8, 2, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Small highlight on center
-        ctx.fillStyle = '#FFFFE0';
-        ctx.beginPath();
-        ctx.arc(x - 0.5, y - 8.5, 0.8, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      function drawBush(x, y) {
-        // Small decorative bushes
-        ctx.fillStyle = colors.grassDark;
-        
-        // Bush base
-        ctx.beginPath();
-        ctx.ellipse(x, y, 12, 8, 0, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Bush highlights
-        ctx.fillStyle = colors.grass;
-        ctx.beginPath();
-        ctx.ellipse(x - 3, y - 2, 6, 4, 0, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.ellipse(x + 4, y - 1, 4, 3, 0, 0, Math.PI * 2);
+        ctx.arc(x, y - 8, 1.5, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -4830,19 +4396,19 @@ void ACutsceneManager::PlayCutscene()
       }
 
       function drawClouds() {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        
         const cloudPositions = [
-          {x: 120, y: 60, size: 1.2, speed: 0.3},
-          {x: 350, y: 40, size: 1.5, speed: 0.2},
-          {x: 650, y: 80, size: 1.0, speed: 0.4},
-          {x: 950, y: 35, size: 1.3, speed: 0.25},
-          {x: 1250, y: 70, size: 1.1, speed: 0.35},
-          {x: 1500, y: 50, size: 0.9, speed: 0.3},
+          {x: 120, y: 60, size: 1.2},
+          {x: 350, y: 40, size: 1.5},
+          {x: 650, y: 80, size: 1.0},
+          {x: 950, y: 35, size: 1.3},
+          {x: 1250, y: 70, size: 1.1},
+          {x: 1500, y: 50, size: 0.9},
         ];
 
-        cloudPositions.forEach((cloud, index) => {
-          // Animate clouds slowly
-          const animatedX = cloud.x + Math.sin(Date.now() * 0.0005 * cloud.speed + index) * 20;
-          drawCloud(animatedX, cloud.y, cloud.size);
+        cloudPositions.forEach(cloud => {
+          drawCloud(cloud.x, cloud.y, cloud.size);
         });
       }
 
@@ -4850,20 +4416,18 @@ void ACutsceneManager::PlayCutscene()
         ctx.save();
         ctx.scale(scale, scale);
         
-        // Enhanced cloud with multiple layers and shadows
-        
-        // Cloud shadow (drawn first)
-        ctx.fillStyle = colors.cloudShadow;
+        // Cloud shadow
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
         ctx.beginPath();
-        ctx.arc(x/scale - 18, y/scale + 8, 28, 0, Math.PI * 2);
-        ctx.arc(x/scale + 2, y/scale - 2, 38, 0, Math.PI * 2);
-        ctx.arc(x/scale + 22, y/scale + 8, 28, 0, Math.PI * 2);
-        ctx.arc(x/scale + 12, y/scale + 18, 23, 0, Math.PI * 2);
-        ctx.arc(x/scale - 8, y/scale + 18, 23, 0, Math.PI * 2);
+        ctx.arc(x/scale - 18, y/scale + 5, 30, 0, Math.PI * 2);
+        ctx.arc(x/scale + 2, y/scale - 5, 40, 0, Math.PI * 2);
+        ctx.arc(x/scale + 22, y/scale + 5, 30, 0, Math.PI * 2);
+        ctx.arc(x/scale + 12, y/scale + 15, 25, 0, Math.PI * 2);
+        ctx.arc(x/scale - 8, y/scale + 15, 25, 0, Math.PI * 2);
         ctx.fill();
         
-        // Main cloud body
-        ctx.fillStyle = colors.cloud;
+        // Main cloud
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.beginPath();
         ctx.arc(x/scale - 20, y/scale, 30, 0, Math.PI * 2);
         ctx.arc(x/scale, y/scale - 10, 40, 0, Math.PI * 2);
@@ -4872,64 +4436,35 @@ void ACutsceneManager::PlayCutscene()
         ctx.arc(x/scale - 10, y/scale + 10, 25, 0, Math.PI * 2);
         ctx.fill();
         
-        // Cloud highlights
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.beginPath();
-        ctx.arc(x/scale - 15, y/scale - 5, 15, 0, Math.PI * 2);
-        ctx.arc(x/scale + 5, y/scale - 15, 20, 0, Math.PI * 2);
-        ctx.fill();
-        
         ctx.restore();
       }
 
       function drawHills() {
-        // Multi-layered hills with enhanced shading
-        
-        // Distant hills (lightest)
+        // Background hills with warm green colors
         ctx.fillStyle = colors.hill;
+        
         ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 140);
-        ctx.quadraticCurveTo(200, canvas.height - 200, 400, canvas.height - 140);
-        ctx.quadraticCurveTo(600, canvas.height - 120, 800, canvas.height - 160);
-        ctx.quadraticCurveTo(1000, canvas.height - 180, 1200, canvas.height - 140);
-        ctx.quadraticCurveTo(1400, canvas.height - 130, canvas.width, canvas.height - 150);
+        ctx.moveTo(0, canvas.height - 120);
+        ctx.quadraticCurveTo(150, canvas.height - 180, 300, canvas.height - 120);
+        ctx.quadraticCurveTo(450, canvas.height - 100, 600, canvas.height - 140);
+        ctx.quadraticCurveTo(800, canvas.height - 160, 1000, canvas.height - 120);
+        ctx.quadraticCurveTo(1200, canvas.height - 110, canvas.width, canvas.height - 130);
         ctx.lineTo(canvas.width, canvas.height);
         ctx.lineTo(0, canvas.height);
         ctx.closePath();
         ctx.fill();
         
-        // Middle hills (medium shade)
+        // Foreground hills (darker)
         ctx.fillStyle = colors.hillDark;
         ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 100);
-        ctx.quadraticCurveTo(150, canvas.height - 140, 300, canvas.height - 100);
-        ctx.quadraticCurveTo(500, canvas.height - 80, 700, canvas.height - 110);
-        ctx.quadraticCurveTo(900, canvas.height - 120, 1100, canvas.height - 100);
-        ctx.quadraticCurveTo(1300, canvas.height - 90, canvas.width, canvas.height - 110);
+        ctx.moveTo(0, canvas.height - 80);
+        ctx.quadraticCurveTo(200, canvas.height - 110, 400, canvas.height - 80);
+        ctx.quadraticCurveTo(600, canvas.height - 70, 800, canvas.height - 90);
+        ctx.quadraticCurveTo(1000, canvas.height - 85, canvas.width, canvas.height - 95);
         ctx.lineTo(canvas.width, canvas.height);
         ctx.lineTo(0, canvas.height);
         ctx.closePath();
         ctx.fill();
-        
-        // Foreground hills (darkest) with texture
-        ctx.fillStyle = colors.hillShadow;
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 60);
-        ctx.quadraticCurveTo(100, canvas.height - 80, 250, canvas.height - 60);
-        ctx.quadraticCurveTo(400, canvas.height - 50, 600, canvas.height - 70);
-        ctx.quadraticCurveTo(800, canvas.height - 65, canvas.width, canvas.height - 75);
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Add hill highlights
-        ctx.strokeStyle = colors.hill;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 58);
-        ctx.quadraticCurveTo(100, canvas.height - 78, 250, canvas.height - 58);
-        ctx.stroke();
       }
 
       // Main game loop
@@ -4957,9 +4492,6 @@ void ACutsceneManager::PlayCutscene()
           character.draw();
         }
 
-        // Draw UI
-        drawUI();
-
         // Update and draw particles
         for (let i = particles.length - 1; i >= 0; i--) {
           const particle = particles[i];
@@ -4979,111 +4511,6 @@ void ACutsceneManager::PlayCutscene()
         }
 
         requestAnimationFrame(animate);
-      }
-
-      // UI Drawing with enhanced art style
-      function drawUI() {
-        if (!character) return;
-        
-        ctx.save();
-        ctx.resetTransform(); // Reset any scaling from DPI handling
-        
-        // Enhanced UI background with rounded corners effect
-        ctx.fillStyle = colors.uiBackground;
-        ctx.fillRect(10, 10, 220, 90);
-        
-        // UI border with gradient
-        const uiBorderGradient = ctx.createLinearGradient(10, 10, 230, 100);
-        uiBorderGradient.addColorStop(0, 'rgba(255, 215, 0, 0.6)');
-        uiBorderGradient.addColorStop(1, 'rgba(255, 215, 0, 0.2)');
-        ctx.strokeStyle = uiBorderGradient;
-        ctx.lineWidth = 2;
-        ctx.strokeRect(10, 10, 220, 90);
-        
-        // Health bar background
-        ctx.fillStyle = '#2D1B13';
-        ctx.fillRect(20, 25, 200, 18);
-        
-        // Health bar border
-        ctx.strokeStyle = '#8B4513';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(20, 25, 200, 18);
-        
-        // Health bar fill with gradient
-        const healthPercent = character.health / character.maxHealth;
-        const healthGradient = ctx.createLinearGradient(20, 25, 220, 43);
-        
-        if (healthPercent > 0.6) {
-          healthGradient.addColorStop(0, colors.healthGood);
-          healthGradient.addColorStop(1, '#66BB6A');
-        } else if (healthPercent > 0.3) {
-          healthGradient.addColorStop(0, colors.healthMid);
-          healthGradient.addColorStop(1, '#FFA726');
-        } else {
-          healthGradient.addColorStop(0, colors.healthBad);
-          healthGradient.addColorStop(1, '#EF5350');
-        }
-        
-        ctx.fillStyle = healthGradient;
-        ctx.fillRect(20, 25, 200 * healthPercent, 18);
-        
-        // Health bar highlight
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.fillRect(20, 25, 200 * healthPercent, 6);
-        
-        // Enhanced text without shadows
-        ctx.fillStyle = colors.uiText;
-        ctx.font = '14px Arial';
-        ctx.fillText(`Health: ${character.health}/${character.maxHealth}`, 25, 38);
-        
-        // Score with enhanced styling
-        ctx.fillStyle = colors.coin;
-        ctx.fillText(`Score: ${character.score}`, 25, 57);
-        
-        // Status indicators with better styling
-        if (character.invulnerable) {
-          ctx.fillStyle = colors.attack;
-          ctx.fillText('INVULNERABLE', 25, 76);
-        }
-        
-        if (character.attacking) {
-          ctx.fillStyle = colors.healthBad;
-          ctx.fillText('ATTACKING!', 140, 76);
-        }
-        
-        // Mini character icon in UI
-        drawMiniCharacter(190, 80);
-        
-        ctx.restore();
-      }
-
-      function drawMiniCharacter(x, y) {
-        // Mini version of character for UI
-        const scale = 0.4;
-        const w = 20;
-        const h = 25;
-        
-        // Head
-        ctx.fillStyle = colors.characterSkin;
-        ctx.fillRect(x + w*0.25, y + 2, w*0.5, w*0.35);
-        
-        // Hair
-        ctx.fillStyle = '#8B4513';
-        ctx.fillRect(x + w*0.3, y, w*0.4, w*0.2);
-        
-        // Body (black top)
-        ctx.fillStyle = colors.characterTop;
-        ctx.fillRect(x + w*0.2, y + h*0.4, w*0.6, h*0.3);
-        
-        // Legs (blue bottom)
-        ctx.fillStyle = colors.characterBottom;
-        ctx.fillRect(x + w*0.25, y + h*0.7, w*0.2, h*0.25);
-        ctx.fillRect(x + w*0.55, y + h*0.7, w*0.2, h*0.25);
-        
-        // Eyes
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(x + w*0.35, y + h*0.2, 2, 2);
-        ctx.fillRect(x + w*0.55, y + h*0.2, 2, 2);
       }
 
       // Initialize and start
