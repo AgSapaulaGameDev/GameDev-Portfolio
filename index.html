@@ -625,12 +625,15 @@
       border-radius: 50%;
     }
 
-    /* Canvas Styles */
+    /* Canvas Styles - Fixed aspect ratio */
     .canvas-bg {
       position: absolute;
       inset: 0;
       pointer-events: none;
       opacity: 0.3;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .canvas-trail {
@@ -3529,6 +3532,15 @@ void ACutsceneManager::PlayCutscene()
       function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        
+        // Prevent stretching by maintaining pixel ratio
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
       }
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
@@ -3539,37 +3551,54 @@ void ACutsceneManager::PlayCutscene()
       let enemies = [];
       let powerUps = [];
       let particles = [];
-      let mario = null;
+      let character = null;
 
-      // Colors and themes
+      // Colors and themes (updated for character customization)
       const colors = {
-        mario: '#ff6b35',
+        // Character colors
+        characterTop: '#1A1A1A', // Black top
+        characterBottom: '#2563EB', // Blue bottom
+        characterSkin: '#FFDBAC',
+        characterShoes: '#654321',
+        
+        // Environment colors
         ground: '#8B4513',
         platform: '#654321',
         coin: '#FFD700',
         enemy: '#DC143C',
         powerUp: '#32CD32',
-        sky: '#87CEEB',
+        sky: '#FFF8DC', // Warm cream
+        skyBottom: '#F7FAFC',
         cloud: '#FFFFFF',
-        brick: '#B8860B',
-        pipe: '#228B22'
+        brick: '#D69E2E',
+        brickDark: '#B7791F',
+        pipe: '#38A169',
+        pipeLight: '#68D391',
+        hill: '#9AE6B4',
+        hillDark: '#68D391',
+        
+        // New environment elements
+        tree: '#22543D',
+        treeLeaves: '#38A169',
+        flower: '#E53E3E',
+        grass: '#48BB78'
       };
 
-      // Mario character
-      class Mario {
+      // Character class (customized with black top and blue bottom)
+      class Character {
         constructor() {
-          this.x = 100;
-          this.y = canvas.height - 100;
-          this.width = 32;
-          this.height = 32;
-          this.vx = 2;
+          this.x = 150;
+          this.y = canvas.height - 150;
+          this.width = 40;
+          this.height = 50;
+          this.vx = 1.2;
           this.vy = 0;
-          this.gravity = 0.5;
-          this.jumpPower = -12;
+          this.gravity = 0.6;
+          this.jumpPower = -15;
           this.onGround = false;
           this.direction = 1;
           this.animFrame = 0;
-          this.animSpeed = 0.2;
+          this.animSpeed = 0.12;
           this.jumpCooldown = 0;
         }
 
@@ -3630,65 +3659,109 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
+          const drawX = this.x;
+          const drawY = this.y;
+          const w = this.width;
+          const h = this.height;
+          
           // Flip sprite based on direction
           if (this.direction < 0) {
             ctx.scale(-1, 1);
-            ctx.translate(-this.x - this.width, 0);
+            ctx.translate(-drawX - w, 0);
           } else {
-            ctx.translate(this.x, 0);
+            ctx.translate(drawX, 0);
           }
 
-          // Draw Mario (simplified pixel art style)
+          // Draw character with black top and blue bottom
           const frame = Math.floor(this.animFrame);
           
-          // Hat
-          ctx.fillStyle = colors.mario;
-          ctx.fillRect(4, this.y + 4, 24, 8);
+          // Shadow
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+          ctx.fillRect(4, drawY + h - 2, w - 8, 4);
           
-          // Face
-          ctx.fillStyle = '#FFDBAC';
-          ctx.fillRect(8, this.y + 8, 16, 12);
+          // Head (skin tone)
+          ctx.fillStyle = colors.characterSkin;
+          ctx.fillRect(8, drawY + 4, w - 16, 14);
           
-          // Shirt
-          ctx.fillStyle = '#0066CC';
-          ctx.fillRect(4, this.y + 16, 24, 8);
-          
-          // Overalls
-          ctx.fillStyle = '#FF0000';
-          ctx.fillRect(8, this.y + 20, 16, 8);
-          
-          // Legs (animated)
+          // Hair/Head top
           ctx.fillStyle = '#8B4513';
+          ctx.fillRect(10, drawY + 2, w - 20, 8);
+          
+          // Black top (shirt/hoodie)
+          ctx.fillStyle = colors.characterTop;
+          ctx.fillRect(6, drawY + 18, w - 12, 16);
+          
+          // Top details (hoodie strings or design)
+          ctx.fillStyle = '#333333';
+          ctx.fillRect(12, drawY + 20, 2, 6);
+          ctx.fillRect(w - 14, drawY + 20, 2, 6);
+          
+          // Blue bottom (pants/jeans)
+          ctx.fillStyle = colors.characterBottom;
+          ctx.fillRect(8, drawY + 34, w - 16, 12);
+          
+          // Pants details (pockets)
+          ctx.fillStyle = '#1E40AF';
+          ctx.fillRect(10, drawY + 36, 4, 3);
+          ctx.fillRect(w - 14, drawY + 36, 4, 3);
+          
+          // Legs with walking animation
+          ctx.fillStyle = colors.characterBottom;
           if (this.onGround && Math.abs(this.vx) > 0) {
             // Walking animation
             const legOffset = frame % 2 === 0 ? 0 : 2;
-            ctx.fillRect(8 + legOffset, this.y + 24, 6, 8);
-            ctx.fillRect(18 - legOffset, this.y + 24, 6, 8);
+            ctx.fillRect(10 + legOffset, drawY + 46, 6, 8);
+            ctx.fillRect(w - 16 - legOffset, drawY + 46, 6, 8);
           } else {
             // Standing
-            ctx.fillRect(10, this.y + 24, 6, 8);
-            ctx.fillRect(16, this.y + 24, 6, 8);
+            ctx.fillRect(12, drawY + 46, 6, 8);
+            ctx.fillRect(w - 18, drawY + 46, 6, 8);
           }
+
+          // Shoes
+          ctx.fillStyle = colors.characterShoes;
+          ctx.fillRect(8, drawY + 52, 10, 4);
+          ctx.fillRect(w - 18, drawY + 52, 10, 4);
 
           // Eyes
           ctx.fillStyle = '#000000';
-          ctx.fillRect(10, this.y + 10, 2, 2);
-          ctx.fillRect(20, this.y + 10, 2, 2);
+          ctx.fillRect(10, drawY + 8, 2, 2);
+          ctx.fillRect(w - 12, drawY + 8, 2, 2);
 
-          // Mustache
-          ctx.fillRect(12, this.y + 14, 8, 2);
+          // Mouth
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(w/2 - 1, drawY + 12, 2, 1);
+
+          // Arms (animated with walking)
+          ctx.fillStyle = colors.characterTop;
+          if (this.onGround && Math.abs(this.vx) > 0) {
+            const armOffset = frame % 2 === 0 ? 0 : 1;
+            // Left arm
+            ctx.fillRect(2, drawY + 20 + armOffset, 4, 8);
+            // Right arm  
+            ctx.fillRect(w - 6, drawY + 20 - armOffset, 4, 8);
+          } else {
+            // Arms at rest
+            ctx.fillRect(2, drawY + 22, 4, 8);
+            ctx.fillRect(w - 6, drawY + 22, 4, 8);
+          }
+
+          // Hands
+          ctx.fillStyle = colors.characterSkin;
+          ctx.fillRect(2, drawY + 28, 4, 3);
+          ctx.fillRect(w - 6, drawY + 28, 4, 3);
 
           ctx.restore();
         }
       }
 
-      // Platform class
+      // Platform class (enhanced with better visuals)
       class Platform {
         constructor(x, y, width, height, type = 'normal') {
           this.x = x;
           this.y = y;
           this.width = width;
-          this.height = height;
+          this.height = height * 1.5; // Make platforms taller
           this.type = type;
           this.animOffset = Math.random() * Math.PI * 2;
         }
@@ -3721,55 +3794,111 @@ void ACutsceneManager::PlayCutscene()
         }
 
         drawNormalPlatform() {
-          // Draw brick-like platform
+          // Enhanced brick-like platform with 3D effect
+          // Main platform color
           ctx.fillStyle = colors.platform;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Add brick texture
-          ctx.strokeStyle = colors.ground;
-          ctx.lineWidth = 1;
+          // Top highlight
+          ctx.fillStyle = '#8B7355';
+          ctx.fillRect(this.x, this.y, this.width, 4);
           
-          const brickWidth = 20;
-          const brickHeight = 10;
+          // Side shadow
+          ctx.fillStyle = '#5D4E37';
+          ctx.fillRect(this.x + this.width - 4, this.y + 4, 4, this.height - 4);
+          
+          // Add detailed brick texture
+          ctx.strokeStyle = colors.ground;
+          ctx.lineWidth = 2;
+          
+          const brickWidth = 30; // Larger bricks
+          const brickHeight = 15;
           
           for (let x = 0; x < this.width; x += brickWidth) {
             for (let y = 0; y < this.height; y += brickHeight) {
-              ctx.strokeRect(this.x + x, this.y + y, 
-                            Math.min(brickWidth, this.width - x), 
-                            Math.min(brickHeight, this.height - y));
+              const actualWidth = Math.min(brickWidth, this.width - x);
+              const actualHeight = Math.min(brickHeight, this.height - y);
+              
+              // Brick outline
+              ctx.strokeRect(this.x + x, this.y + y, actualWidth, actualHeight);
+              
+              // Brick highlight
+              ctx.fillStyle = '#8B7355';
+              ctx.fillRect(this.x + x + 2, this.y + y + 2, actualWidth - 4, 2);
+              
+              // Brick shadow
+              ctx.fillStyle = '#5D4E37';
+              ctx.fillRect(this.x + x + actualWidth - 4, this.y + y + 4, 2, actualHeight - 4);
             }
           }
         }
 
         drawBrickPlatform() {
-          // Question mark blocks
+          // Enhanced question mark blocks with 3D effect
+          // Main block
           ctx.fillStyle = colors.brick;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
+          // Top highlight
+          ctx.fillStyle = '#F6E05E';
+          ctx.fillRect(this.x, this.y, this.width, 6);
+          
+          // Side shadow
+          ctx.fillStyle = colors.brickDark;
+          ctx.fillRect(this.x + this.width - 6, this.y + 6, 6, this.height - 6);
+          
           // Question mark
           ctx.fillStyle = '#FFFFFF';
-          ctx.font = 'bold 16px Arial';
+          ctx.font = 'bold 24px Arial';
           ctx.textAlign = 'center';
-          ctx.fillText('?', this.x + this.width/2, this.y + this.height/2 + 6);
-          
-          // Border
-          ctx.strokeStyle = '#8B4513';
+          ctx.strokeStyle = '#000000';
           ctx.lineWidth = 2;
+          ctx.strokeText('?', this.x + this.width/2, this.y + this.height/2 + 8);
+          ctx.fillText('?', this.x + this.width/2, this.y + this.height/2 + 8);
+          
+          // Border with 3D effect
+          ctx.strokeStyle = colors.brickDark;
+          ctx.lineWidth = 3;
           ctx.strokeRect(this.x, this.y, this.width, this.height);
+          
+          // Inner border highlight
+          ctx.strokeStyle = '#F6E05E';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4);
         }
 
         drawPipe() {
-          // Green pipe
+          // Enhanced green pipe with better 3D effect
+          // Main pipe body
           ctx.fillStyle = colors.pipe;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Pipe top
-          ctx.fillStyle = '#32CD32';
-          ctx.fillRect(this.x - 5, this.y, this.width + 10, 15);
+          // Pipe top (larger and more detailed)
+          ctx.fillStyle = colors.pipeLight;
+          ctx.fillRect(this.x - 8, this.y, this.width + 16, 20);
           
-          // Pipe highlights
-          ctx.fillStyle = '#90EE90';
-          ctx.fillRect(this.x + 5, this.y + 15, 8, this.height - 15);
+          // Pipe top shadow
+          ctx.fillStyle = colors.pipe;
+          ctx.fillRect(this.x - 8, this.y + 16, this.width + 16, 4);
+          
+          // Pipe body highlights
+          ctx.fillStyle = colors.pipeLight;
+          ctx.fillRect(this.x + 8, this.y + 20, 12, this.height - 20);
+          
+          // Pipe body shadow
+          ctx.fillStyle = '#2F855A';
+          ctx.fillRect(this.x + this.width - 12, this.y + 20, 12, this.height - 20);
+          
+          // Pipe rim details
+          ctx.fillStyle = '#1A202C';
+          ctx.fillRect(this.x - 4, this.y + 4, this.width + 8, 4);
+          ctx.fillRect(this.x - 4, this.y + 12, this.width + 8, 4);
+          
+          // Inner pipe darkness
+          ctx.fillStyle = '#000000';
+          ctx.beginPath();
+          ctx.arc(this.x + this.width/2, this.y + 10, this.width/3, 0, Math.PI * 2);
+          ctx.fill();
         }
 
         drawCloudPlatform() {
@@ -3793,16 +3922,17 @@ void ACutsceneManager::PlayCutscene()
         }
       }
 
-      // Coin class
+      // Coin class (larger and more detailed)
       class Coin {
         constructor(x, y) {
           this.x = x;
           this.y = y;
-          this.size = 12;
+          this.size = 20; // Increased from 12
           this.rotation = 0;
-          this.rotationSpeed = 0.1;
+          this.rotationSpeed = 0.08;
           this.floatOffset = Math.random() * Math.PI * 2;
           this.collected = false;
+          this.scale = 1.2; // Scale factor
         }
 
         update() {
@@ -3811,12 +3941,12 @@ void ACutsceneManager::PlayCutscene()
           // Floating animation
           this.y += Math.sin(Date.now() * 0.003 + this.floatOffset) * 0.5;
           
-          // Check collision with Mario
-          if (mario && !this.collected &&
-              mario.x < this.x + this.size &&
-              mario.x + mario.width > this.x &&
-              mario.y < this.y + this.size &&
-              mario.y + mario.height > this.y) {
+          // Check collision with character
+          if (character && !this.collected &&
+              character.x < this.x + this.size &&
+              character.x + character.width > this.x &&
+              character.y < this.y + this.size &&
+              character.y + character.height > this.y) {
             this.collected = true;
             createCoinParticles(this.x + this.size/2, this.y + this.size/2);
           }
@@ -3826,42 +3956,62 @@ void ACutsceneManager::PlayCutscene()
           if (this.collected) return;
           
           ctx.save();
-          ctx.translate(this.x + this.size/2, this.y + this.size/2);
+          const size = this.size * this.scale;
+          ctx.translate(this.x + size/2, this.y + size/2);
           ctx.rotate(this.rotation);
           
-          // Coin body
-          ctx.fillStyle = colors.coin;
+          // Coin shadow
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
           ctx.beginPath();
-          ctx.arc(0, 0, this.size/2, 0, Math.PI * 2);
+          ctx.arc(2, 4, size/2, 0, Math.PI * 2);
           ctx.fill();
+          
+          // Coin body with gradient effect
+          const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size/2);
+          gradient.addColorStop(0, '#FFFF99');
+          gradient.addColorStop(0.7, colors.coin);
+          gradient.addColorStop(1, '#B8860B');
+          
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(0, 0, size/2, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Coin border
+          ctx.strokeStyle = '#B8860B';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(0, 0, size/2, 0, Math.PI * 2);
+          ctx.stroke();
           
           // Coin highlight
           ctx.fillStyle = '#FFFFE0';
           ctx.beginPath();
-          ctx.arc(-2, -2, this.size/4, 0, Math.PI * 2);
+          ctx.arc(-size/6, -size/6, size/4, 0, Math.PI * 2);
           ctx.fill();
           
-          // Coin center
-          ctx.fillStyle = colors.coin;
-          ctx.font = 'bold 10px Arial';
+          // Coin center symbol
+          ctx.fillStyle = '#8B6914';
+          ctx.font = 'bold 16px Arial';
           ctx.textAlign = 'center';
-          ctx.fillText('¢', 0, 3);
+          ctx.fillText('$', 0, 5);
           
           ctx.restore();
         }
       }
 
-      // Enemy class (Goomba-style)
+      // Enemy class (larger Goomba-style)
       class Enemy {
         constructor(x, y) {
           this.x = x;
           this.y = y;
-          this.width = 24;
-          this.height = 24;
-          this.vx = -1;
+          this.width = 36; // Increased from 24
+          this.height = 36; // Increased from 24
+          this.vx = -0.8; // Slower movement
           this.direction = -1;
           this.animFrame = 0;
-          this.animSpeed = 0.1;
+          this.animSpeed = 0.08; // Slower animation
+          this.scale = 1.3; // Scale factor
         }
 
         update() {
@@ -3897,35 +4047,66 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
-          // Goomba body
-          ctx.fillStyle = colors.enemy;
-          ctx.fillRect(this.x + 2, this.y + 8, this.width - 4, this.height - 8);
+          const w = this.width * this.scale;
+          const h = this.height * this.scale;
           
-          // Goomba head
+          // Shadow
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+          ctx.fillRect(this.x - 2, this.y + h - 4, w + 4, 6);
+          
+          // Goomba body with gradient
+          const bodyGradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + h);
+          bodyGradient.addColorStop(0, '#FF6B6B');
+          bodyGradient.addColorStop(0.5, colors.enemy);
+          bodyGradient.addColorStop(1, '#B91C1C');
+          
+          ctx.fillStyle = bodyGradient;
+          ctx.fillRect(this.x + 3, this.y + 12, w - 6, h - 12);
+          
+          // Goomba head with better shape
+          ctx.fillStyle = colors.enemy;
           ctx.beginPath();
-          ctx.arc(this.x + this.width/2, this.y + 8, 10, 0, Math.PI);
+          ctx.arc(this.x + w/2, this.y + 12, 15, 0, Math.PI);
           ctx.fill();
           
-          // Eyes
+          // Head highlight
+          ctx.fillStyle = '#FF6B6B';
+          ctx.beginPath();
+          ctx.arc(this.x + w/2 - 4, this.y + 8, 6, 0, Math.PI);
+          ctx.fill();
+          
+          // Eyes (larger and more detailed)
           ctx.fillStyle = '#FFFFFF';
           const eyeOffset = Math.floor(this.animFrame) === 0 ? 0 : 1;
-          ctx.fillRect(this.x + 6 + eyeOffset, this.y + 4, 3, 3);
-          ctx.fillRect(this.x + 15 + eyeOffset, this.y + 4, 3, 3);
+          ctx.fillRect(this.x + 8 + eyeOffset, this.y + 6, 6, 6);
+          ctx.fillRect(this.x + w - 14 + eyeOffset, this.y + 6, 6, 6);
           
           // Eye pupils
           ctx.fillStyle = '#000000';
-          ctx.fillRect(this.x + 7 + eyeOffset, this.y + 5, 1, 1);
-          ctx.fillRect(this.x + 16 + eyeOffset, this.y + 5, 1, 1);
+          ctx.fillRect(this.x + 10 + eyeOffset, this.y + 8, 2, 2);
+          ctx.fillRect(this.x + w - 12 + eyeOffset, this.y + 8, 2, 2);
           
-          // Angry eyebrows
+          // Angry eyebrows (thicker)
           ctx.strokeStyle = '#8B0000';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(this.x + 8, this.y + 3);
+          ctx.lineTo(this.x + 14, this.y + 6);
+          ctx.moveTo(this.x + w - 14, this.y + 6);
+          ctx.lineTo(this.x + w - 8, this.y + 3);
+          ctx.stroke();
+          
+          // Frown
+          ctx.strokeStyle = '#000000';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(this.x + 6, this.y + 2);
-          ctx.lineTo(this.x + 10, this.y + 4);
-          ctx.moveTo(this.x + 14, this.y + 4);
-          ctx.lineTo(this.x + 18, this.y + 2);
+          ctx.arc(this.x + w/2, this.y + 14, 4, 0.2 * Math.PI, 0.8 * Math.PI);
           ctx.stroke();
+          
+          // Feet
+          ctx.fillStyle = '#8B4513';
+          ctx.fillRect(this.x + 6, this.y + h - 6, 8, 6);
+          ctx.fillRect(this.x + w - 14, this.y + h - 6, 8, 6);
           
           ctx.restore();
         }
@@ -3982,84 +4163,248 @@ void ACutsceneManager::PlayCutscene()
 
       // Initialize game world
       function initGameWorld() {
-        // Create Mario
-        mario = new Mario();
+        // Create character
+        character = new Character();
 
-        // Create platforms
+        // Create platforms (larger and more varied)
         platforms = [
           // Ground platforms
-          new Platform(0, canvas.height - 20, canvas.width, 20, 'normal'),
+          new Platform(0, canvas.height - 30, canvas.width, 30, 'normal'),
           
-          // Floating platforms
-          new Platform(200, canvas.height - 150, 120, 20, 'normal'),
-          new Platform(400, canvas.height - 200, 80, 20, 'brick'),
-          new Platform(600, canvas.height - 120, 100, 20, 'cloud'),
-          new Platform(800, canvas.height - 180, 60, 80, 'pipe'),
-          new Platform(1000, canvas.height - 160, 140, 20, 'normal'),
-          new Platform(1200, canvas.height - 100, 80, 20, 'floating'),
+          // Floating platforms (bigger and more spaced)
+          new Platform(250, canvas.height - 200, 150, 25, 'normal'),
+          new Platform(500, canvas.height - 280, 100, 30, 'brick'),
+          new Platform(750, canvas.height - 180, 130, 25, 'cloud'),
+          new Platform(950, canvas.height - 240, 80, 100, 'pipe'),
+          new Platform(1200, canvas.height - 220, 160, 25, 'normal'),
+          new Platform(1450, canvas.height - 160, 100, 25, 'floating'),
           
           // Higher platforms
-          new Platform(300, canvas.height - 280, 100, 20, 'brick'),
-          new Platform(700, canvas.height - 320, 120, 20, 'cloud'),
-          new Platform(1100, canvas.height - 250, 80, 20, 'normal'),
+          new Platform(400, canvas.height - 380, 120, 25, 'brick'),
+          new Platform(800, canvas.height - 420, 140, 25, 'cloud'),
+          new Platform(1300, canvas.height - 320, 100, 25, 'normal'),
+          
+          // Additional mid-level platforms
+          new Platform(150, canvas.height - 300, 100, 25, 'normal'),
+          new Platform(650, canvas.height - 350, 80, 25, 'brick'),
+          new Platform(1100, canvas.height - 280, 120, 25, 'cloud'),
         ];
 
-        // Create coins
+        // Create coins (more coins, better positioned)
         coins = [
-          new Coin(250, canvas.height - 180),
-          new Coin(280, canvas.height - 180),
-          new Coin(440, canvas.height - 240),
-          new Coin(350, canvas.height - 320),
-          new Coin(650, canvas.height - 160),
-          new Coin(750, canvas.height - 360),
-          new Coin(1150, canvas.height - 290),
-          new Coin(1180, canvas.height - 290),
-          new Coin(1050, canvas.height - 200),
+          new Coin(300, canvas.height - 240),
+          new Coin(340, canvas.height - 240),
+          new Coin(380, canvas.height - 240),
+          new Coin(540, canvas.height - 330),
+          new Coin(450, canvas.height - 430),
+          new Coin(820, canvas.height - 230),
+          new Coin(850, canvas.height - 470),
+          new Coin(1350, canvas.height - 370),
+          new Coin(1380, canvas.height - 370),
+          new Coin(1250, canvas.height - 270),
+          new Coin(180, canvas.height - 350),
+          new Coin(680, canvas.height - 400),
+          new Coin(1130, canvas.height - 330),
         ];
 
-        // Create enemies
+        // Create enemies (larger, better positioned)
         enemies = [
-          new Enemy(250, canvas.height - 170),
-          new Enemy(500, canvas.height - 60),
-          new Enemy(900, canvas.height - 60),
-          new Enemy(1200, canvas.height - 140),
+          new Enemy(300, canvas.height - 200),
+          new Enemy(600, canvas.height - 80),
+          new Enemy(1000, canvas.height - 80),
+          new Enemy(1300, canvas.height - 200),
+          new Enemy(500, canvas.height - 80),
         ];
       }
 
-      // Draw background
+      // Draw background with enhanced environment
       function drawBackground() {
-        // Sky gradient
+        // Sky gradient with more natural colors
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#87CEEB');
-        gradient.addColorStop(0.7, '#98D8E8');
-        gradient.addColorStop(1, '#B0E0E6');
+        gradient.addColorStop(0, '#FFE5B4'); // Warm peach
+        gradient.addColorStop(0.3, '#FFF8DC'); // Warm cream
+        gradient.addColorStop(0.7, '#F0F8FF'); // Very light blue-white
+        gradient.addColorStop(1, '#E6F3FF'); // Subtle blue at bottom
         
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw clouds in background
+        // Draw sun
+        drawSun();
+        
+        // Draw clouds
         drawClouds();
         
-        // Draw hills
+        // Draw background trees
+        drawBackgroundTrees();
+        
+        // Draw hills with grass
         drawHills();
+        
+        // Draw foreground vegetation
+        drawVegetation();
+      }
+
+      function drawBackgroundTrees() {
+        const trees = [
+          {x: 80, y: canvas.height - 200, size: 0.8},
+          {x: 200, y: canvas.height - 180, size: 1.0},
+          {x: 400, y: canvas.height - 220, size: 0.9},
+          {x: 700, y: canvas.height - 190, size: 1.1},
+          {x: 900, y: canvas.height - 210, size: 0.7},
+          {x: 1100, y: canvas.height - 180, size: 1.0},
+          {x: 1350, y: canvas.height - 200, size: 0.9},
+        ];
+
+        trees.forEach(tree => {
+          drawTree(tree.x, tree.y, tree.size);
+        });
+      }
+
+      function drawTree(x, y, scale) {
+        ctx.save();
+        
+        // Tree trunk
+        ctx.fillStyle = colors.tree;
+        const trunkWidth = 12 * scale;
+        const trunkHeight = 40 * scale;
+        ctx.fillRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
+        
+        // Tree leaves (multiple circles for natural look)
+        ctx.fillStyle = colors.treeLeaves;
+        const leafRadius = 25 * scale;
+        
+        // Main leaf cluster
+        ctx.beginPath();
+        ctx.arc(x, y - 10 * scale, leafRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Additional leaf clusters
+        ctx.beginPath();
+        ctx.arc(x - 15 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(x + 15 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Tree highlight
+        ctx.fillStyle = '#4AE54A';
+        ctx.beginPath();
+        ctx.arc(x - 8 * scale, y - 15 * scale, leafRadius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+      }
+
+      function drawVegetation() {
+        // Draw grass patches
+        for (let i = 0; i < canvas.width; i += 20) {
+          if (Math.random() < 0.7) {
+            drawGrass(i, canvas.height - 25);
+          }
+        }
+        
+        // Draw flowers
+        const flowers = [
+          {x: 150, y: canvas.height - 35},
+          {x: 350, y: canvas.height - 30},
+          {x: 550, y: canvas.height - 35},
+          {x: 750, y: canvas.height - 32},
+          {x: 950, y: canvas.height - 35},
+          {x: 1150, y: canvas.height - 30},
+        ];
+        
+        flowers.forEach(flower => {
+          drawFlower(flower.x, flower.y);
+        });
+      }
+
+      function drawGrass(x, y) {
+        ctx.strokeStyle = colors.grass;
+        ctx.lineWidth = 2;
+        
+        for (let i = 0; i < 3; i++) {
+          const grassX = x + i * 3;
+          const grassHeight = 5 + Math.random() * 8;
+          
+          ctx.beginPath();
+          ctx.moveTo(grassX, y);
+          ctx.lineTo(grassX + Math.random() * 2 - 1, y - grassHeight);
+          ctx.stroke();
+        }
+      }
+
+      function drawFlower(x, y) {
+        // Flower stem
+        ctx.strokeStyle = colors.grass;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - 8);
+        ctx.stroke();
+        
+        // Flower petals
+        ctx.fillStyle = colors.flower;
+        for (let i = 0; i < 5; i++) {
+          const angle = (i * Math.PI * 2) / 5;
+          const petalX = x + Math.cos(angle) * 3;
+          const petalY = y - 8 + Math.sin(angle) * 3;
+          
+          ctx.beginPath();
+          ctx.arc(petalX, petalY, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        // Flower center
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(x, y - 8, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawSun() {
+        // Add a warm sun in the background
+        const sunX = canvas.width * 0.8;
+        const sunY = canvas.height * 0.15;
+        
+        // Sun rays
+        ctx.strokeStyle = 'rgba(255, 223, 186, 0.4)';
+        ctx.lineWidth = 3;
+        for (let i = 0; i < 8; i++) {
+          const angle = (i * Math.PI * 2) / 8;
+          const rayLength = 40;
+          ctx.beginPath();
+          ctx.moveTo(sunX, sunY);
+          ctx.lineTo(
+            sunX + Math.cos(angle) * rayLength,
+            sunY + Math.sin(angle) * rayLength
+          );
+          ctx.stroke();
+        }
+        
+        // Sun body
+        const sunGradient = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 25);
+        sunGradient.addColorStop(0, '#FFF9C4');
+        sunGradient.addColorStop(0.7, '#FEF08A');
+        sunGradient.addColorStop(1, '#F59E0B');
+        
+        ctx.fillStyle = sunGradient;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 25, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       function drawClouds() {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         
         const cloudPositions = [
-          {x: 80, y: 120, size: 1.8},
-          {x: 280, y: 100, size: 2.2},
-          {x: 520, y: 140, size: 1.6},
-          {x: 750, y: 110, size: 2.0},
-          {x: 980, y: 130, size: 1.7},
-          {x: 1180, y: 115, size: 1.9},
-          // Additional clouds for better coverage
-          {x: 150, y: 160, size: 1.4},
-          {x: 400, y: 150, size: 1.5},
-          {x: 650, y: 170, size: 1.3},
-          {x: 850, y: 155, size: 1.6},
-          {x: 1100, y: 145, size: 1.4},
+          {x: 120, y: 60, size: 1.2},
+          {x: 350, y: 40, size: 1.5},
+          {x: 650, y: 80, size: 1.0},
+          {x: 950, y: 35, size: 1.3},
+          {x: 1250, y: 70, size: 1.1},
+          {x: 1500, y: 50, size: 0.9},
         ];
 
         cloudPositions.forEach(cloud => {
@@ -4071,38 +4416,51 @@ void ACutsceneManager::PlayCutscene()
         ctx.save();
         ctx.scale(scale, scale);
         
-        // Draw more detailed, fluffy cloud
+        // Cloud shadow
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
         ctx.beginPath();
-        ctx.arc(x/scale - 25, y/scale, 30, 0, Math.PI * 2);
-        ctx.arc(x/scale - 8, y/scale - 15, 38, 0, Math.PI * 2);
-        ctx.arc(x/scale + 15, y/scale - 18, 42, 0, Math.PI * 2);
-        ctx.arc(x/scale + 35, y/scale - 8, 35, 0, Math.PI * 2);
-        ctx.arc(x/scale + 25, y/scale + 12, 28, 0, Math.PI * 2);
-        ctx.arc(x/scale - 5, y/scale + 15, 32, 0, Math.PI * 2);
-        ctx.arc(x/scale - 20, y/scale + 8, 25, 0, Math.PI * 2);
+        ctx.arc(x/scale - 18, y/scale + 5, 30, 0, Math.PI * 2);
+        ctx.arc(x/scale + 2, y/scale - 5, 40, 0, Math.PI * 2);
+        ctx.arc(x/scale + 22, y/scale + 5, 30, 0, Math.PI * 2);
+        ctx.arc(x/scale + 12, y/scale + 15, 25, 0, Math.PI * 2);
+        ctx.arc(x/scale - 8, y/scale + 15, 25, 0, Math.PI * 2);
         ctx.fill();
         
-        // Add cloud shadow for depth
-        ctx.fillStyle = 'rgba(200, 220, 240, 0.5)';
+        // Main cloud
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.beginPath();
-        ctx.arc(x/scale - 15, y/scale + 10, 25, 0, Math.PI * 2);
-        ctx.arc(x/scale + 10, y/scale + 18, 30, 0, Math.PI * 2);
-        ctx.arc(x/scale + 30, y/scale + 15, 22, 0, Math.PI * 2);
+        ctx.arc(x/scale - 20, y/scale, 30, 0, Math.PI * 2);
+        ctx.arc(x/scale, y/scale - 10, 40, 0, Math.PI * 2);
+        ctx.arc(x/scale + 20, y/scale, 30, 0, Math.PI * 2);
+        ctx.arc(x/scale + 10, y/scale + 10, 25, 0, Math.PI * 2);
+        ctx.arc(x/scale - 10, y/scale + 10, 25, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.restore();
       }
 
       function drawHills() {
-        ctx.fillStyle = '#90EE90';
+        // Background hills with warm green colors
+        ctx.fillStyle = colors.hill;
         
-        // Background hills
         ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 100);
-        ctx.quadraticCurveTo(100, canvas.height - 150, 200, canvas.height - 100);
-        ctx.quadraticCurveTo(350, canvas.height - 80, 500, canvas.height - 120);
-        ctx.quadraticCurveTo(700, canvas.height - 140, 900, canvas.height - 100);
-        ctx.quadraticCurveTo(1100, canvas.height - 90, canvas.width, canvas.height - 110);
+        ctx.moveTo(0, canvas.height - 120);
+        ctx.quadraticCurveTo(150, canvas.height - 180, 300, canvas.height - 120);
+        ctx.quadraticCurveTo(450, canvas.height - 100, 600, canvas.height - 140);
+        ctx.quadraticCurveTo(800, canvas.height - 160, 1000, canvas.height - 120);
+        ctx.quadraticCurveTo(1200, canvas.height - 110, canvas.width, canvas.height - 130);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Foreground hills (darker)
+        ctx.fillStyle = colors.hillDark;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height - 80);
+        ctx.quadraticCurveTo(200, canvas.height - 110, 400, canvas.height - 80);
+        ctx.quadraticCurveTo(600, canvas.height - 70, 800, canvas.height - 90);
+        ctx.quadraticCurveTo(1000, canvas.height - 85, canvas.width, canvas.height - 95);
         ctx.lineTo(canvas.width, canvas.height);
         ctx.lineTo(0, canvas.height);
         ctx.closePath();
@@ -4128,10 +4486,10 @@ void ACutsceneManager::PlayCutscene()
           enemy.draw();
         });
 
-        // Update and draw Mario
-        if (mario) {
-          mario.update();
-          mario.draw();
+        // Update and draw character
+        if (character) {
+          character.update();
+          character.draw();
         }
 
         // Update and draw particles
