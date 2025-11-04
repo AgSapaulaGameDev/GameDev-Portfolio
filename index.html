@@ -625,15 +625,12 @@
       border-radius: 50%;
     }
 
-    /* Canvas Styles - Fixed aspect ratio */
+    /* Canvas Styles */
     .canvas-bg {
       position: absolute;
       inset: 0;
       pointer-events: none;
       opacity: 0.3;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
 
     .canvas-trail {
@@ -3532,15 +3529,6 @@ void ACutsceneManager::PlayCutscene()
       function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        
-        // Prevent stretching by maintaining pixel ratio
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
       }
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
@@ -3551,60 +3539,37 @@ void ACutsceneManager::PlayCutscene()
       let enemies = [];
       let powerUps = [];
       let particles = [];
-      let character = null;
+      let mario = null;
 
-      // Colors matching the pixel art platformer style
+      // Colors and themes
       const colors = {
-        // Character colors (cute pixel art style)
-        characterBody: '#2563EB', // Blue body
-        characterHead: '#FFFFFF', // White head
-        characterEyes: '#1E293B', // Dark eyes
-        characterOutline: '#1E3A8A', // Dark blue outline
-        
-        // Environment colors (winter/ice theme)
-        skyTop: '#87CEEB', // Soft winter blue sky
-        skyBottom: '#B0E0E6', // Light powder blue
-        bgMountain: '#4682B4', // Steel blue mountains
-        bgMountainLight: '#6495ED', // Cornflower blue mountains
-        
-        // Platform colors
-        platformGrass: '#4CAF50', // Bright green
-        platformGrassLight: '#66BB6A', // Light green
-        platformGrassDark: '#388E3C', // Dark green
-        platformDirt: '#5D4037', // Brown dirt
-        platformDirtDark: '#3E2723', // Dark brown
-        platformOutline: '#1B5E20', // Dark green outline
-        
-        // Decorative elements
-        tree: '#B0BEC5', // Ice tree trunk (light gray)
-        treeLeaves: '#E1F5FE', // Ice leaves (very light blue)
-        treeLeavesLight: '#F0F8FF', // Light ice
-        treeIce: '#81D4FA', // Ice blue accents
-        treeIceLight: '#B3E5FC', // Light ice blue
-        treeIceDark: '#0288D1', // Dark ice blue
-        coin: '#FFD700', // Gold
-        coinOutline: '#F57F17', // Dark gold
-        enemy: '#E53935', // Red
-        cloud: '#E3F2FD', // Very light blue
-        grass: '#81C784', // Light green grass
-        flower: '#EC407A' // Pink flowers
+        mario: '#ff6b35',
+        ground: '#8B4513',
+        platform: '#654321',
+        coin: '#FFD700',
+        enemy: '#DC143C',
+        powerUp: '#32CD32',
+        sky: '#87CEEB',
+        cloud: '#FFFFFF',
+        brick: '#B8860B',
+        pipe: '#228B22'
       };
 
-      // Character class (pixel art style matching reference - blue character with red cap)
-      class Character {
+      // Mario character
+      class Mario {
         constructor() {
-          this.x = 150;
-          this.y = canvas.height - 150;
-          this.width = 48; // Made bigger
-          this.height = 48; // Made bigger
-          this.vx = 1.5;
+          this.x = 100;
+          this.y = canvas.height - 100;
+          this.width = 32;
+          this.height = 32;
+          this.vx = 2;
           this.vy = 0;
-          this.gravity = 0.6;
-          this.jumpPower = -14;
+          this.gravity = 0.5;
+          this.jumpPower = -12;
           this.onGround = false;
           this.direction = 1;
           this.animFrame = 0;
-          this.animSpeed = 0.15;
+          this.animSpeed = 0.2;
           this.jumpCooldown = 0;
         }
 
@@ -3629,7 +3594,7 @@ void ACutsceneManager::PlayCutscene()
             if (this.x < platform.x + platform.width &&
                 this.x + this.width > platform.x &&
                 this.y + this.height > platform.y &&
-                this.y + this.height < platform.y + platform.height + 15 &&
+                this.y + this.height < platform.y + platform.height + 10 &&
                 this.vy >= 0) {
               this.y = platform.y - this.height;
               this.vy = 0;
@@ -3638,8 +3603,8 @@ void ACutsceneManager::PlayCutscene()
           });
 
           // Ground collision
-          if (this.y + this.height > canvas.height - 30) {
-            this.y = canvas.height - 30 - this.height;
+          if (this.y + this.height > canvas.height - 20) {
+            this.y = canvas.height - 20 - this.height;
             this.vy = 0;
             this.onGround = true;
           }
@@ -3665,146 +3630,65 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
-          const drawX = this.x;
-          const drawY = this.y;
-          const w = this.width;
-          const h = this.height;
-          
           // Flip sprite based on direction
           if (this.direction < 0) {
             ctx.scale(-1, 1);
-            ctx.translate(-drawX - w, 0);
+            ctx.translate(-this.x - this.width, 0);
           } else {
-            ctx.translate(drawX, 0);
+            ctx.translate(this.x, 0);
           }
 
-          // Draw character matching the sprite sheet style (blue character with red cap)
+          // Draw Mario (simplified pixel art style)
           const frame = Math.floor(this.animFrame);
           
-          // Shadow
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-          ctx.fillRect(8, drawY + h - 3, w - 16, 4);
+          // Hat
+          ctx.fillStyle = colors.mario;
+          ctx.fillRect(4, this.y + 4, 24, 8);
           
-          // === LEGS/FEET (blue) ===
-          const legOffset = (this.onGround && Math.abs(this.vx) > 0) ? (frame % 2 === 0 ? 0 : 3) : 0;
+          // Face
+          ctx.fillStyle = '#FFDBAC';
+          ctx.fillRect(8, this.y + 8, 16, 12);
           
-          ctx.fillStyle = colors.characterBody;
-          // Left leg
-          ctx.fillRect(12 + legOffset, drawY + h - 12, 8, 12);
-          // Right leg
-          ctx.fillRect(w - 20 - legOffset, drawY + h - 12, 8, 12);
+          // Shirt
+          ctx.fillStyle = '#0066CC';
+          ctx.fillRect(4, this.y + 16, 24, 8);
           
-          // Leg outlines
-          ctx.strokeStyle = colors.characterOutline;
-          ctx.lineWidth = 2;
-          ctx.strokeRect(12 + legOffset, drawY + h - 12, 8, 12);
-          ctx.strokeRect(w - 20 - legOffset, drawY + h - 12, 8, 12);
+          // Overalls
+          ctx.fillStyle = '#FF0000';
+          ctx.fillRect(8, this.y + 20, 16, 8);
           
-          // Feet (darker blue)
-          ctx.fillStyle = '#1E40AF';
-          ctx.fillRect(10 + legOffset, drawY + h - 4, 10, 4);
-          ctx.fillRect(w - 20 - legOffset, drawY + h - 4, 10, 4);
-          
-          // === BODY (blue) ===
-          ctx.fillStyle = colors.characterBody;
-          ctx.fillRect(10, drawY + 20, w - 20, 16);
-          
-          // Body outline
-          ctx.strokeStyle = colors.characterOutline;
-          ctx.lineWidth = 2;
-          ctx.strokeRect(10, drawY + 20, w - 20, 16);
-          
-          // Body highlight (lighter blue)
-          ctx.fillStyle = '#3B82F6';
-          ctx.fillRect(12, drawY + 22, w - 24, 4);
-          
-          // === HEAD (white/light) ===
-          ctx.fillStyle = colors.characterHead;
-          ctx.fillRect(12, drawY + 8, w - 24, 16);
-          
-          // Head outline
-          ctx.strokeStyle = colors.characterOutline;
-          ctx.lineWidth = 2;
-          ctx.strokeRect(12, drawY + 8, w - 24, 16);
-          
-          // === CAP/HAT (red) ===
-          ctx.fillStyle = '#E53E3E';
-          // Hat top
-          ctx.fillRect(10, drawY + 4, w - 20, 8);
-          // Hat brim
-          ctx.fillRect(8, drawY + 10, w - 16, 4);
-          
-          // Hat outline
-          ctx.strokeStyle = '#B91C1C';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(10, drawY + 4, w - 20, 8);
-          ctx.strokeRect(8, drawY + 10, w - 16, 4);
-          
-          // Hat detail (lighter red)
-          ctx.fillStyle = '#F87171';
-          ctx.fillRect(12, drawY + 5, w - 24, 3);
-          
-          // === FACE ===
-          // Eyes (large, cute anime-style)
-          ctx.fillStyle = colors.characterHead;
-          ctx.fillRect(15, drawY + 13, 8, 8);
-          ctx.fillRect(w - 23, drawY + 13, 8, 8);
-          
-          // Eye outlines
-          ctx.strokeStyle = colors.characterOutline;
-          ctx.lineWidth = 2;
-          ctx.strokeRect(15, drawY + 13, 8, 8);
-          ctx.strokeRect(w - 23, drawY + 13, 8, 8);
-          
-          // Eye pupils (bright cyan/blue - larger and more expressive)
-          ctx.fillStyle = '#06B6D4';
-          ctx.fillRect(17, drawY + 15, 4, 4);
-          ctx.fillRect(w - 21, drawY + 15, 4, 4);
-          
-          // Eye shine (white dot for life)
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(18, drawY + 16, 2, 2);
-          ctx.fillRect(w - 20, drawY + 16, 2, 2);
-          
-          // Nose (small cute pixel)
-          ctx.fillStyle = '#FFA726';
-          ctx.fillRect(w/2 - 1, drawY + 18, 2, 1);
-          
-          // Mouth (small smile)
-          ctx.fillStyle = colors.characterOutline;
-          ctx.fillRect(w/2 - 2, drawY + 20, 4, 1);
-          ctx.fillRect(w/2 - 3, drawY + 21, 2, 1);
-          ctx.fillRect(w/2 + 1, drawY + 21, 2, 1);
-          
-          // === ARMS (blue, simple) ===
-          ctx.fillStyle = colors.characterBody;
+          // Legs (animated)
+          ctx.fillStyle = '#8B4513';
           if (this.onGround && Math.abs(this.vx) > 0) {
-            const armSwing = frame % 2 === 0 ? 0 : 2;
-            // Left arm
-            ctx.fillRect(6, drawY + 22 + armSwing, 6, 10);
-            ctx.strokeRect(6, drawY + 22 + armSwing, 6, 10);
-            // Right arm
-            ctx.fillRect(w - 12, drawY + 22 - armSwing, 6, 10);
-            ctx.strokeRect(w - 12, drawY + 22 - armSwing, 6, 10);
+            // Walking animation
+            const legOffset = frame % 2 === 0 ? 0 : 2;
+            ctx.fillRect(8 + legOffset, this.y + 24, 6, 8);
+            ctx.fillRect(18 - legOffset, this.y + 24, 6, 8);
           } else {
-            // Arms at rest
-            ctx.fillRect(6, drawY + 24, 6, 10);
-            ctx.strokeRect(6, drawY + 24, 6, 10);
-            ctx.fillRect(w - 12, drawY + 24, 6, 10);
-            ctx.strokeRect(w - 12, drawY + 24, 6, 10);
+            // Standing
+            ctx.fillRect(10, this.y + 24, 6, 8);
+            ctx.fillRect(16, this.y + 24, 6, 8);
           }
+
+          // Eyes
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(10, this.y + 10, 2, 2);
+          ctx.fillRect(20, this.y + 10, 2, 2);
+
+          // Mustache
+          ctx.fillRect(12, this.y + 14, 8, 2);
 
           ctx.restore();
         }
       }
 
-      // Platform class (enhanced with better visuals)
+      // Platform class
       class Platform {
         constructor(x, y, width, height, type = 'normal') {
           this.x = x;
           this.y = y;
           this.width = width;
-          this.height = height * 1.5; // Make platforms taller
+          this.height = height;
           this.type = type;
           this.animOffset = Math.random() * Math.PI * 2;
         }
@@ -3837,135 +3721,55 @@ void ACutsceneManager::PlayCutscene()
         }
 
         drawNormalPlatform() {
-          // Pixel art grass platform with winter/ice effects
+          // Draw brick-like platform
+          ctx.fillStyle = colors.platform;
+          ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Ice layer on top (light blue-white)
-          ctx.fillStyle = '#E6F3FF';
-          ctx.fillRect(this.x, this.y, this.width, 6);
+          // Add brick texture
+          ctx.strokeStyle = colors.ground;
+          ctx.lineWidth = 1;
           
-          // Grass layer below ice (winter grass - less vibrant)
-          ctx.fillStyle = '#66BB6A';
-          ctx.fillRect(this.x, this.y + 6, this.width, 6);
+          const brickWidth = 20;
+          const brickHeight = 10;
           
-          // Lighter ice highlights
-          ctx.fillStyle = '#F0F8FF';
-          ctx.fillRect(this.x, this.y, this.width, 2);
-          
-          // Ice outline (light blue)
-          ctx.strokeStyle = '#87CEEB';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(this.x, this.y, this.width, 6);
-          
-          // Dirt/soil layer below grass (darker, frozen)
-          ctx.fillStyle = '#4A4A4A';
-          ctx.fillRect(this.x, this.y + 12, this.width, this.height - 12);
-          
-          // Darker dirt bottom
-          ctx.fillStyle = '#2E2E2E';
-          ctx.fillRect(this.x, this.y + this.height - 4, this.width, 4);
-          
-          // Outline for dirt
-          ctx.strokeStyle = '#1A1A1A';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(this.x, this.y + 12, this.width, this.height - 12);
-          
-          // Add ice crystals on top (small pixels)
-          ctx.fillStyle = '#FFFFFF';
-          for (let x = 0; x < this.width; x += 8) {
-            // Random ice crystal formations
-            if (Math.random() < 0.7) {
-              ctx.fillRect(this.x + x + 2, this.y - 2, 2, 3);
+          for (let x = 0; x < this.width; x += brickWidth) {
+            for (let y = 0; y < this.height; y += brickHeight) {
+              ctx.strokeRect(this.x + x, this.y + y, 
+                            Math.min(brickWidth, this.width - x), 
+                            Math.min(brickHeight, this.height - y));
             }
-            if (Math.random() < 0.5) {
-              ctx.fillRect(this.x + x + 5, this.y - 3, 2, 4);
-            }
-          }
-          
-          // Frozen dirt texture spots
-          ctx.fillStyle = '#6A6A6A';
-          for (let x = 0; x < this.width; x += 12) {
-            for (let y = 12; y < this.height - 4; y += 10) {
-              if (Math.random() < 0.4) {
-                ctx.fillRect(this.x + x + Math.random() * 8, this.y + y, 2, 2);
-              }
-            }
-          }
-          
-          // Ice sparkles
-          ctx.fillStyle = '#E1F5FE';
-          for (let i = 0; i < 3; i++) {
-            const sparkleX = this.x + Math.random() * this.width;
-            const sparkleY = this.y + Math.random() * 6;
-            ctx.fillRect(sparkleX, sparkleY, 1, 1);
           }
         }
 
         drawBrickPlatform() {
-          // Enhanced question mark blocks with 3D effect
-          // Main block
+          // Question mark blocks
           ctx.fillStyle = colors.brick;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Top highlight
-          ctx.fillStyle = '#F6E05E';
-          ctx.fillRect(this.x, this.y, this.width, 6);
-          
-          // Side shadow
-          ctx.fillStyle = colors.brickDark;
-          ctx.fillRect(this.x + this.width - 6, this.y + 6, 6, this.height - 6);
-          
           // Question mark
           ctx.fillStyle = '#FFFFFF';
-          ctx.font = 'bold 24px Arial';
+          ctx.font = 'bold 16px Arial';
           ctx.textAlign = 'center';
-          ctx.strokeStyle = '#000000';
-          ctx.lineWidth = 2;
-          ctx.strokeText('?', this.x + this.width/2, this.y + this.height/2 + 8);
-          ctx.fillText('?', this.x + this.width/2, this.y + this.height/2 + 8);
+          ctx.fillText('?', this.x + this.width/2, this.y + this.height/2 + 6);
           
-          // Border with 3D effect
-          ctx.strokeStyle = colors.brickDark;
-          ctx.lineWidth = 3;
+          // Border
+          ctx.strokeStyle = '#8B4513';
+          ctx.lineWidth = 2;
           ctx.strokeRect(this.x, this.y, this.width, this.height);
-          
-          // Inner border highlight
-          ctx.strokeStyle = '#F6E05E';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4);
         }
 
         drawPipe() {
-          // Enhanced green pipe with better 3D effect
-          // Main pipe body
+          // Green pipe
           ctx.fillStyle = colors.pipe;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Pipe top (larger and more detailed)
-          ctx.fillStyle = colors.pipeLight;
-          ctx.fillRect(this.x - 8, this.y, this.width + 16, 20);
+          // Pipe top
+          ctx.fillStyle = '#32CD32';
+          ctx.fillRect(this.x - 5, this.y, this.width + 10, 15);
           
-          // Pipe top shadow
-          ctx.fillStyle = colors.pipe;
-          ctx.fillRect(this.x - 8, this.y + 16, this.width + 16, 4);
-          
-          // Pipe body highlights
-          ctx.fillStyle = colors.pipeLight;
-          ctx.fillRect(this.x + 8, this.y + 20, 12, this.height - 20);
-          
-          // Pipe body shadow
-          ctx.fillStyle = '#2F855A';
-          ctx.fillRect(this.x + this.width - 12, this.y + 20, 12, this.height - 20);
-          
-          // Pipe rim details
-          ctx.fillStyle = '#1A202C';
-          ctx.fillRect(this.x - 4, this.y + 4, this.width + 8, 4);
-          ctx.fillRect(this.x - 4, this.y + 12, this.width + 8, 4);
-          
-          // Inner pipe darkness
-          ctx.fillStyle = '#000000';
-          ctx.beginPath();
-          ctx.arc(this.x + this.width/2, this.y + 10, this.width/3, 0, Math.PI * 2);
-          ctx.fill();
+          // Pipe highlights
+          ctx.fillStyle = '#90EE90';
+          ctx.fillRect(this.x + 5, this.y + 15, 8, this.height - 15);
         }
 
         drawCloudPlatform() {
@@ -3989,17 +3793,16 @@ void ACutsceneManager::PlayCutscene()
         }
       }
 
-      // Coin class (larger and more detailed)
+      // Coin class
       class Coin {
         constructor(x, y) {
           this.x = x;
           this.y = y;
-          this.size = 20; // Increased from 12
+          this.size = 12;
           this.rotation = 0;
-          this.rotationSpeed = 0.08;
+          this.rotationSpeed = 0.1;
           this.floatOffset = Math.random() * Math.PI * 2;
           this.collected = false;
-          this.scale = 1.2; // Scale factor
         }
 
         update() {
@@ -4008,12 +3811,12 @@ void ACutsceneManager::PlayCutscene()
           // Floating animation
           this.y += Math.sin(Date.now() * 0.003 + this.floatOffset) * 0.5;
           
-          // Check collision with character
-          if (character && !this.collected &&
-              character.x < this.x + this.size &&
-              character.x + character.width > this.x &&
-              character.y < this.y + this.size &&
-              character.y + character.height > this.y) {
+          // Check collision with Mario
+          if (mario && !this.collected &&
+              mario.x < this.x + this.size &&
+              mario.x + mario.width > this.x &&
+              mario.y < this.y + this.size &&
+              mario.y + mario.height > this.y) {
             this.collected = true;
             createCoinParticles(this.x + this.size/2, this.y + this.size/2);
           }
@@ -4023,53 +3826,42 @@ void ACutsceneManager::PlayCutscene()
           if (this.collected) return;
           
           ctx.save();
-          const size = this.size * this.scale;
-          ctx.translate(this.x + size/2, this.y + size/2);
+          ctx.translate(this.x + this.size/2, this.y + this.size/2);
           ctx.rotate(this.rotation);
           
-          // Pixel art coin style
-          // Coin body (yellow/gold circle)
+          // Coin body
           ctx.fillStyle = colors.coin;
           ctx.beginPath();
-          ctx.arc(0, 0, size/2, 0, Math.PI * 2);
+          ctx.arc(0, 0, this.size/2, 0, Math.PI * 2);
           ctx.fill();
           
-          // Coin outline (darker gold)
-          ctx.strokeStyle = colors.coinOutline;
-          ctx.lineWidth = 2;
+          // Coin highlight
+          ctx.fillStyle = '#FFFFE0';
           ctx.beginPath();
-          ctx.arc(0, 0, size/2, 0, Math.PI * 2);
-          ctx.stroke();
+          ctx.arc(-2, -2, this.size/4, 0, Math.PI * 2);
+          ctx.fill();
           
-          // Inner circle detail
-          ctx.strokeStyle = colors.coinOutline;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.arc(0, 0, size/2 - 3, 0, Math.PI * 2);
-          ctx.stroke();
-          
-          // Coin symbol ($ or simple design)
-          ctx.fillStyle = colors.coinOutline;
-          ctx.font = 'bold 12px Arial';
+          // Coin center
+          ctx.fillStyle = colors.coin;
+          ctx.font = 'bold 10px Arial';
           ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('$', 0, 1);
+          ctx.fillText('¢', 0, 3);
           
           ctx.restore();
         }
       }
 
-      // Enemy class (red devil-style character from reference)
+      // Enemy class (Goomba-style)
       class Enemy {
         constructor(x, y) {
           this.x = x;
           this.y = y;
-          this.width = 44; // Made bigger
-          this.height = 44; // Made bigger
-          this.vx = -0.8;
+          this.width = 24;
+          this.height = 24;
+          this.vx = -1;
           this.direction = -1;
           this.animFrame = 0;
-          this.animSpeed = 0.08;
+          this.animSpeed = 0.1;
         }
 
         update() {
@@ -4091,13 +3883,13 @@ void ACutsceneManager::PlayCutscene()
             if (this.x < platform.x + platform.width &&
                 this.x + this.width > platform.x &&
                 this.y + this.height >= platform.y &&
-                this.y + this.height <= platform.y + 15) {
+                this.y + this.height <= platform.y + 10) {
               onPlatform = true;
             }
           });
           
           // Fall if not on platform
-          if (!onPlatform && this.y + this.height < canvas.height - 30) {
+          if (!onPlatform && this.y + this.height < canvas.height - 20) {
             this.y += 2;
           }
         }
@@ -4105,120 +3897,35 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
-          const w = this.width;
-          const h = this.height;
-          
-          // Shadow
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-          ctx.fillRect(this.x + 6, this.y + h - 3, w - 12, 4);
-          
-          // === Draw red devil character (matching sprite reference) ===
-          const frame = Math.floor(this.animFrame);
-          
-          // === LEGS/FEET (red) ===
-          const legOffset = frame % 2 === 0 ? 0 : 2;
-          
+          // Goomba body
           ctx.fillStyle = colors.enemy;
-          // Left leg
-          ctx.fillRect(this.x + 12 + legOffset, this.y + h - 12, 8, 12);
-          // Right leg
-          ctx.fillRect(this.x + w - 20 - legOffset, this.y + h - 12, 8, 12);
+          ctx.fillRect(this.x + 2, this.y + 8, this.width - 4, this.height - 8);
           
-          // Leg outlines
-          ctx.strokeStyle = '#B91C1C';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(this.x + 12 + legOffset, this.y + h - 12, 8, 12);
-          ctx.strokeRect(this.x + w - 20 - legOffset, this.y + h - 12, 8, 12);
-          
-          // Feet (darker red)
-          ctx.fillStyle = '#991B1B';
-          ctx.fillRect(this.x + 10 + legOffset, this.y + h - 4, 10, 4);
-          ctx.fillRect(this.x + w - 20 - legOffset, this.y + h - 4, 10, 4);
-          
-          // === BODY (red) ===
-          ctx.fillStyle = colors.enemy;
-          ctx.fillRect(this.x + 10, this.y + 18, w - 20, 18);
-          
-          // Body outline
-          ctx.strokeStyle = '#B91C1C';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(this.x + 10, this.y + 18, w - 20, 18);
-          
-          // Body highlight (lighter red)
-          ctx.fillStyle = '#F87171';
-          ctx.fillRect(this.x + 12, this.y + 20, w - 24, 4);
-          
-          // === HEAD (red, round top) ===
-          ctx.fillStyle = colors.enemy;
-          ctx.fillRect(this.x + 12, this.y + 8, w - 24, 14);
-          
-          // Head outline
-          ctx.strokeStyle = '#B91C1C';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(this.x + 12, this.y + 8, w - 24, 14);
-          
-          // Round top of head
-          ctx.fillStyle = colors.enemy;
+          // Goomba head
           ctx.beginPath();
-          ctx.arc(this.x + w/2, this.y + 10, 12, Math.PI, 0);
+          ctx.arc(this.x + this.width/2, this.y + 8, 10, 0, Math.PI);
           ctx.fill();
-          ctx.strokeStyle = '#B91C1C';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(this.x + w/2, this.y + 10, 12, Math.PI, 0);
-          ctx.stroke();
           
-          // === HORNS (devil horns) ===
-          ctx.fillStyle = '#7C2D12';
-          // Left horn
-          ctx.beginPath();
-          ctx.moveTo(this.x + 10, this.y + 8);
-          ctx.lineTo(this.x + 8, this.y + 2);
-          ctx.lineTo(this.x + 14, this.y + 6);
-          ctx.closePath();
-          ctx.fill();
-          ctx.strokeStyle = '#991B1B';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          
-          // Right horn
-          ctx.beginPath();
-          ctx.moveTo(this.x + w - 10, this.y + 8);
-          ctx.lineTo(this.x + w - 8, this.y + 2);
-          ctx.lineTo(this.x + w - 14, this.y + 6);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          
-          // === EYES (large white eyes) ===
+          // Eyes
           ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(this.x + 14, this.y + 12, 6, 6);
-          ctx.fillRect(this.x + w - 20, this.y + 12, 6, 6);
+          const eyeOffset = Math.floor(this.animFrame) === 0 ? 0 : 1;
+          ctx.fillRect(this.x + 6 + eyeOffset, this.y + 4, 3, 3);
+          ctx.fillRect(this.x + 15 + eyeOffset, this.y + 4, 3, 3);
           
-          // Eye outlines
-          ctx.strokeStyle = '#000000';
+          // Eye pupils
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(this.x + 7 + eyeOffset, this.y + 5, 1, 1);
+          ctx.fillRect(this.x + 16 + eyeOffset, this.y + 5, 1, 1);
+          
+          // Angry eyebrows
+          ctx.strokeStyle = '#8B0000';
           ctx.lineWidth = 2;
-          ctx.strokeRect(this.x + 14, this.y + 12, 6, 6);
-          ctx.strokeRect(this.x + w - 20, this.y + 12, 6, 6);
-          
-          // Eye pupils (dark)
-          ctx.fillStyle = '#1E293B';
-          const eyeMove = frame % 2 === 0 ? 0 : 1;
-          ctx.fillRect(this.x + 16 + eyeMove, this.y + 14, 3, 3);
-          ctx.fillRect(this.x + w - 18 + eyeMove, this.y + 14, 3, 3);
-          
-          // === ARMS (red, simple) ===
-          ctx.fillStyle = colors.enemy;
-          ctx.strokeStyle = '#B91C1C';
-          ctx.lineWidth = 2;
-          
-          const armSwing = frame % 2 === 0 ? 0 : 2;
-          // Left arm
-          ctx.fillRect(this.x + 6, this.y + 20 + armSwing, 6, 10);
-          ctx.strokeRect(this.x + 6, this.y + 20 + armSwing, 6, 10);
-          // Right arm
-          ctx.fillRect(this.x + w - 12, this.y + 20 - armSwing, 6, 10);
-          ctx.strokeRect(this.x + w - 12, this.y + 20 - armSwing, 6, 10);
+          ctx.beginPath();
+          ctx.moveTo(this.x + 6, this.y + 2);
+          ctx.lineTo(this.x + 10, this.y + 4);
+          ctx.moveTo(this.x + 14, this.y + 4);
+          ctx.lineTo(this.x + 18, this.y + 2);
+          ctx.stroke();
           
           ctx.restore();
         }
@@ -4275,504 +3982,235 @@ void ACutsceneManager::PlayCutscene()
 
       // Initialize game world
       function initGameWorld() {
-        // Create character
-        character = new Character();
+        // Create Mario
+        mario = new Mario();
 
-        // Initialize snowfall
-        initSnowfall();
-
-        // Create platforms (larger and more varied)
+        // Create platforms
         platforms = [
           // Ground platforms
-          new Platform(0, canvas.height - 30, canvas.width, 30, 'normal'),
+          new Platform(0, canvas.height - 20, canvas.width, 20, 'normal'),
           
-          // Floating platforms (bigger and more spaced)
-          new Platform(250, canvas.height - 200, 150, 25, 'normal'),
-          new Platform(500, canvas.height - 280, 100, 30, 'brick'),
-          new Platform(750, canvas.height - 180, 130, 25, 'cloud'),
-          new Platform(950, canvas.height - 240, 80, 100, 'pipe'),
-          new Platform(1200, canvas.height - 220, 160, 25, 'normal'),
-          new Platform(1450, canvas.height - 160, 100, 25, 'floating'),
+          // Lower level platforms (easier to reach)
+          new Platform(150, canvas.height - 120, 100, 20, 'normal'),
+          new Platform(300, canvas.height - 140, 80, 20, 'brick'),
+          new Platform(450, canvas.height - 110, 120, 20, 'normal'),
+          new Platform(620, canvas.height - 130, 90, 20, 'cloud'),
+          new Platform(760, canvas.height - 150, 60, 80, 'pipe'),
+          new Platform(900, canvas.height - 120, 110, 20, 'normal'),
+          new Platform(1050, canvas.height - 140, 80, 20, 'floating'),
+          new Platform(1180, canvas.height - 100, 100, 20, 'brick'),
+          new Platform(1320, canvas.height - 130, 90, 20, 'normal'),
           
-          // Higher platforms
-          new Platform(400, canvas.height - 380, 120, 25, 'brick'),
-          new Platform(800, canvas.height - 420, 140, 25, 'cloud'),
-          new Platform(1300, canvas.height - 320, 100, 25, 'normal'),
+          // Mid-level platforms
+          new Platform(200, canvas.height - 200, 120, 20, 'normal'),
+          new Platform(380, canvas.height - 220, 80, 20, 'brick'),
+          new Platform(520, canvas.height - 180, 100, 20, 'cloud'),
+          new Platform(680, canvas.height - 210, 90, 20, 'normal'),
+          new Platform(820, canvas.height - 240, 80, 20, 'floating'),
+          new Platform(950, canvas.height - 190, 110, 20, 'brick'),
+          new Platform(1120, canvas.height - 220, 100, 20, 'normal'),
+          new Platform(1280, canvas.height - 200, 80, 20, 'cloud'),
           
-          // Additional mid-level platforms
-          new Platform(150, canvas.height - 300, 100, 25, 'normal'),
-          new Platform(650, canvas.height - 350, 80, 25, 'brick'),
-          new Platform(1100, canvas.height - 280, 120, 25, 'cloud'),
+          // Higher platforms (challenging)
+          new Platform(250, canvas.height - 300, 100, 20, 'brick'),
+          new Platform(420, canvas.height - 320, 90, 20, 'floating'),
+          new Platform(580, canvas.height - 280, 80, 20, 'cloud'),
+          new Platform(720, canvas.height - 340, 100, 20, 'normal'),
+          new Platform(880, canvas.height - 310, 80, 20, 'brick'),
+          new Platform(1020, canvas.height - 290, 90, 20, 'floating'),
+          new Platform(1170, canvas.height - 330, 100, 20, 'cloud'),
+          new Platform(1320, canvas.height - 280, 80, 20, 'normal'),
+          
+          // Top tier platforms (expert level)
+          new Platform(180, canvas.height - 380, 80, 20, 'floating'),
+          new Platform(320, canvas.height - 400, 90, 20, 'cloud'),
+          new Platform(480, canvas.height - 360, 100, 20, 'brick'),
+          new Platform(640, canvas.height - 420, 80, 20, 'floating'),
+          new Platform(800, canvas.height - 390, 90, 20, 'normal'),
+          new Platform(960, canvas.height - 370, 100, 20, 'cloud'),
+          new Platform(1120, canvas.height - 410, 80, 20, 'brick'),
+          new Platform(1280, canvas.height - 380, 90, 20, 'floating'),
+          
+          // Additional pipes and obstacles
+          new Platform(500, canvas.height - 260, 60, 100, 'pipe'),
+          new Platform(1000, canvas.height - 160, 60, 80, 'pipe'),
+          new Platform(350, canvas.height - 180, 60, 60, 'pipe'),
+          new Platform(1200, canvas.height - 290, 60, 70, 'pipe'),
+          
+          // Moving/floating platforms scattered throughout
+          new Platform(120, canvas.height - 250, 80, 20, 'floating'),
+          new Platform(600, canvas.height - 350, 80, 20, 'floating'),
+          new Platform(850, canvas.height - 270, 80, 20, 'floating'),
+          new Platform(1350, canvas.height - 350, 80, 20, 'floating'),
         ];
 
-        // Create coins (more coins, better positioned)
+        // Create coins
         coins = [
-          new Coin(300, canvas.height - 240),
-          new Coin(340, canvas.height - 240),
-          new Coin(380, canvas.height - 240),
-          new Coin(540, canvas.height - 330),
-          new Coin(450, canvas.height - 430),
-          new Coin(820, canvas.height - 230),
-          new Coin(850, canvas.height - 470),
-          new Coin(1350, canvas.height - 370),
-          new Coin(1380, canvas.height - 370),
-          new Coin(1250, canvas.height - 270),
-          new Coin(180, canvas.height - 350),
-          new Coin(680, canvas.height - 400),
-          new Coin(1130, canvas.height - 330),
+          // Lower level coins
+          new Coin(200, canvas.height - 150),
+          new Coin(340, canvas.height - 170),
+          new Coin(500, canvas.height - 140),
+          new Coin(660, canvas.height - 160),
+          new Coin(950, canvas.height - 150),
+          new Coin(1100, canvas.height - 170),
+          new Coin(1230, canvas.height - 130),
+          new Coin(1370, canvas.height - 160),
+          
+          // Mid-level coins
+          new Coin(250, canvas.height - 230),
+          new Coin(430, canvas.height - 250),
+          new Coin(570, canvas.height - 210),
+          new Coin(730, canvas.height - 240),
+          new Coin(870, canvas.height - 270),
+          new Coin(1000, canvas.height - 220),
+          new Coin(1170, canvas.height - 250),
+          new Coin(1330, canvas.height - 230),
+          
+          // Higher level coins
+          new Coin(300, canvas.height - 330),
+          new Coin(470, canvas.height - 350),
+          new Coin(630, canvas.height - 310),
+          new Coin(770, canvas.height - 370),
+          new Coin(930, canvas.height - 340),
+          new Coin(1070, canvas.height - 320),
+          new Coin(1220, canvas.height - 360),
+          new Coin(1370, canvas.height - 310),
+          
+          // Top tier coins (bonus)
+          new Coin(230, canvas.height - 410),
+          new Coin(370, canvas.height - 430),
+          new Coin(530, canvas.height - 390),
+          new Coin(690, canvas.height - 450),
+          new Coin(850, canvas.height - 420),
+          new Coin(1010, canvas.height - 400),
+          new Coin(1170, canvas.height - 440),
+          new Coin(1330, canvas.height - 410),
+          
+          // Coin trails for platforms
+          new Coin(170, canvas.height - 280),
+          new Coin(650, canvas.height - 380),
+          new Coin(900, canvas.height - 300),
         ];
 
-        // Create enemies (larger, better positioned)
+        // Create enemies
         enemies = [
-          new Enemy(300, canvas.height - 200),
-          new Enemy(600, canvas.height - 80),
-          new Enemy(1000, canvas.height - 80),
-          new Enemy(1300, canvas.height - 200),
-          new Enemy(500, canvas.height - 80),
+          // Ground level enemies
+          new Enemy(180, canvas.height - 60),
+          new Enemy(350, canvas.height - 60),
+          new Enemy(600, canvas.height - 60),
+          new Enemy(900, canvas.height - 60),
+          new Enemy(1200, canvas.height - 60),
+          
+          // Platform enemies
+          new Enemy(220, canvas.height - 140),
+          new Enemy(500, canvas.height - 140),
+          new Enemy(800, canvas.height - 170),
+          new Enemy(1100, canvas.height - 170),
+          new Enemy(1300, canvas.height - 160),
+          
+          // Mid-level enemies
+          new Enemy(300, canvas.height - 230),
+          new Enemy(600, canvas.height - 210),
+          new Enemy(950, canvas.height - 220),
+          new Enemy(1250, canvas.height - 230),
+          
+          // Higher level enemies (fewer but more challenging)
+          new Enemy(350, canvas.height - 330),
+          new Enemy(800, canvas.height - 340),
+          new Enemy(1150, canvas.height - 360),
         ];
       }
 
-      // Draw background matching the pixel art platformer style
+      // Draw background
       function drawBackground() {
-        // Winter blue sky gradient
+        // Sky gradient
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, colors.skyTop);
-        gradient.addColorStop(1, colors.skyBottom);
+        gradient.addColorStop(0, '#87CEEB');
+        gradient.addColorStop(0.7, '#98D8E8');
+        gradient.addColorStop(1, '#B0E0E6');
         
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw background mountains/hills (winter theme with snow)
-        drawBackgroundMountains();
-        
-        // Draw clouds (bigger and lower)
+        // Draw clouds in background
         drawClouds();
         
-        // Draw background ice trees
-        drawBackgroundTrees();
-        
-        // Add falling snow effect
-        drawSnowfall();
-      }
-
-      function drawBackgroundMountains() {
-        // Far background mountains (winter blue with snow caps)
-        ctx.fillStyle = colors.bgMountain;
-        
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 150);
-        
-        // Create mountain peaks with snow
-        ctx.lineTo(100, canvas.height - 250);
-        ctx.lineTo(200, canvas.height - 200);
-        ctx.lineTo(300, canvas.height - 280);
-        ctx.lineTo(450, canvas.height - 220);
-        ctx.lineTo(600, canvas.height - 300);
-        ctx.lineTo(750, canvas.height - 240);
-        ctx.lineTo(900, canvas.height - 290);
-        ctx.lineTo(1100, canvas.height - 230);
-        ctx.lineTo(1300, canvas.height - 270);
-        ctx.lineTo(canvas.width, canvas.height - 200);
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Add snow caps to mountains
-        ctx.fillStyle = '#F8F8FF';
-        ctx.beginPath();
-        ctx.moveTo(80, canvas.height - 230);
-        ctx.lineTo(100, canvas.height - 250);
-        ctx.lineTo(120, canvas.height - 230);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.moveTo(280, canvas.height - 260);
-        ctx.lineTo(300, canvas.height - 280);
-        ctx.lineTo(320, canvas.height - 260);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.moveTo(580, canvas.height - 280);
-        ctx.lineTo(600, canvas.height - 300);
-        ctx.lineTo(620, canvas.height - 280);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.moveTo(880, canvas.height - 270);
-        ctx.lineTo(900, canvas.height - 290);
-        ctx.lineTo(920, canvas.height - 270);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.moveTo(1280, canvas.height - 250);
-        ctx.lineTo(1300, canvas.height - 270);
-        ctx.lineTo(1320, canvas.height - 250);
-        ctx.fill();
-        
-        // Mid-layer mountains (lighter blue with more snow)
-        ctx.fillStyle = colors.bgMountainLight;
-        
-        ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 100);
-        ctx.lineTo(150, canvas.height - 180);
-        ctx.lineTo(300, canvas.height - 140);
-        ctx.lineTo(500, canvas.height - 200);
-        ctx.lineTo(700, canvas.height - 150);
-        ctx.lineTo(900, canvas.height - 190);
-        ctx.lineTo(1100, canvas.height - 140);
-        ctx.lineTo(1300, canvas.height - 170);
-        ctx.lineTo(canvas.width, canvas.height - 130);
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Snow caps for mid-layer mountains
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.moveTo(130, canvas.height - 160);
-        ctx.lineTo(150, canvas.height - 180);
-        ctx.lineTo(170, canvas.height - 160);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.moveTo(480, canvas.height - 180);
-        ctx.lineTo(500, canvas.height - 200);
-        ctx.lineTo(520, canvas.height - 180);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.moveTo(880, canvas.height - 170);
-        ctx.lineTo(900, canvas.height - 190);
-        ctx.lineTo(920, canvas.height - 170);
-        ctx.fill();
-      }
-
-      function drawBackgroundTrees() {
-        const iceTrees = [
-          {x: 120, y: canvas.height - 160, size: 1.2},
-          {x: 320, y: canvas.height - 180, size: 1.4},
-          {x: 580, y: canvas.height - 150, size: 1.1},
-          {x: 820, y: canvas.height - 170, size: 1.3},
-          {x: 1080, y: canvas.height - 165, size: 1.2},
-          {x: 1320, y: canvas.height - 155, size: 1.0},
-        ];
-
-        iceTrees.forEach(tree => {
-          drawPixelIceTree(tree.x, tree.y, tree.size);
-        });
-      }
-
-      function drawPixelIceTree(x, y, scale) {
-        ctx.save();
-        
-        // Ice tree trunk (light gray with blue tints)
-        ctx.fillStyle = colors.tree;
-        const trunkWidth = 12 * scale;
-        const trunkHeight = 35 * scale;
-        ctx.fillRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
-        
-        // Trunk ice coating
-        ctx.fillStyle = colors.treeIceLight;
-        ctx.fillRect(x - trunkWidth/2 + 1, y, trunkWidth - 2, trunkHeight);
-        
-        // Trunk outline (ice blue)
-        ctx.strokeStyle = colors.treeIceDark;
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
-        
-        // Ice tree foliage (crystalline, angular shapes)
-        const leafSize = 40 * scale;
-        
-        // Main ice foliage (light blue-white)
-        ctx.fillStyle = colors.treeLeaves;
-        
-        // Create crystalline tree shape with triangular sections
-        ctx.beginPath();
-        // Top crystal point
-        ctx.moveTo(x, y - 20 * scale);
-        ctx.lineTo(x - leafSize * 0.6, y + 5 * scale);
-        ctx.lineTo(x + leafSize * 0.6, y + 5 * scale);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Middle crystal section
-        ctx.beginPath();
-        ctx.moveTo(x - leafSize * 0.7, y + 5 * scale);
-        ctx.lineTo(x - leafSize * 0.4, y - 5 * scale);
-        ctx.lineTo(x + leafSize * 0.4, y - 5 * scale);
-        ctx.lineTo(x + leafSize * 0.7, y + 5 * scale);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Bottom crystal section
-        ctx.beginPath();
-        ctx.moveTo(x - leafSize * 0.5, y + 10 * scale);
-        ctx.lineTo(x - leafSize * 0.8, y + 20 * scale);
-        ctx.lineTo(x + leafSize * 0.8, y + 20 * scale);
-        ctx.lineTo(x + leafSize * 0.5, y + 10 * scale);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Ice crystal highlights (brighter white-blue)
-        ctx.fillStyle = colors.treeLeavesLight;
-        
-        // Top highlight
-        ctx.beginPath();
-        ctx.moveTo(x, y - 20 * scale);
-        ctx.lineTo(x - leafSize * 0.3, y);
-        ctx.lineTo(x - leafSize * 0.1, y - 5 * scale);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Middle highlights
-        ctx.fillRect(x - leafSize * 0.2, y - 3 * scale, leafSize * 0.4, 3 * scale);
-        ctx.fillRect(x - leafSize * 0.3, y + 8 * scale, leafSize * 0.6, 3 * scale);
-        
-        // Ice crystal edges (blue outlines)
-        ctx.strokeStyle = colors.treeIce;
-        ctx.lineWidth = 2;
-        
-        // Outline the main crystal shapes
-        ctx.beginPath();
-        ctx.moveTo(x, y - 20 * scale);
-        ctx.lineTo(x - leafSize * 0.6, y + 5 * scale);
-        ctx.lineTo(x - leafSize * 0.8, y + 20 * scale);
-        ctx.moveTo(x, y - 20 * scale);
-        ctx.lineTo(x + leafSize * 0.6, y + 5 * scale);
-        ctx.lineTo(x + leafSize * 0.8, y + 20 * scale);
-        ctx.stroke();
-        
-        // Ice crystal details (small ice shards)
-        ctx.fillStyle = colors.treeIce;
-        
-        // Small ice shards around the tree
-        for (let i = 0; i < 6; i++) {
-          const angle = (i * Math.PI * 2) / 6;
-          const shardX = x + Math.cos(angle) * leafSize * 0.9;
-          const shardY = y + Math.sin(angle) * leafSize * 0.6 + 5 * scale;
-          
-          ctx.beginPath();
-          ctx.moveTo(shardX, shardY);
-          ctx.lineTo(shardX + Math.cos(angle) * 6 * scale, shardY + Math.sin(angle) * 6 * scale);
-          ctx.lineTo(shardX + Math.cos(angle + 0.3) * 4 * scale, shardY + Math.sin(angle + 0.3) * 4 * scale);
-          ctx.closePath();
-          ctx.fill();
-        }
-        
-        // Sparkling ice effect
-        ctx.fillStyle = '#FFFFFF';
-        for (let i = 0; i < 8; i++) {
-          const sparkleX = x + (Math.random() - 0.5) * leafSize * 1.2;
-          const sparkleY = y + (Math.random() - 0.5) * leafSize * 0.8;
-          ctx.fillRect(sparkleX, sparkleY, 2, 2);
-        }
-        
-        ctx.restore();
-      }
-
-      // Snow particle system for winter atmosphere
-      let snowflakes = [];
-      
-      function initSnowfall() {
-        snowflakes = [];
-        for (let i = 0; i < 50; i++) {
-          snowflakes.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 3 + 1,
-            speed: Math.random() * 1 + 0.5,
-            drift: Math.random() * 0.5 - 0.25,
-            opacity: Math.random() * 0.6 + 0.4
-          });
-        }
-      }
-      
-      function drawSnowfall() {
-        ctx.save();
-        
-        // Update and draw snowflakes
-        for (let i = 0; i < snowflakes.length; i++) {
-          const flake = snowflakes[i];
-          
-          // Update position
-          flake.y += flake.speed;
-          flake.x += flake.drift;
-          
-          // Wrap around screen
-          if (flake.y > canvas.height) {
-            flake.y = -10;
-            flake.x = Math.random() * canvas.width;
-          }
-          if (flake.x > canvas.width) {
-            flake.x = 0;
-          } else if (flake.x < 0) {
-            flake.x = canvas.width;
-          }
-          
-          // Draw snowflake
-          ctx.globalAlpha = flake.opacity;
-          ctx.fillStyle = '#FFFFFF';
-          ctx.beginPath();
-          ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2);
-          ctx.fill();
-          
-          // Add sparkle effect to larger flakes
-          if (flake.size > 2) {
-            ctx.fillStyle = '#E6F3FF';
-            ctx.fillRect(flake.x - 1, flake.y - 1, 2, 2);
-            ctx.fillRect(flake.x - 1, flake.y + 1, 2, 2);
-            ctx.fillRect(flake.x + 1, flake.y - 1, 2, 2);
-            ctx.fillRect(flake.x + 1, flake.y + 1, 2, 2);
-          }
-        }
-        
-        ctx.globalAlpha = 1;
-        ctx.restore();
-      }
-
-      function drawVegetation() {
-        // Draw small grass tufts on ground
-        ctx.fillStyle = colors.grass;
-        for (let i = 0; i < canvas.width; i += 15) {
-          if (Math.random() < 0.5) {
-            const grassX = i;
-            const grassY = canvas.height - 28;
-            
-            // Small grass pixels
-            ctx.fillRect(grassX, grassY, 2, 4);
-            ctx.fillRect(grassX + 3, grassY - 1, 2, 5);
-            ctx.fillRect(grassX + 6, grassY, 2, 3);
-          }
-        }
-        
-        // Draw small pixel flowers
-        const flowers = [
-          {x: 180, y: canvas.height - 32},
-          {x: 420, y: canvas.height - 30},
-          {x: 680, y: canvas.height - 33},
-          {x: 920, y: canvas.height - 31},
-          {x: 1180, y: canvas.height - 32},
-        ];
-        
-        flowers.forEach(flower => {
-          drawPixelFlower(flower.x, flower.y);
-        });
-      }
-
-      function drawPixelFlower(x, y) {
-        // Flower stem
-        ctx.fillStyle = colors.grass;
-        ctx.fillRect(x, y, 2, 6);
-        
-        // Flower head (small pixel clusters)
-        ctx.fillStyle = colors.flower;
-        ctx.fillRect(x - 1, y - 2, 4, 2);
-        ctx.fillRect(x, y - 3, 2, 2);
-        
-        // Flower center
-        ctx.fillStyle = '#FDD835';
-        ctx.fillRect(x, y - 2, 2, 1);
-      }
-
-      function drawSun() {
-        // Small pixel sun in corner
-        const sunX = canvas.width * 0.85;
-        const sunY = canvas.height * 0.12;
-        
-        // Sun body (simple circle with outline)
-        ctx.fillStyle = '#FDD835';
-        ctx.beginPath();
-        ctx.arc(sunX, sunY, 20, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Sun outline
-        ctx.strokeStyle = '#F57F17';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(sunX, sunY, 20, 0, Math.PI * 2);
-        ctx.stroke();
-        
-        // Simple sun rays (pixel style)
-        ctx.strokeStyle = '#FDD835';
-        ctx.lineWidth = 3;
-        for (let i = 0; i < 8; i++) {
-          const angle = (i * Math.PI * 2) / 8;
-          const rayLength = 12;
-          ctx.beginPath();
-          ctx.moveTo(sunX + Math.cos(angle) * 22, sunY + Math.sin(angle) * 22);
-          ctx.lineTo(
-            sunX + Math.cos(angle) * (22 + rayLength),
-            sunY + Math.sin(angle) * (22 + rayLength)
-          );
-          ctx.stroke();
-        }
+        // Draw hills
+        drawHills();
       }
 
       function drawClouds() {
-        // Pixel art style clouds (bigger and lower)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        
         const cloudPositions = [
-          {x: 150, y: 120, size: 1.8},
-          {x: 400, y: 100, size: 2.0},
-          {x: 700, y: 135, size: 1.6},
-          {x: 1000, y: 110, size: 1.9},
-          {x: 1300, y: 130, size: 1.7},
-          {x: 50, y: 140, size: 1.5},
-          {x: 850, y: 95, size: 1.4},
-          {x: 1150, y: 125, size: 1.6},
+          {x: 80, y: 120, size: 1.6},
+          {x: 250, y: 100, size: 1.8},
+          {x: 450, y: 130, size: 1.4},
+          {x: 650, y: 110, size: 1.7},
+          {x: 850, y: 140, size: 1.5},
+          {x: 1050, y: 95, size: 1.9},
+          {x: 1250, y: 125, size: 1.6},
+          {x: 1450, y: 115, size: 1.3},
+          // Additional background clouds for depth
+          {x: 150, y: 160, size: 1.2},
+          {x: 550, y: 150, size: 1.1},
+          {x: 950, y: 170, size: 1.3},
+          {x: 1350, y: 155, size: 1.0},
         ];
 
         cloudPositions.forEach(cloud => {
-          drawPixelCloud(cloud.x, cloud.y, cloud.size);
+          drawCloud(cloud.x, cloud.y, cloud.size);
         });
       }
 
-      function drawPixelCloud(x, y, scale) {
+      function drawCloud(x, y, scale) {
         ctx.save();
+        ctx.scale(scale, scale);
         
-        // Cloud body (series of overlapping circles for bigger, more prominent look)
-        ctx.fillStyle = colors.cloud;
-        
-        const size = 25 * scale; // Increased base size
-        
-        // Main cloud circles - bigger and more detailed
+        // Main cloud body with more natural, fluffy appearance
         ctx.beginPath();
-        ctx.arc(x - 20 * scale, y, size * 0.9, 0, Math.PI * 2);
-        ctx.arc(x - 10 * scale, y - 8 * scale, size * 0.7, 0, Math.PI * 2);
-        ctx.arc(x, y - 10 * scale, size, 0, Math.PI * 2);
-        ctx.arc(x + 10 * scale, y - 8 * scale, size * 0.7, 0, Math.PI * 2);
-        ctx.arc(x + 20 * scale, y, size * 0.9, 0, Math.PI * 2);
-        ctx.arc(x + 12 * scale, y + 10 * scale, size * 0.6, 0, Math.PI * 2);
-        ctx.arc(x - 12 * scale, y + 10 * scale, size * 0.6, 0, Math.PI * 2);
-        ctx.arc(x, y + 5 * scale, size * 0.8, 0, Math.PI * 2);
+        ctx.arc(x/scale - 25, y/scale, 30, 0, Math.PI * 2);
+        ctx.arc(x/scale - 10, y/scale - 15, 35, 0, Math.PI * 2);
+        ctx.arc(x/scale + 10, y/scale - 18, 40, 0, Math.PI * 2);
+        ctx.arc(x/scale + 30, y/scale - 10, 32, 0, Math.PI * 2);
+        ctx.arc(x/scale + 45, y/scale, 28, 0, Math.PI * 2);
+        ctx.arc(x/scale + 20, y/scale + 12, 25, 0, Math.PI * 2);
+        ctx.arc(x/scale - 5, y/scale + 15, 28, 0, Math.PI * 2);
+        ctx.arc(x/scale - 20, y/scale + 10, 22, 0, Math.PI * 2);
         ctx.fill();
         
-        // Cloud shadow for depth
-        ctx.fillStyle = 'rgba(200, 220, 255, 0.6)';
+        // Add cloud shadow for depth
+        ctx.fillStyle = 'rgba(200, 220, 255, 0.4)';
         ctx.beginPath();
-        ctx.arc(x + 2, y + 8 * scale, size * 0.9, 0, Math.PI * 2);
+        ctx.arc(x/scale - 20, y/scale + 8, 28, 0, Math.PI * 2);
+        ctx.arc(x/scale + 5, y/scale + 18, 30, 0, Math.PI * 2);
+        ctx.arc(x/scale + 25, y/scale + 12, 25, 0, Math.PI * 2);
         ctx.fill();
         
-        // Cloud outline (more visible)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(x, y - 10 * scale, size, 0, Math.PI * 2);
-        ctx.stroke();
-        
-        // Add extra cloud puffs for more detail
+        // Add subtle highlight
         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.beginPath();
-        ctx.arc(x - 8 * scale, y - 3 * scale, size * 0.4, 0, Math.PI * 2);
-        ctx.arc(x + 8 * scale, y - 3 * scale, size * 0.4, 0, Math.PI * 2);
+        ctx.arc(x/scale - 5, y/scale - 12, 20, 0, Math.PI * 2);
+        ctx.arc(x/scale + 15, y/scale - 15, 22, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.restore();
       }
 
       function drawHills() {
-        // Not needed for this pixel art style - background mountains replace hills
+        ctx.fillStyle = '#90EE90';
+        
+        // Background hills
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height - 100);
+        ctx.quadraticCurveTo(100, canvas.height - 150, 200, canvas.height - 100);
+        ctx.quadraticCurveTo(350, canvas.height - 80, 500, canvas.height - 120);
+        ctx.quadraticCurveTo(700, canvas.height - 140, 900, canvas.height - 100);
+        ctx.quadraticCurveTo(1100, canvas.height - 90, canvas.width, canvas.height - 110);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.closePath();
+        ctx.fill();
       }
 
       // Main game loop
@@ -4794,10 +4232,10 @@ void ACutsceneManager::PlayCutscene()
           enemy.draw();
         });
 
-        // Update and draw character
-        if (character) {
-          character.update();
-          character.draw();
+        // Update and draw Mario
+        if (mario) {
+          mario.update();
+          mario.draw();
         }
 
         // Update and draw particles
