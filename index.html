@@ -3587,13 +3587,13 @@ void ACutsceneManager::PlayCutscene()
         flower: '#EC407A' // Pink flowers
       };
 
-      // Character class (pixel art style like the reference images)
+      // Character class (pixel art style matching reference - blue character with red cap)
       class Character {
         constructor() {
           this.x = 150;
           this.y = canvas.height - 150;
-          this.width = 32;
-          this.height = 32;
+          this.width = 48; // Made bigger
+          this.height = 48; // Made bigger
           this.vx = 1.5;
           this.vy = 0;
           this.gravity = 0.6;
@@ -3626,7 +3626,7 @@ void ACutsceneManager::PlayCutscene()
             if (this.x < platform.x + platform.width &&
                 this.x + this.width > platform.x &&
                 this.y + this.height > platform.y &&
-                this.y + this.height < platform.y + platform.height + 10 &&
+                this.y + this.height < platform.y + platform.height + 15 &&
                 this.vy >= 0) {
               this.y = platform.y - this.height;
               this.vy = 0;
@@ -3635,8 +3635,8 @@ void ACutsceneManager::PlayCutscene()
           });
 
           // Ground collision
-          if (this.y + this.height > canvas.height - 20) {
-            this.y = canvas.height - 20 - this.height;
+          if (this.y + this.height > canvas.height - 30) {
+            this.y = canvas.height - 30 - this.height;
             this.vy = 0;
             this.onGround = true;
           }
@@ -3675,78 +3675,111 @@ void ACutsceneManager::PlayCutscene()
             ctx.translate(drawX, 0);
           }
 
-          // Draw cute pixel art character (inspired by the reference)
+          // Draw character matching the sprite sheet style (blue character with red cap)
           const frame = Math.floor(this.animFrame);
           
-          // Character outline/shadow
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-          ctx.fillRect(4, drawY + h - 2, w - 8, 3);
+          // Shadow
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+          ctx.fillRect(8, drawY + h - 3, w - 16, 4);
           
-          // Main body (blue, round style)
+          // === LEGS/FEET (blue) ===
+          const legOffset = (this.onGround && Math.abs(this.vx) > 0) ? (frame % 2 === 0 ? 0 : 3) : 0;
+          
           ctx.fillStyle = colors.characterBody;
-          ctx.fillRect(6, drawY + 12, w - 12, h - 16);
+          // Left leg
+          ctx.fillRect(12 + legOffset, drawY + h - 12, 8, 12);
+          // Right leg
+          ctx.fillRect(w - 20 - legOffset, drawY + h - 12, 8, 12);
           
-          // Body outline (darker blue)
+          // Leg outlines
           ctx.strokeStyle = colors.characterOutline;
           ctx.lineWidth = 2;
-          ctx.strokeRect(6, drawY + 12, w - 12, h - 16);
+          ctx.strokeRect(12 + legOffset, drawY + h - 12, 8, 12);
+          ctx.strokeRect(w - 20 - legOffset, drawY + h - 12, 8, 12);
           
-          // Round head (white)
+          // Feet (darker blue)
+          ctx.fillStyle = '#1E40AF';
+          ctx.fillRect(10 + legOffset, drawY + h - 4, 10, 4);
+          ctx.fillRect(w - 20 - legOffset, drawY + h - 4, 10, 4);
+          
+          // === BODY (blue) ===
+          ctx.fillStyle = colors.characterBody;
+          ctx.fillRect(10, drawY + 20, w - 20, 16);
+          
+          // Body outline
+          ctx.strokeStyle = colors.characterOutline;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(10, drawY + 20, w - 20, 16);
+          
+          // Body highlight (lighter blue)
+          ctx.fillStyle = '#3B82F6';
+          ctx.fillRect(12, drawY + 22, w - 24, 4);
+          
+          // === HEAD (white/light) ===
           ctx.fillStyle = colors.characterHead;
-          ctx.beginPath();
-          ctx.arc(w/2, drawY + 8, 8, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.fillRect(12, drawY + 8, w - 24, 16);
           
           // Head outline
           ctx.strokeStyle = colors.characterOutline;
           ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(w/2, drawY + 8, 8, 0, Math.PI * 2);
-          ctx.stroke();
+          ctx.strokeRect(12, drawY + 8, w - 24, 16);
           
-          // Eyes (simple dots)
-          ctx.fillStyle = colors.characterEyes;
-          ctx.fillRect(12, drawY + 6, 3, 3);
-          ctx.fillRect(w - 15, drawY + 6, 3, 3);
+          // === CAP/HAT (red) ===
+          ctx.fillStyle = '#E53E3E';
+          // Hat top
+          ctx.fillRect(10, drawY + 4, w - 20, 8);
+          // Hat brim
+          ctx.fillRect(8, drawY + 10, w - 16, 4);
           
-          // Optional: small mouth
-          ctx.fillStyle = colors.characterEyes;
-          ctx.fillRect(w/2 - 1, drawY + 11, 2, 1);
+          // Hat outline
+          ctx.strokeStyle = '#B91C1C';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(10, drawY + 4, w - 20, 8);
+          ctx.strokeRect(8, drawY + 10, w - 16, 4);
           
-          // Arms (small, pixel style)
-          ctx.fillStyle = colors.characterBody;
-          ctx.fillRect(4, drawY + 14, 3, 8);
-          ctx.fillRect(w - 7, drawY + 14, 3, 8);
+          // Hat detail (lighter red)
+          ctx.fillStyle = '#F87171';
+          ctx.fillRect(12, drawY + 5, w - 24, 3);
           
-          // Arm outlines
+          // === FACE ===
+          // Eyes (large, cute style)
+          ctx.fillStyle = colors.characterHead;
+          ctx.fillRect(16, drawY + 14, 6, 6);
+          ctx.fillRect(w - 22, drawY + 14, 6, 6);
+          
+          // Eye outlines
           ctx.strokeStyle = colors.characterOutline;
-          ctx.lineWidth = 1;
-          ctx.strokeRect(4, drawY + 14, 3, 8);
-          ctx.strokeRect(w - 7, drawY + 14, 3, 8);
+          ctx.lineWidth = 2;
+          ctx.strokeRect(16, drawY + 14, 6, 6);
+          ctx.strokeRect(w - 22, drawY + 14, 6, 6);
           
-          // Legs with walking animation
+          // Eye pupils (bright cyan/blue)
+          ctx.fillStyle = '#06B6D4';
+          ctx.fillRect(18, drawY + 16, 3, 3);
+          ctx.fillRect(w - 20, drawY + 16, 3, 3);
+          
+          // Eye shine (white dot)
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(19, drawY + 17, 1, 1);
+          ctx.fillRect(w - 19, drawY + 17, 1, 1);
+          
+          // === ARMS (blue, simple) ===
           ctx.fillStyle = colors.characterBody;
           if (this.onGround && Math.abs(this.vx) > 0) {
-            // Walking animation - legs move
-            const legOffset = frame % 2 === 0 ? 0 : 2;
-            // Left leg
-            ctx.fillRect(10 + legOffset, drawY + h - 8, 4, 8);
-            ctx.strokeRect(10 + legOffset, drawY + h - 8, 4, 8);
-            // Right leg
-            ctx.fillRect(w - 14 - legOffset, drawY + h - 8, 4, 8);
-            ctx.strokeRect(w - 14 - legOffset, drawY + h - 8, 4, 8);
+            const armSwing = frame % 2 === 0 ? 0 : 2;
+            // Left arm
+            ctx.fillRect(6, drawY + 22 + armSwing, 6, 10);
+            ctx.strokeRect(6, drawY + 22 + armSwing, 6, 10);
+            // Right arm
+            ctx.fillRect(w - 12, drawY + 22 - armSwing, 6, 10);
+            ctx.strokeRect(w - 12, drawY + 22 - armSwing, 6, 10);
           } else {
-            // Standing - legs together
-            ctx.fillRect(10, drawY + h - 8, 4, 8);
-            ctx.strokeRect(10, drawY + h - 8, 4, 8);
-            ctx.fillRect(w - 14, drawY + h - 8, 4, 8);
-            ctx.strokeRect(w - 14, drawY + h - 8, 4, 8);
+            // Arms at rest
+            ctx.fillRect(6, drawY + 24, 6, 10);
+            ctx.strokeRect(6, drawY + 24, 6, 10);
+            ctx.fillRect(w - 12, drawY + 24, 6, 10);
+            ctx.strokeRect(w - 12, drawY + 24, 6, 10);
           }
-          
-          // Feet (small rectangles)
-          ctx.fillStyle = colors.characterOutline;
-          ctx.fillRect(8, drawY + h - 2, 6, 2);
-          ctx.fillRect(w - 14, drawY + h - 2, 6, 2);
 
           ctx.restore();
         }
@@ -4001,18 +4034,17 @@ void ACutsceneManager::PlayCutscene()
         }
       }
 
-      // Enemy class (larger Goomba-style)
+      // Enemy class (red devil-style character from reference)
       class Enemy {
         constructor(x, y) {
           this.x = x;
           this.y = y;
-          this.width = 36; // Increased from 24
-          this.height = 36; // Increased from 24
-          this.vx = -0.8; // Slower movement
+          this.width = 44; // Made bigger
+          this.height = 44; // Made bigger
+          this.vx = -0.8;
           this.direction = -1;
           this.animFrame = 0;
-          this.animSpeed = 0.08; // Slower animation
-          this.scale = 1.3; // Scale factor
+          this.animSpeed = 0.08;
         }
 
         update() {
@@ -4034,13 +4066,13 @@ void ACutsceneManager::PlayCutscene()
             if (this.x < platform.x + platform.width &&
                 this.x + this.width > platform.x &&
                 this.y + this.height >= platform.y &&
-                this.y + this.height <= platform.y + 10) {
+                this.y + this.height <= platform.y + 15) {
               onPlatform = true;
             }
           });
           
           // Fall if not on platform
-          if (!onPlatform && this.y + this.height < canvas.height - 20) {
+          if (!onPlatform && this.y + this.height < canvas.height - 30) {
             this.y += 2;
           }
         }
@@ -4048,55 +4080,120 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
-          const w = this.width * this.scale;
-          const h = this.height * this.scale;
+          const w = this.width;
+          const h = this.height;
           
           // Shadow
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-          ctx.fillRect(this.x - 2, this.y + h - 4, w + 4, 4);
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+          ctx.fillRect(this.x + 6, this.y + h - 3, w - 12, 4);
           
-          // Simple pixel art enemy (red blob/creature)
-          // Main body (red)
+          // === Draw red devil character (matching sprite reference) ===
+          const frame = Math.floor(this.animFrame);
+          
+          // === LEGS/FEET (red) ===
+          const legOffset = frame % 2 === 0 ? 0 : 2;
+          
           ctx.fillStyle = colors.enemy;
-          ctx.fillRect(this.x + 3, this.y + 8, w - 6, h - 12);
+          // Left leg
+          ctx.fillRect(this.x + 12 + legOffset, this.y + h - 12, 8, 12);
+          // Right leg
+          ctx.fillRect(this.x + w - 20 - legOffset, this.y + h - 12, 8, 12);
+          
+          // Leg outlines
+          ctx.strokeStyle = '#B91C1C';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(this.x + 12 + legOffset, this.y + h - 12, 8, 12);
+          ctx.strokeRect(this.x + w - 20 - legOffset, this.y + h - 12, 8, 12);
+          
+          // Feet (darker red)
+          ctx.fillStyle = '#991B1B';
+          ctx.fillRect(this.x + 10 + legOffset, this.y + h - 4, 10, 4);
+          ctx.fillRect(this.x + w - 20 - legOffset, this.y + h - 4, 10, 4);
+          
+          // === BODY (red) ===
+          ctx.fillStyle = colors.enemy;
+          ctx.fillRect(this.x + 10, this.y + 18, w - 20, 18);
           
           // Body outline
-          ctx.strokeStyle = '#B71C1C';
+          ctx.strokeStyle = '#B91C1C';
           ctx.lineWidth = 2;
-          ctx.strokeRect(this.x + 3, this.y + 8, w - 6, h - 12);
+          ctx.strokeRect(this.x + 10, this.y + 18, w - 20, 18);
           
-          // Round head/top
+          // Body highlight (lighter red)
+          ctx.fillStyle = '#F87171';
+          ctx.fillRect(this.x + 12, this.y + 20, w - 24, 4);
+          
+          // === HEAD (red, round top) ===
+          ctx.fillStyle = colors.enemy;
+          ctx.fillRect(this.x + 12, this.y + 8, w - 24, 14);
+          
+          // Head outline
+          ctx.strokeStyle = '#B91C1C';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(this.x + 12, this.y + 8, w - 24, 14);
+          
+          // Round top of head
           ctx.fillStyle = colors.enemy;
           ctx.beginPath();
-          ctx.arc(this.x + w/2, this.y + 10, 12, 0, Math.PI);
+          ctx.arc(this.x + w/2, this.y + 10, 12, Math.PI, 0);
           ctx.fill();
-          
-          ctx.strokeStyle = '#B71C1C';
+          ctx.strokeStyle = '#B91C1C';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.arc(this.x + w/2, this.y + 10, 12, 0, Math.PI);
+          ctx.arc(this.x + w/2, this.y + 10, 12, Math.PI, 0);
           ctx.stroke();
           
-          // Eyes (white with black pupils)
+          // === HORNS (devil horns) ===
+          ctx.fillStyle = '#7C2D12';
+          // Left horn
+          ctx.beginPath();
+          ctx.moveTo(this.x + 10, this.y + 8);
+          ctx.lineTo(this.x + 8, this.y + 2);
+          ctx.lineTo(this.x + 14, this.y + 6);
+          ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = '#991B1B';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          
+          // Right horn
+          ctx.beginPath();
+          ctx.moveTo(this.x + w - 10, this.y + 8);
+          ctx.lineTo(this.x + w - 8, this.y + 2);
+          ctx.lineTo(this.x + w - 14, this.y + 6);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          
+          // === EYES (large white eyes) ===
           ctx.fillStyle = '#FFFFFF';
-          const eyeOffset = Math.floor(this.animFrame) === 0 ? 0 : 1;
-          ctx.fillRect(this.x + 10 + eyeOffset, this.y + 6, 4, 4);
-          ctx.fillRect(this.x + w - 14 + eyeOffset, this.y + 6, 4, 4);
+          ctx.fillRect(this.x + 14, this.y + 12, 6, 6);
+          ctx.fillRect(this.x + w - 20, this.y + 12, 6, 6);
           
-          // Eye pupils
-          ctx.fillStyle = '#000000';
-          ctx.fillRect(this.x + 11 + eyeOffset, this.y + 7, 2, 2);
-          ctx.fillRect(this.x + w - 13 + eyeOffset, this.y + 7, 2, 2);
+          // Eye outlines
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(this.x + 14, this.y + 12, 6, 6);
+          ctx.strokeRect(this.x + w - 20, this.y + 12, 6, 6);
           
-          // Angry eyebrows (pixel style)
-          ctx.fillStyle = '#8B0000';
-          ctx.fillRect(this.x + 9, this.y + 4, 5, 2);
-          ctx.fillRect(this.x + w - 14, this.y + 4, 5, 2);
+          // Eye pupils (dark)
+          ctx.fillStyle = '#1E293B';
+          const eyeMove = frame % 2 === 0 ? 0 : 1;
+          ctx.fillRect(this.x + 16 + eyeMove, this.y + 14, 3, 3);
+          ctx.fillRect(this.x + w - 18 + eyeMove, this.y + 14, 3, 3);
           
-          // Simple feet
-          ctx.fillStyle = '#C62828';
-          ctx.fillRect(this.x + 8, this.y + h - 6, 6, 6);
-          ctx.fillRect(this.x + w - 14, this.y + h - 6, 6, 6);
+          // === ARMS (red, simple) ===
+          ctx.fillStyle = colors.enemy;
+          ctx.strokeStyle = '#B91C1C';
+          ctx.lineWidth = 2;
+          
+          const armSwing = frame % 2 === 0 ? 0 : 2;
+          // Left arm
+          ctx.fillRect(this.x + 6, this.y + 20 + armSwing, 6, 10);
+          ctx.strokeRect(this.x + 6, this.y + 20 + armSwing, 6, 10);
+          // Right arm
+          ctx.fillRect(this.x + w - 12, this.y + 20 - armSwing, 6, 10);
+          ctx.strokeRect(this.x + w - 12, this.y + 20 - armSwing, 6, 10);
           
           ctx.restore();
         }
