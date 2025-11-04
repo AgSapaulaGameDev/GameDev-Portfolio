@@ -3553,35 +3553,57 @@ void ACutsceneManager::PlayCutscene()
       let particles = [];
       let character = null;
 
-      // Colors and themes (updated for character customization)
+      // Colors and themes (refined art style palette)
       const colors = {
         // Character colors
-        characterTop: '#1A1A1A', // Black top
-        characterBottom: '#2563EB', // Blue bottom
-        characterSkin: '#FFDBAC',
-        characterShoes: '#654321',
+        characterTop: '#1A1A1A', // Rich black
+        characterBottom: '#2563EB', // Vibrant blue
+        characterSkin: '#FFDBAC', // Warm skin tone
+        characterShoes: '#654321', // Brown leather
         
-        // Environment colors
-        ground: '#8B4513',
-        platform: '#654321',
-        coin: '#FFD700',
-        enemy: '#DC143C',
-        powerUp: '#32CD32',
-        sky: '#FFF8DC', // Warm cream
-        skyBottom: '#F7FAFC',
-        cloud: '#FFFFFF',
-        brick: '#D69E2E',
-        brickDark: '#B7791F',
-        pipe: '#38A169',
-        pipeLight: '#68D391',
-        hill: '#9AE6B4',
-        hillDark: '#68D391',
+        // Environment colors (cohesive palette)
+        ground: '#8B4513', // Rich earth brown
+        platform: '#A0522D', // Sienna brown
+        coin: '#FFD700', // Pure gold
+        enemy: '#DC143C', // Crimson red
+        powerUp: '#32CD32', // Lime green
         
-        // New environment elements
-        tree: '#22543D',
-        treeLeaves: '#38A169',
-        flower: '#E53E3E',
-        grass: '#48BB78'
+        // Sky and atmosphere
+        sky: '#FFE5B4', // Warm peach
+        skyMid: '#FFF8DC', // Cream white
+        skyBottom: '#F0F8FF', // Very light blue
+        cloud: '#FFFFFF', // Pure white
+        cloudShadow: '#E6E6FA', // Light lavender
+        
+        // Platforms and structures
+        brick: '#CD853F', // Peru gold
+        brickDark: '#A0522D', // Darker sienna
+        brickLight: '#F4A460', // Sandy brown
+        pipe: '#228B22', // Forest green
+        pipeLight: '#32CD32', // Lime highlight
+        pipeDark: '#006400', // Dark green
+        
+        // Nature elements
+        tree: '#8B4513', // Brown trunk
+        treeLeaves: '#228B22', // Forest green
+        treeLeavesLight: '#32CD32', // Light green
+        treeLeavesShade: '#006400', // Dark green shade
+        hill: '#9AE6B4', // Light green
+        hillDark: '#68D391', // Medium green
+        hillShadow: '#48BB78', // Darker green
+        grass: '#48BB78', // Grass green
+        grassDark: '#38A169', // Dark grass
+        flower: '#E53E3E', // Red flowers
+        flowerCenter: '#FFD700', // Golden center
+        
+        // Effects and UI
+        particle: '#FFFFFF', // White sparkles
+        attack: '#FFFF00', // Yellow energy
+        healthGood: '#00AA00', // Green health
+        healthMid: '#FFAA00', // Orange health
+        healthBad: '#AA0000', // Red health
+        uiBackground: 'rgba(0, 0, 0, 0.7)', // Dark transparent
+        uiText: '#FFFFFF' // White text
       };
 
       // Character class (customized with black top and blue bottom)
@@ -3914,77 +3936,101 @@ void ACutsceneManager::PlayCutscene()
         }
 
         drawNormalPlatform() {
-          // Enhanced brick-like platform with 3D effect
-          // Main platform color
-          ctx.fillStyle = colors.platform;
+          // Enhanced platform with consistent art style
+          // Main platform with gradient
+          const platformGradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
+          platformGradient.addColorStop(0, colors.brickLight);
+          platformGradient.addColorStop(0.3, colors.platform);
+          platformGradient.addColorStop(1, colors.brickDark);
+          
+          ctx.fillStyle = platformGradient;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Top highlight
-          ctx.fillStyle = '#8B7355';
-          ctx.fillRect(this.x, this.y, this.width, 4);
-          
-          // Side shadow
-          ctx.fillStyle = '#5D4E37';
-          ctx.fillRect(this.x + this.width - 4, this.y + 4, 4, this.height - 4);
-          
-          // Add detailed brick texture
-          ctx.strokeStyle = colors.ground;
+          // Enhanced brick texture with consistent spacing
+          ctx.strokeStyle = colors.brickDark;
           ctx.lineWidth = 2;
           
-          const brickWidth = 30; // Larger bricks
-          const brickHeight = 15;
+          const brickWidth = 32;
+          const brickHeight = 16;
           
-          for (let x = 0; x < this.width; x += brickWidth) {
-            for (let y = 0; y < this.height; y += brickHeight) {
-              const actualWidth = Math.min(brickWidth, this.width - x);
-              const actualHeight = Math.min(brickHeight, this.height - y);
+          for (let row = 0; row < Math.ceil(this.height / brickHeight); row++) {
+            for (let col = 0; col < Math.ceil(this.width / brickWidth); col++) {
+              const offsetX = (row % 2) * (brickWidth / 2); // Offset every other row
+              const x = this.x + col * brickWidth + offsetX;
+              const y = this.y + row * brickHeight;
               
-              // Brick outline
-              ctx.strokeRect(this.x + x, this.y + y, actualWidth, actualHeight);
-              
-              // Brick highlight
-              ctx.fillStyle = '#8B7355';
-              ctx.fillRect(this.x + x + 2, this.y + y + 2, actualWidth - 4, 2);
-              
-              // Brick shadow
-              ctx.fillStyle = '#5D4E37';
-              ctx.fillRect(this.x + x + actualWidth - 4, this.y + y + 4, 2, actualHeight - 4);
+              if (x < this.x + this.width && y < this.y + this.height) {
+                const actualWidth = Math.min(brickWidth, this.x + this.width - x);
+                const actualHeight = Math.min(brickHeight, this.y + this.height - y);
+                
+                // Brick outline
+                ctx.strokeRect(x, y, actualWidth, actualHeight);
+                
+                // Brick highlight
+                ctx.fillStyle = colors.brickLight;
+                ctx.fillRect(x + 2, y + 2, actualWidth - 4, 2);
+                
+                // Brick shadow
+                ctx.fillStyle = colors.brickDark;
+                ctx.fillRect(x + actualWidth - 3, y + 3, 2, actualHeight - 3);
+              }
             }
           }
+          
+          // Top edge highlight
+          ctx.fillStyle = colors.brickLight;
+          ctx.fillRect(this.x, this.y, this.width, 3);
+          
+          // Bottom edge shadow
+          ctx.fillStyle = colors.brickDark;
+          ctx.fillRect(this.x, this.y + this.height - 3, this.width, 3);
         }
 
         drawBrickPlatform() {
-          // Enhanced question mark blocks with 3D effect
-          // Main block
-          ctx.fillStyle = colors.brick;
+          // Enhanced question mark blocks with refined art style
+          // Main block with gradient
+          const blockGradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
+          blockGradient.addColorStop(0, '#F6E05E');
+          blockGradient.addColorStop(0.4, colors.brick);
+          blockGradient.addColorStop(1, colors.brickDark);
+          
+          ctx.fillStyle = blockGradient;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
+          // Enhanced 3D borders
           // Top highlight
-          ctx.fillStyle = '#F6E05E';
-          ctx.fillRect(this.x, this.y, this.width, 6);
+          ctx.fillStyle = '#FFFACD';
+          ctx.fillRect(this.x, this.y, this.width, 4);
           
-          // Side shadow
+          // Left highlight
+          ctx.fillRect(this.x, this.y, 4, this.height);
+          
+          // Bottom shadow
           ctx.fillStyle = colors.brickDark;
-          ctx.fillRect(this.x + this.width - 6, this.y + 6, 6, this.height - 6);
+          ctx.fillRect(this.x, this.y + this.height - 4, this.width, 4);
           
-          // Question mark
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = 'bold 24px Arial';
+          // Right shadow
+          ctx.fillRect(this.x + this.width - 4, this.y, 4, this.height);
+          
+          // Question mark with shadow effect
+          ctx.fillStyle = '#000000';
+          ctx.font = 'bold 26px Arial';
           ctx.textAlign = 'center';
-          ctx.strokeStyle = '#000000';
-          ctx.lineWidth = 2;
-          ctx.strokeText('?', this.x + this.width/2, this.y + this.height/2 + 8);
+          ctx.fillText('?', this.x + this.width/2 + 2, this.y + this.height/2 + 10);
+          
+          ctx.fillStyle = '#FFFFFF';
           ctx.fillText('?', this.x + this.width/2, this.y + this.height/2 + 8);
           
-          // Border with 3D effect
+          // Inner decorative border
           ctx.strokeStyle = colors.brickDark;
-          ctx.lineWidth = 3;
-          ctx.strokeRect(this.x, this.y, this.width, this.height);
-          
-          // Inner border highlight
-          ctx.strokeStyle = '#F6E05E';
           ctx.lineWidth = 2;
-          ctx.strokeRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4);
+          ctx.strokeRect(this.x + 3, this.y + 3, this.width - 6, this.height - 6);
+          
+          // Animated glow effect
+          const glowIntensity = 0.3 + 0.2 * Math.sin(Date.now() * 0.003);
+          ctx.strokeStyle = `rgba(255, 215, 0, ${glowIntensity})`;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(this.x - 1, this.y - 1, this.width + 2, this.height + 2);
         }
 
         drawPipe() {
@@ -4434,32 +4480,94 @@ void ACutsceneManager::PlayCutscene()
         ];
       }
 
-      // Draw background with enhanced environment
+      // Draw background with enhanced cohesive art style
       function drawBackground() {
-        // Sky gradient with more natural colors
+        // Enhanced sky gradient with perfect color harmony
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#FFE5B4'); // Warm peach
-        gradient.addColorStop(0.3, '#FFF8DC'); // Warm cream
-        gradient.addColorStop(0.7, '#F0F8FF'); // Very light blue-white
-        gradient.addColorStop(1, '#E6F3FF'); // Subtle blue at bottom
+        gradient.addColorStop(0, colors.sky); // Warm peach top
+        gradient.addColorStop(0.3, colors.skyMid); // Cream middle
+        gradient.addColorStop(0.7, colors.skyBottom); // Light blue bottom
+        gradient.addColorStop(1, '#E6F3FF'); // Subtle blue at horizon
         
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw sun
+        // Draw atmospheric elements in layers
+        drawDistantMountains();
         drawSun();
-        
-        // Draw clouds
         drawClouds();
-        
-        // Draw background trees
         drawBackgroundTrees();
-        
-        // Draw hills with grass
         drawHills();
-        
-        // Draw foreground vegetation
         drawVegetation();
+        drawAtmosphericParticles();
+      }
+
+      function drawDistantMountains() {
+        // Add distant mountains for depth
+        ctx.fillStyle = 'rgba(173, 216, 230, 0.3)'; // Light blue mountains
+        
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height * 0.4);
+        ctx.quadraticCurveTo(canvas.width * 0.2, canvas.height * 0.25, canvas.width * 0.4, canvas.height * 0.35);
+        ctx.quadraticCurveTo(canvas.width * 0.6, canvas.height * 0.3, canvas.width * 0.8, canvas.height * 0.4);
+        ctx.quadraticCurveTo(canvas.width, canvas.height * 0.35, canvas.width, canvas.height * 0.45);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawSun() {
+        const sunX = canvas.width * 0.8;
+        const sunY = canvas.height * 0.15;
+        
+        // Enhanced sun with better rays
+        ctx.strokeStyle = 'rgba(255, 223, 186, 0.4)';
+        ctx.lineWidth = 3;
+        for (let i = 0; i < 12; i++) {
+          const angle = (i * Math.PI * 2) / 12;
+          const rayLength = 50 + Math.sin(Date.now() * 0.002 + i) * 5; // Animated rays
+          ctx.beginPath();
+          ctx.moveTo(sunX, sunY);
+          ctx.lineTo(
+            sunX + Math.cos(angle) * rayLength,
+            sunY + Math.sin(angle) * rayLength
+          );
+          ctx.stroke();
+        }
+        
+        // Enhanced sun with glow effect
+        const sunGradient = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 30);
+        sunGradient.addColorStop(0, '#FFF9C4');
+        sunGradient.addColorStop(0.5, '#FEF08A');
+        sunGradient.addColorStop(0.8, '#F59E0B');
+        sunGradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        
+        ctx.fillStyle = sunGradient;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 30, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Sun core
+        ctx.fillStyle = '#FFFACD';
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 20, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawAtmosphericParticles() {
+        // Add floating pollen/dust particles for atmosphere
+        const time = Date.now() * 0.001;
+        
+        for (let i = 0; i < 8; i++) {
+          const x = (canvas.width * 0.1 * i + time * 20 + Math.sin(time + i) * 30) % canvas.width;
+          const y = canvas.height * 0.3 + Math.sin(time * 0.7 + i * 0.5) * 50;
+          
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.beginPath();
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
       function drawBackgroundTrees() {
@@ -4481,102 +4589,211 @@ void ACutsceneManager::PlayCutscene()
       function drawTree(x, y, scale) {
         ctx.save();
         
-        // Tree trunk
-        ctx.fillStyle = colors.tree;
-        const trunkWidth = 12 * scale;
-        const trunkHeight = 40 * scale;
+        // Enhanced tree with more realistic proportions
+        const trunkWidth = 14 * scale;
+        const trunkHeight = 45 * scale;
+        
+        // Tree trunk with bark texture
+        const trunkGradient = ctx.createLinearGradient(x - trunkWidth/2, y, x + trunkWidth/2, y);
+        trunkGradient.addColorStop(0, colors.tree);
+        trunkGradient.addColorStop(0.3, '#A0522D');
+        trunkGradient.addColorStop(0.7, colors.tree);
+        trunkGradient.addColorStop(1, '#654321');
+        
+        ctx.fillStyle = trunkGradient;
         ctx.fillRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
         
-        // Tree leaves (multiple circles for natural look)
+        // Bark texture lines
+        ctx.strokeStyle = '#654321';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 3; i++) {
+          const lineY = y + 10 + i * 12;
+          ctx.beginPath();
+          ctx.moveTo(x - trunkWidth/2 + 2, lineY);
+          ctx.lineTo(x + trunkWidth/2 - 2, lineY);
+          ctx.stroke();
+        }
+        
+        // Enhanced tree canopy with multiple leaf layers
+        const leafRadius = 28 * scale;
+        
+        // Shadow layer
+        ctx.fillStyle = colors.treeLeavesShade;
+        ctx.beginPath();
+        ctx.arc(x + 3, y - 8 * scale, leafRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Main leaf clusters
         ctx.fillStyle = colors.treeLeaves;
-        const leafRadius = 25 * scale;
         
-        // Main leaf cluster
+        // Central cluster
         ctx.beginPath();
-        ctx.arc(x, y - 10 * scale, leafRadius, 0, Math.PI * 2);
+        ctx.arc(x, y - 12 * scale, leafRadius, 0, Math.PI * 2);
         ctx.fill();
         
-        // Additional leaf clusters
+        // Side clusters
         ctx.beginPath();
-        ctx.arc(x - 15 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
+        ctx.arc(x - 18 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.beginPath();
-        ctx.arc(x + 15 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
+        ctx.arc(x + 18 * scale, y - 5 * scale, leafRadius * 0.8, 0, Math.PI * 2);
         ctx.fill();
         
-        // Tree highlight
-        ctx.fillStyle = '#4AE54A';
+        // Top cluster
         ctx.beginPath();
-        ctx.arc(x - 8 * scale, y - 15 * scale, leafRadius * 0.4, 0, Math.PI * 2);
+        ctx.arc(x, y - 25 * scale, leafRadius * 0.7, 0, Math.PI * 2);
         ctx.fill();
+        
+        // Light highlights on leaves
+        ctx.fillStyle = colors.treeLeavesLight;
+        ctx.beginPath();
+        ctx.arc(x - 8 * scale, y - 18 * scale, leafRadius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(x + 6 * scale, y - 15 * scale, leafRadius * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Small decorative branches
+        ctx.strokeStyle = colors.tree;
+        ctx.lineWidth = 2 * scale;
+        ctx.beginPath();
+        ctx.moveTo(x - trunkWidth/4, y + trunkHeight * 0.3);
+        ctx.lineTo(x - trunkWidth * 0.8, y + trunkHeight * 0.2);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(x + trunkWidth/4, y + trunkHeight * 0.5);
+        ctx.lineTo(x + trunkWidth * 0.7, y + trunkHeight * 0.4);
+        ctx.stroke();
         
         ctx.restore();
       }
 
       function drawVegetation() {
-        // Draw grass patches
-        for (let i = 0; i < canvas.width; i += 20) {
-          if (Math.random() < 0.7) {
-            drawGrass(i, canvas.height - 25);
+        // Enhanced grass patches with variation
+        for (let i = 0; i < canvas.width; i += 15) {
+          if (Math.random() < 0.8) {
+            drawGrassCluster(i, canvas.height - 25);
           }
         }
         
-        // Draw flowers
+        // Enhanced flowers with more variety
         const flowers = [
-          {x: 150, y: canvas.height - 35},
-          {x: 350, y: canvas.height - 30},
-          {x: 550, y: canvas.height - 35},
-          {x: 750, y: canvas.height - 32},
-          {x: 950, y: canvas.height - 35},
-          {x: 1150, y: canvas.height - 30},
+          {x: 150, y: canvas.height - 35, type: 'red'},
+          {x: 180, y: canvas.height - 32, type: 'yellow'},
+          {x: 350, y: canvas.height - 30, type: 'red'},
+          {x: 380, y: canvas.height - 33, type: 'pink'},
+          {x: 550, y: canvas.height - 35, type: 'yellow'},
+          {x: 580, y: canvas.height - 31, type: 'red'},
+          {x: 750, y: canvas.height - 32, type: 'pink'},
+          {x: 780, y: canvas.height - 34, type: 'yellow'},
+          {x: 950, y: canvas.height - 35, type: 'red'},
+          {x: 980, y: canvas.height - 30, type: 'pink'},
+          {x: 1150, y: canvas.height - 30, type: 'yellow'},
+          {x: 1180, y: canvas.height - 33, type: 'red'},
         ];
         
         flowers.forEach(flower => {
-          drawFlower(flower.x, flower.y);
+          drawFlower(flower.x, flower.y, flower.type);
+        });
+        
+        // Add small bushes
+        const bushes = [
+          {x: 200, y: canvas.height - 40},
+          {x: 500, y: canvas.height - 38},
+          {x: 800, y: canvas.height - 42},
+          {x: 1100, y: canvas.height - 39},
+        ];
+        
+        bushes.forEach(bush => {
+          drawBush(bush.x, bush.y);
         });
       }
 
-      function drawGrass(x, y) {
-        ctx.strokeStyle = colors.grass;
-        ctx.lineWidth = 2;
+      function drawGrassCluster(x, y) {
+        // Enhanced grass with multiple blades and shading
+        const grassTypes = [colors.grass, colors.grassDark, '#5CBB5C'];
         
-        for (let i = 0; i < 3; i++) {
-          const grassX = x + i * 3;
-          const grassHeight = 5 + Math.random() * 8;
+        for (let i = 0; i < 4; i++) {
+          const grassX = x + i * 3 + Math.random() * 2;
+          const grassHeight = 6 + Math.random() * 10;
+          const grassColor = grassTypes[Math.floor(Math.random() * grassTypes.length)];
+          
+          ctx.strokeStyle = grassColor;
+          ctx.lineWidth = 1.5;
           
           ctx.beginPath();
           ctx.moveTo(grassX, y);
-          ctx.lineTo(grassX + Math.random() * 2 - 1, y - grassHeight);
+          ctx.quadraticCurveTo(
+            grassX + Math.random() * 2 - 1, 
+            y - grassHeight * 0.6,
+            grassX + Math.random() * 3 - 1.5, 
+            y - grassHeight
+          );
           ctx.stroke();
         }
       }
 
-      function drawFlower(x, y) {
-        // Flower stem
-        ctx.strokeStyle = colors.grass;
+      function drawFlower(x, y, type) {
+        // Enhanced flowers with different colors and details
+        const flowerColors = {
+          red: colors.flower,
+          yellow: '#FFD700',
+          pink: '#FF69B4'
+        };
+        
+        // Flower stem with slight curve
+        ctx.strokeStyle = colors.grassDark;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x, y - 8);
+        ctx.quadraticCurveTo(x + 1, y - 4, x, y - 8);
         ctx.stroke();
         
-        // Flower petals
-        ctx.fillStyle = colors.flower;
+        // Flower petals (5 petals)
+        ctx.fillStyle = flowerColors[type] || colors.flower;
         for (let i = 0; i < 5; i++) {
           const angle = (i * Math.PI * 2) / 5;
-          const petalX = x + Math.cos(angle) * 3;
-          const petalY = y - 8 + Math.sin(angle) * 3;
+          const petalX = x + Math.cos(angle) * 4;
+          const petalY = y - 8 + Math.sin(angle) * 4;
           
           ctx.beginPath();
-          ctx.arc(petalX, petalY, 2, 0, Math.PI * 2);
+          ctx.ellipse(petalX, petalY, 3, 2, angle, 0, Math.PI * 2);
           ctx.fill();
         }
         
         // Flower center
-        ctx.fillStyle = '#FFD700';
+        ctx.fillStyle = colors.flowerCenter;
         ctx.beginPath();
-        ctx.arc(x, y - 8, 1.5, 0, Math.PI * 2);
+        ctx.arc(x, y - 8, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Small highlight on center
+        ctx.fillStyle = '#FFFFE0';
+        ctx.beginPath();
+        ctx.arc(x - 0.5, y - 8.5, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawBush(x, y) {
+        // Small decorative bushes
+        ctx.fillStyle = colors.grassDark;
+        
+        // Bush base
+        ctx.beginPath();
+        ctx.ellipse(x, y, 12, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Bush highlights
+        ctx.fillStyle = colors.grass;
+        ctx.beginPath();
+        ctx.ellipse(x - 3, y - 2, 6, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.ellipse(x + 4, y - 1, 4, 3, 0, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -4613,19 +4830,19 @@ void ACutsceneManager::PlayCutscene()
       }
 
       function drawClouds() {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        
         const cloudPositions = [
-          {x: 120, y: 60, size: 1.2},
-          {x: 350, y: 40, size: 1.5},
-          {x: 650, y: 80, size: 1.0},
-          {x: 950, y: 35, size: 1.3},
-          {x: 1250, y: 70, size: 1.1},
-          {x: 1500, y: 50, size: 0.9},
+          {x: 120, y: 60, size: 1.2, speed: 0.3},
+          {x: 350, y: 40, size: 1.5, speed: 0.2},
+          {x: 650, y: 80, size: 1.0, speed: 0.4},
+          {x: 950, y: 35, size: 1.3, speed: 0.25},
+          {x: 1250, y: 70, size: 1.1, speed: 0.35},
+          {x: 1500, y: 50, size: 0.9, speed: 0.3},
         ];
 
-        cloudPositions.forEach(cloud => {
-          drawCloud(cloud.x, cloud.y, cloud.size);
+        cloudPositions.forEach((cloud, index) => {
+          // Animate clouds slowly
+          const animatedX = cloud.x + Math.sin(Date.now() * 0.0005 * cloud.speed + index) * 20;
+          drawCloud(animatedX, cloud.y, cloud.size);
         });
       }
 
@@ -4633,18 +4850,20 @@ void ACutsceneManager::PlayCutscene()
         ctx.save();
         ctx.scale(scale, scale);
         
-        // Cloud shadow
-        ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+        // Enhanced cloud with multiple layers and shadows
+        
+        // Cloud shadow (drawn first)
+        ctx.fillStyle = colors.cloudShadow;
         ctx.beginPath();
-        ctx.arc(x/scale - 18, y/scale + 5, 30, 0, Math.PI * 2);
-        ctx.arc(x/scale + 2, y/scale - 5, 40, 0, Math.PI * 2);
-        ctx.arc(x/scale + 22, y/scale + 5, 30, 0, Math.PI * 2);
-        ctx.arc(x/scale + 12, y/scale + 15, 25, 0, Math.PI * 2);
-        ctx.arc(x/scale - 8, y/scale + 15, 25, 0, Math.PI * 2);
+        ctx.arc(x/scale - 18, y/scale + 8, 28, 0, Math.PI * 2);
+        ctx.arc(x/scale + 2, y/scale - 2, 38, 0, Math.PI * 2);
+        ctx.arc(x/scale + 22, y/scale + 8, 28, 0, Math.PI * 2);
+        ctx.arc(x/scale + 12, y/scale + 18, 23, 0, Math.PI * 2);
+        ctx.arc(x/scale - 8, y/scale + 18, 23, 0, Math.PI * 2);
         ctx.fill();
         
-        // Main cloud
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        // Main cloud body
+        ctx.fillStyle = colors.cloud;
         ctx.beginPath();
         ctx.arc(x/scale - 20, y/scale, 30, 0, Math.PI * 2);
         ctx.arc(x/scale, y/scale - 10, 40, 0, Math.PI * 2);
@@ -4653,35 +4872,64 @@ void ACutsceneManager::PlayCutscene()
         ctx.arc(x/scale - 10, y/scale + 10, 25, 0, Math.PI * 2);
         ctx.fill();
         
+        // Cloud highlights
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.beginPath();
+        ctx.arc(x/scale - 15, y/scale - 5, 15, 0, Math.PI * 2);
+        ctx.arc(x/scale + 5, y/scale - 15, 20, 0, Math.PI * 2);
+        ctx.fill();
+        
         ctx.restore();
       }
 
       function drawHills() {
-        // Background hills with warm green colors
-        ctx.fillStyle = colors.hill;
+        // Multi-layered hills with enhanced shading
         
+        // Distant hills (lightest)
+        ctx.fillStyle = colors.hill;
         ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 120);
-        ctx.quadraticCurveTo(150, canvas.height - 180, 300, canvas.height - 120);
-        ctx.quadraticCurveTo(450, canvas.height - 100, 600, canvas.height - 140);
-        ctx.quadraticCurveTo(800, canvas.height - 160, 1000, canvas.height - 120);
-        ctx.quadraticCurveTo(1200, canvas.height - 110, canvas.width, canvas.height - 130);
+        ctx.moveTo(0, canvas.height - 140);
+        ctx.quadraticCurveTo(200, canvas.height - 200, 400, canvas.height - 140);
+        ctx.quadraticCurveTo(600, canvas.height - 120, 800, canvas.height - 160);
+        ctx.quadraticCurveTo(1000, canvas.height - 180, 1200, canvas.height - 140);
+        ctx.quadraticCurveTo(1400, canvas.height - 130, canvas.width, canvas.height - 150);
         ctx.lineTo(canvas.width, canvas.height);
         ctx.lineTo(0, canvas.height);
         ctx.closePath();
         ctx.fill();
         
-        // Foreground hills (darker)
+        // Middle hills (medium shade)
         ctx.fillStyle = colors.hillDark;
         ctx.beginPath();
-        ctx.moveTo(0, canvas.height - 80);
-        ctx.quadraticCurveTo(200, canvas.height - 110, 400, canvas.height - 80);
-        ctx.quadraticCurveTo(600, canvas.height - 70, 800, canvas.height - 90);
-        ctx.quadraticCurveTo(1000, canvas.height - 85, canvas.width, canvas.height - 95);
+        ctx.moveTo(0, canvas.height - 100);
+        ctx.quadraticCurveTo(150, canvas.height - 140, 300, canvas.height - 100);
+        ctx.quadraticCurveTo(500, canvas.height - 80, 700, canvas.height - 110);
+        ctx.quadraticCurveTo(900, canvas.height - 120, 1100, canvas.height - 100);
+        ctx.quadraticCurveTo(1300, canvas.height - 90, canvas.width, canvas.height - 110);
         ctx.lineTo(canvas.width, canvas.height);
         ctx.lineTo(0, canvas.height);
         ctx.closePath();
         ctx.fill();
+        
+        // Foreground hills (darkest) with texture
+        ctx.fillStyle = colors.hillShadow;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height - 60);
+        ctx.quadraticCurveTo(100, canvas.height - 80, 250, canvas.height - 60);
+        ctx.quadraticCurveTo(400, canvas.height - 50, 600, canvas.height - 70);
+        ctx.quadraticCurveTo(800, canvas.height - 65, canvas.width, canvas.height - 75);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Add hill highlights
+        ctx.strokeStyle = colors.hill;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height - 58);
+        ctx.quadraticCurveTo(100, canvas.height - 78, 250, canvas.height - 58);
+        ctx.stroke();
       }
 
       // Main game loop
@@ -4733,45 +4981,125 @@ void ACutsceneManager::PlayCutscene()
         requestAnimationFrame(animate);
       }
 
-      // UI Drawing
+      // UI Drawing with enhanced art style
       function drawUI() {
         if (!character) return;
         
         ctx.save();
         ctx.resetTransform(); // Reset any scaling from DPI handling
         
-        // Background for UI
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(10, 10, 200, 80);
+        // Enhanced UI background with rounded corners effect
+        ctx.fillStyle = colors.uiBackground;
+        ctx.fillRect(10, 10, 220, 90);
         
-        // Health bar
-        ctx.fillStyle = '#8B0000';
-        ctx.fillRect(20, 20, 180, 15);
+        // UI border with gradient
+        const uiBorderGradient = ctx.createLinearGradient(10, 10, 230, 100);
+        uiBorderGradient.addColorStop(0, 'rgba(255, 215, 0, 0.6)');
+        uiBorderGradient.addColorStop(1, 'rgba(255, 215, 0, 0.2)');
+        ctx.strokeStyle = uiBorderGradient;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(10, 10, 220, 90);
         
+        // Health bar background
+        ctx.fillStyle = '#2D1B13';
+        ctx.fillRect(20, 25, 200, 18);
+        
+        // Health bar border
+        ctx.strokeStyle = '#8B4513';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(20, 25, 200, 18);
+        
+        // Health bar fill with gradient
         const healthPercent = character.health / character.maxHealth;
-        ctx.fillStyle = healthPercent > 0.5 ? '#00AA00' : healthPercent > 0.25 ? '#FFAA00' : '#AA0000';
-        ctx.fillRect(20, 20, 180 * healthPercent, 15);
+        const healthGradient = ctx.createLinearGradient(20, 25, 220, 43);
         
-        // Health text
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '12px Arial';
-        ctx.fillText(`Health: ${character.health}/${character.maxHealth}`, 25, 32);
+        if (healthPercent > 0.6) {
+          healthGradient.addColorStop(0, colors.healthGood);
+          healthGradient.addColorStop(1, '#66BB6A');
+        } else if (healthPercent > 0.3) {
+          healthGradient.addColorStop(0, colors.healthMid);
+          healthGradient.addColorStop(1, '#FFA726');
+        } else {
+          healthGradient.addColorStop(0, colors.healthBad);
+          healthGradient.addColorStop(1, '#EF5350');
+        }
         
-        // Score
-        ctx.fillText(`Score: ${character.score}`, 25, 50);
+        ctx.fillStyle = healthGradient;
+        ctx.fillRect(20, 25, 200 * healthPercent, 18);
         
-        // Status
+        // Health bar highlight
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillRect(20, 25, 200 * healthPercent, 6);
+        
+        // Enhanced text with shadows
+        ctx.fillStyle = '#000000';
+        ctx.font = '14px Arial';
+        ctx.fillText(`Health: ${character.health}/${character.maxHealth}`, 26, 39);
+        
+        ctx.fillStyle = colors.uiText;
+        ctx.fillText(`Health: ${character.health}/${character.maxHealth}`, 25, 38);
+        
+        // Score with enhanced styling
+        ctx.fillStyle = '#000000';
+        ctx.fillText(`Score: ${character.score}`, 26, 58);
+        
+        ctx.fillStyle = colors.coin;
+        ctx.fillText(`Score: ${character.score}`, 25, 57);
+        
+        // Status indicators with better styling
         if (character.invulnerable) {
-          ctx.fillStyle = '#FFFF00';
-          ctx.fillText('INVULNERABLE', 25, 65);
+          ctx.fillStyle = '#000000';
+          ctx.fillText('INVULNERABLE', 26, 77);
+          
+          ctx.fillStyle = colors.attack;
+          ctx.fillText('INVULNERABLE', 25, 76);
         }
         
         if (character.attacking) {
-          ctx.fillStyle = '#FF4444';
-          ctx.fillText('ATTACKING!', 120, 65);
+          ctx.fillStyle = '#000000';
+          ctx.fillText('ATTACKING!', 141, 77);
+          
+          ctx.fillStyle = colors.healthBad;
+          ctx.fillText('ATTACKING!', 140, 76);
         }
         
+        // Mini character icon in UI
+        drawMiniCharacter(190, 80);
+        
         ctx.restore();
+      }
+
+      function drawMiniCharacter(x, y) {
+        // Mini version of character for UI
+        const scale = 0.4;
+        const w = 20;
+        const h = 25;
+        
+        // Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.fillRect(x + 2, y + h - 1, w - 4, 2);
+        
+        // Head
+        ctx.fillStyle = colors.characterSkin;
+        ctx.fillRect(x + w*0.25, y + 2, w*0.5, w*0.35);
+        
+        // Hair
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(x + w*0.3, y, w*0.4, w*0.2);
+        
+        // Body (black top)
+        ctx.fillStyle = colors.characterTop;
+        ctx.fillRect(x + w*0.2, y + h*0.4, w*0.6, h*0.3);
+        
+        // Legs (blue bottom)
+        ctx.fillStyle = colors.characterBottom;
+        ctx.fillRect(x + w*0.25, y + h*0.7, w*0.2, h*0.25);
+        ctx.fillRect(x + w*0.55, y + h*0.7, w*0.2, h*0.25);
+        
+        // Eyes
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(x + w*0.35, y + h*0.2, 2, 2);
+        ctx.fillRect(x + w*0.55, y + h*0.2, 2, 2);
       }
 
       // Initialize and start
