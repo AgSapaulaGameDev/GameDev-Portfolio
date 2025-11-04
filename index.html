@@ -3561,11 +3561,11 @@ void ACutsceneManager::PlayCutscene()
         characterEyes: '#1E293B', // Dark eyes
         characterOutline: '#1E3A8A', // Dark blue outline
         
-        // Environment colors (matching the platformer)
-        skyTop: '#1E88E5', // Bright blue sky
-        skyBottom: '#2196F3', // Lighter blue
-        bgMountain: '#1565C0', // Dark blue mountains
-        bgMountainLight: '#42A5F5', // Light blue mountains
+        // Environment colors (winter/ice theme)
+        skyTop: '#87CEEB', // Soft winter blue sky
+        skyBottom: '#B0E0E6', // Light powder blue
+        bgMountain: '#4682B4', // Steel blue mountains
+        bgMountainLight: '#6495ED', // Cornflower blue mountains
         
         // Platform colors
         platformGrass: '#4CAF50', // Bright green
@@ -3576,9 +3576,12 @@ void ACutsceneManager::PlayCutscene()
         platformOutline: '#1B5E20', // Dark green outline
         
         // Decorative elements
-        tree: '#4E342E', // Tree trunk
-        treeLeaves: '#2E7D32', // Dark green leaves
-        treeLeavesLight: '#43A047', // Light green
+        tree: '#B0BEC5', // Ice tree trunk (light gray)
+        treeLeaves: '#E1F5FE', // Ice leaves (very light blue)
+        treeLeavesLight: '#F0F8FF', // Light ice
+        treeIce: '#81D4FA', // Ice blue accents
+        treeIceLight: '#B3E5FC', // Light ice blue
+        treeIceDark: '#0288D1', // Dark ice blue
         coin: '#FFD700', // Gold
         coinOutline: '#F57F17', // Dark gold
         enemy: '#E53935', // Red
@@ -3742,26 +3745,36 @@ void ACutsceneManager::PlayCutscene()
           ctx.fillRect(12, drawY + 5, w - 24, 3);
           
           // === FACE ===
-          // Eyes (large, cute style)
+          // Eyes (large, cute anime-style)
           ctx.fillStyle = colors.characterHead;
-          ctx.fillRect(16, drawY + 14, 6, 6);
-          ctx.fillRect(w - 22, drawY + 14, 6, 6);
+          ctx.fillRect(15, drawY + 13, 8, 8);
+          ctx.fillRect(w - 23, drawY + 13, 8, 8);
           
           // Eye outlines
           ctx.strokeStyle = colors.characterOutline;
           ctx.lineWidth = 2;
-          ctx.strokeRect(16, drawY + 14, 6, 6);
-          ctx.strokeRect(w - 22, drawY + 14, 6, 6);
+          ctx.strokeRect(15, drawY + 13, 8, 8);
+          ctx.strokeRect(w - 23, drawY + 13, 8, 8);
           
-          // Eye pupils (bright cyan/blue)
+          // Eye pupils (bright cyan/blue - larger and more expressive)
           ctx.fillStyle = '#06B6D4';
-          ctx.fillRect(18, drawY + 16, 3, 3);
-          ctx.fillRect(w - 20, drawY + 16, 3, 3);
+          ctx.fillRect(17, drawY + 15, 4, 4);
+          ctx.fillRect(w - 21, drawY + 15, 4, 4);
           
-          // Eye shine (white dot)
+          // Eye shine (white dot for life)
           ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(19, drawY + 17, 1, 1);
-          ctx.fillRect(w - 19, drawY + 17, 1, 1);
+          ctx.fillRect(18, drawY + 16, 2, 2);
+          ctx.fillRect(w - 20, drawY + 16, 2, 2);
+          
+          // Nose (small cute pixel)
+          ctx.fillStyle = '#FFA726';
+          ctx.fillRect(w/2 - 1, drawY + 18, 2, 1);
+          
+          // Mouth (small smile)
+          ctx.fillStyle = colors.characterOutline;
+          ctx.fillRect(w/2 - 2, drawY + 20, 4, 1);
+          ctx.fillRect(w/2 - 3, drawY + 21, 2, 1);
+          ctx.fillRect(w/2 + 1, drawY + 21, 2, 1);
           
           // === ARMS (blue, simple) ===
           ctx.fillStyle = colors.characterBody;
@@ -3824,39 +3837,43 @@ void ACutsceneManager::PlayCutscene()
         }
 
         drawNormalPlatform() {
-          // Pixel art grass platform style (like the reference image)
+          // Pixel art grass platform with winter/ice effects
           
-          // Grass top layer (bright green)
-          ctx.fillStyle = colors.platformGrass;
-          ctx.fillRect(this.x, this.y, this.width, 8);
+          // Ice layer on top (light blue-white)
+          ctx.fillStyle = '#E6F3FF';
+          ctx.fillRect(this.x, this.y, this.width, 6);
           
-          // Lighter green highlights on grass
-          ctx.fillStyle = colors.platformGrassLight;
-          ctx.fillRect(this.x, this.y, this.width, 3);
+          // Grass layer below ice (winter grass - less vibrant)
+          ctx.fillStyle = '#66BB6A';
+          ctx.fillRect(this.x, this.y + 6, this.width, 6);
           
-          // Dark green outline
-          ctx.strokeStyle = colors.platformOutline;
+          // Lighter ice highlights
+          ctx.fillStyle = '#F0F8FF';
+          ctx.fillRect(this.x, this.y, this.width, 2);
+          
+          // Ice outline (light blue)
+          ctx.strokeStyle = '#87CEEB';
           ctx.lineWidth = 2;
-          ctx.strokeRect(this.x, this.y, this.width, 8);
+          ctx.strokeRect(this.x, this.y, this.width, 6);
           
-          // Dirt/soil layer below grass
-          ctx.fillStyle = colors.platformDirt;
-          ctx.fillRect(this.x, this.y + 8, this.width, this.height - 8);
+          // Dirt/soil layer below grass (darker, frozen)
+          ctx.fillStyle = '#4A4A4A';
+          ctx.fillRect(this.x, this.y + 12, this.width, this.height - 12);
           
           // Darker dirt bottom
-          ctx.fillStyle = colors.platformDirtDark;
+          ctx.fillStyle = '#2E2E2E';
           ctx.fillRect(this.x, this.y + this.height - 4, this.width, 4);
           
           // Outline for dirt
-          ctx.strokeStyle = colors.platformDirtDark;
+          ctx.strokeStyle = '#1A1A1A';
           ctx.lineWidth = 2;
-          ctx.strokeRect(this.x, this.y + 8, this.width, this.height - 8);
+          ctx.strokeRect(this.x, this.y + 12, this.width, this.height - 12);
           
-          // Add grass blades on top (small pixels)
-          ctx.fillStyle = colors.platformGrassDark;
+          // Add ice crystals on top (small pixels)
+          ctx.fillStyle = '#FFFFFF';
           for (let x = 0; x < this.width; x += 8) {
-            // Random grass blade heights
-            if (Math.random() < 0.6) {
+            // Random ice crystal formations
+            if (Math.random() < 0.7) {
               ctx.fillRect(this.x + x + 2, this.y - 2, 2, 3);
             }
             if (Math.random() < 0.5) {
@@ -3864,14 +3881,22 @@ void ACutsceneManager::PlayCutscene()
             }
           }
           
-          // Dirt texture spots
-          ctx.fillStyle = '#4E342E';
+          // Frozen dirt texture spots
+          ctx.fillStyle = '#6A6A6A';
           for (let x = 0; x < this.width; x += 12) {
-            for (let y = 8; y < this.height - 4; y += 10) {
+            for (let y = 12; y < this.height - 4; y += 10) {
               if (Math.random() < 0.4) {
                 ctx.fillRect(this.x + x + Math.random() * 8, this.y + y, 2, 2);
               }
             }
+          }
+          
+          // Ice sparkles
+          ctx.fillStyle = '#E1F5FE';
+          for (let i = 0; i < 3; i++) {
+            const sparkleX = this.x + Math.random() * this.width;
+            const sparkleY = this.y + Math.random() * 6;
+            ctx.fillRect(sparkleX, sparkleY, 1, 1);
           }
         }
 
@@ -4253,6 +4278,9 @@ void ACutsceneManager::PlayCutscene()
         // Create character
         character = new Character();
 
+        // Initialize snowfall
+        initSnowfall();
+
         // Create platforms (larger and more varied)
         platforms = [
           // Ground platforms
@@ -4306,7 +4334,7 @@ void ACutsceneManager::PlayCutscene()
 
       // Draw background matching the pixel art platformer style
       function drawBackground() {
-        // Vibrant blue sky gradient (like the reference)
+        // Winter blue sky gradient
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, colors.skyTop);
         gradient.addColorStop(1, colors.skyBottom);
@@ -4314,24 +4342,27 @@ void ACutsceneManager::PlayCutscene()
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw background mountains/hills (layered blue silhouettes)
+        // Draw background mountains/hills (winter theme with snow)
         drawBackgroundMountains();
         
-        // Draw clouds
+        // Draw clouds (bigger and lower)
         drawClouds();
         
-        // Draw background trees
+        // Draw background ice trees
         drawBackgroundTrees();
+        
+        // Add falling snow effect
+        drawSnowfall();
       }
 
       function drawBackgroundMountains() {
-        // Far background mountains (darker blue)
+        // Far background mountains (winter blue with snow caps)
         ctx.fillStyle = colors.bgMountain;
         
         ctx.beginPath();
         ctx.moveTo(0, canvas.height - 150);
         
-        // Create mountain peaks
+        // Create mountain peaks with snow
         ctx.lineTo(100, canvas.height - 250);
         ctx.lineTo(200, canvas.height - 200);
         ctx.lineTo(300, canvas.height - 280);
@@ -4347,7 +4378,39 @@ void ACutsceneManager::PlayCutscene()
         ctx.closePath();
         ctx.fill();
         
-        // Mid-layer mountains (lighter blue)
+        // Add snow caps to mountains
+        ctx.fillStyle = '#F8F8FF';
+        ctx.beginPath();
+        ctx.moveTo(80, canvas.height - 230);
+        ctx.lineTo(100, canvas.height - 250);
+        ctx.lineTo(120, canvas.height - 230);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(280, canvas.height - 260);
+        ctx.lineTo(300, canvas.height - 280);
+        ctx.lineTo(320, canvas.height - 260);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(580, canvas.height - 280);
+        ctx.lineTo(600, canvas.height - 300);
+        ctx.lineTo(620, canvas.height - 280);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(880, canvas.height - 270);
+        ctx.lineTo(900, canvas.height - 290);
+        ctx.lineTo(920, canvas.height - 270);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(1280, canvas.height - 250);
+        ctx.lineTo(1300, canvas.height - 270);
+        ctx.lineTo(1320, canvas.height - 250);
+        ctx.fill();
+        
+        // Mid-layer mountains (lighter blue with more snow)
         ctx.fillStyle = colors.bgMountainLight;
         
         ctx.beginPath();
@@ -4364,62 +4427,208 @@ void ACutsceneManager::PlayCutscene()
         ctx.lineTo(0, canvas.height);
         ctx.closePath();
         ctx.fill();
+        
+        // Snow caps for mid-layer mountains
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.moveTo(130, canvas.height - 160);
+        ctx.lineTo(150, canvas.height - 180);
+        ctx.lineTo(170, canvas.height - 160);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(480, canvas.height - 180);
+        ctx.lineTo(500, canvas.height - 200);
+        ctx.lineTo(520, canvas.height - 180);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(880, canvas.height - 170);
+        ctx.lineTo(900, canvas.height - 190);
+        ctx.lineTo(920, canvas.height - 170);
+        ctx.fill();
       }
 
       function drawBackgroundTrees() {
-        const trees = [
-          {x: 100, y: canvas.height - 160, size: 1.0},
-          {x: 300, y: canvas.height - 180, size: 1.2},
-          {x: 600, y: canvas.height - 150, size: 0.9},
-          {x: 900, y: canvas.height - 170, size: 1.1},
-          {x: 1200, y: canvas.height - 165, size: 1.0},
+        const iceTrees = [
+          {x: 120, y: canvas.height - 160, size: 1.2},
+          {x: 320, y: canvas.height - 180, size: 1.4},
+          {x: 580, y: canvas.height - 150, size: 1.1},
+          {x: 820, y: canvas.height - 170, size: 1.3},
+          {x: 1080, y: canvas.height - 165, size: 1.2},
+          {x: 1320, y: canvas.height - 155, size: 1.0},
         ];
 
-        trees.forEach(tree => {
-          drawPixelTree(tree.x, tree.y, tree.size);
+        iceTrees.forEach(tree => {
+          drawPixelIceTree(tree.x, tree.y, tree.size);
         });
       }
 
-      function drawPixelTree(x, y, scale) {
+      function drawPixelIceTree(x, y, scale) {
         ctx.save();
         
-        // Tree trunk (brown rectangle)
+        // Ice tree trunk (light gray with blue tints)
         ctx.fillStyle = colors.tree;
-        const trunkWidth = 10 * scale;
-        const trunkHeight = 30 * scale;
+        const trunkWidth = 12 * scale;
+        const trunkHeight = 35 * scale;
         ctx.fillRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
         
-        // Trunk outline
-        ctx.strokeStyle = '#3E2723';
+        // Trunk ice coating
+        ctx.fillStyle = colors.treeIceLight;
+        ctx.fillRect(x - trunkWidth/2 + 1, y, trunkWidth - 2, trunkHeight);
+        
+        // Trunk outline (ice blue)
+        ctx.strokeStyle = colors.treeIceDark;
         ctx.lineWidth = 2;
         ctx.strokeRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
         
-        // Tree foliage (round, layered circles - pixel art style)
-        const leafSize = 35 * scale;
+        // Ice tree foliage (crystalline, angular shapes)
+        const leafSize = 40 * scale;
         
-        // Dark green base
+        // Main ice foliage (light blue-white)
         ctx.fillStyle = colors.treeLeaves;
+        
+        // Create crystalline tree shape with triangular sections
         ctx.beginPath();
-        ctx.arc(x, y - 5, leafSize, 0, Math.PI * 2);
+        // Top crystal point
+        ctx.moveTo(x, y - 20 * scale);
+        ctx.lineTo(x - leafSize * 0.6, y + 5 * scale);
+        ctx.lineTo(x + leafSize * 0.6, y + 5 * scale);
+        ctx.closePath();
         ctx.fill();
         
-        // Outline
-        ctx.strokeStyle = '#1B5E20';
-        ctx.lineWidth = 2;
+        // Middle crystal section
         ctx.beginPath();
-        ctx.arc(x, y - 5, leafSize, 0, Math.PI * 2);
+        ctx.moveTo(x - leafSize * 0.7, y + 5 * scale);
+        ctx.lineTo(x - leafSize * 0.4, y - 5 * scale);
+        ctx.lineTo(x + leafSize * 0.4, y - 5 * scale);
+        ctx.lineTo(x + leafSize * 0.7, y + 5 * scale);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Bottom crystal section
+        ctx.beginPath();
+        ctx.moveTo(x - leafSize * 0.5, y + 10 * scale);
+        ctx.lineTo(x - leafSize * 0.8, y + 20 * scale);
+        ctx.lineTo(x + leafSize * 0.8, y + 20 * scale);
+        ctx.lineTo(x + leafSize * 0.5, y + 10 * scale);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Ice crystal highlights (brighter white-blue)
+        ctx.fillStyle = colors.treeLeavesLight;
+        
+        // Top highlight
+        ctx.beginPath();
+        ctx.moveTo(x, y - 20 * scale);
+        ctx.lineTo(x - leafSize * 0.3, y);
+        ctx.lineTo(x - leafSize * 0.1, y - 5 * scale);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Middle highlights
+        ctx.fillRect(x - leafSize * 0.2, y - 3 * scale, leafSize * 0.4, 3 * scale);
+        ctx.fillRect(x - leafSize * 0.3, y + 8 * scale, leafSize * 0.6, 3 * scale);
+        
+        // Ice crystal edges (blue outlines)
+        ctx.strokeStyle = colors.treeIce;
+        ctx.lineWidth = 2;
+        
+        // Outline the main crystal shapes
+        ctx.beginPath();
+        ctx.moveTo(x, y - 20 * scale);
+        ctx.lineTo(x - leafSize * 0.6, y + 5 * scale);
+        ctx.lineTo(x - leafSize * 0.8, y + 20 * scale);
+        ctx.moveTo(x, y - 20 * scale);
+        ctx.lineTo(x + leafSize * 0.6, y + 5 * scale);
+        ctx.lineTo(x + leafSize * 0.8, y + 20 * scale);
         ctx.stroke();
         
-        // Light green highlights (multiple smaller circles)
-        ctx.fillStyle = colors.treeLeavesLight;
-        ctx.beginPath();
-        ctx.arc(x - 10 * scale, y - 10 * scale, leafSize * 0.5, 0, Math.PI * 2);
-        ctx.fill();
+        // Ice crystal details (small ice shards)
+        ctx.fillStyle = colors.treeIce;
         
-        ctx.beginPath();
-        ctx.arc(x + 8 * scale, y - 8 * scale, leafSize * 0.4, 0, Math.PI * 2);
-        ctx.fill();
+        // Small ice shards around the tree
+        for (let i = 0; i < 6; i++) {
+          const angle = (i * Math.PI * 2) / 6;
+          const shardX = x + Math.cos(angle) * leafSize * 0.9;
+          const shardY = y + Math.sin(angle) * leafSize * 0.6 + 5 * scale;
+          
+          ctx.beginPath();
+          ctx.moveTo(shardX, shardY);
+          ctx.lineTo(shardX + Math.cos(angle) * 6 * scale, shardY + Math.sin(angle) * 6 * scale);
+          ctx.lineTo(shardX + Math.cos(angle + 0.3) * 4 * scale, shardY + Math.sin(angle + 0.3) * 4 * scale);
+          ctx.closePath();
+          ctx.fill();
+        }
         
+        // Sparkling ice effect
+        ctx.fillStyle = '#FFFFFF';
+        for (let i = 0; i < 8; i++) {
+          const sparkleX = x + (Math.random() - 0.5) * leafSize * 1.2;
+          const sparkleY = y + (Math.random() - 0.5) * leafSize * 0.8;
+          ctx.fillRect(sparkleX, sparkleY, 2, 2);
+        }
+        
+        ctx.restore();
+      }
+
+      // Snow particle system for winter atmosphere
+      let snowflakes = [];
+      
+      function initSnowfall() {
+        snowflakes = [];
+        for (let i = 0; i < 50; i++) {
+          snowflakes.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1,
+            speed: Math.random() * 1 + 0.5,
+            drift: Math.random() * 0.5 - 0.25,
+            opacity: Math.random() * 0.6 + 0.4
+          });
+        }
+      }
+      
+      function drawSnowfall() {
+        ctx.save();
+        
+        // Update and draw snowflakes
+        for (let i = 0; i < snowflakes.length; i++) {
+          const flake = snowflakes[i];
+          
+          // Update position
+          flake.y += flake.speed;
+          flake.x += flake.drift;
+          
+          // Wrap around screen
+          if (flake.y > canvas.height) {
+            flake.y = -10;
+            flake.x = Math.random() * canvas.width;
+          }
+          if (flake.x > canvas.width) {
+            flake.x = 0;
+          } else if (flake.x < 0) {
+            flake.x = canvas.width;
+          }
+          
+          // Draw snowflake
+          ctx.globalAlpha = flake.opacity;
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Add sparkle effect to larger flakes
+          if (flake.size > 2) {
+            ctx.fillStyle = '#E6F3FF';
+            ctx.fillRect(flake.x - 1, flake.y - 1, 2, 2);
+            ctx.fillRect(flake.x - 1, flake.y + 1, 2, 2);
+            ctx.fillRect(flake.x + 1, flake.y - 1, 2, 2);
+            ctx.fillRect(flake.x + 1, flake.y + 1, 2, 2);
+          }
+        }
+        
+        ctx.globalAlpha = 1;
         ctx.restore();
       }
 
@@ -4502,13 +4711,16 @@ void ACutsceneManager::PlayCutscene()
       }
 
       function drawClouds() {
-        // Pixel art style clouds (simple rounded shapes)
+        // Pixel art style clouds (bigger and lower)
         const cloudPositions = [
-          {x: 150, y: 70, size: 1.0},
-          {x: 400, y: 50, size: 1.2},
-          {x: 700, y: 85, size: 0.9},
-          {x: 1000, y: 60, size: 1.1},
-          {x: 1300, y: 80, size: 1.0},
+          {x: 150, y: 120, size: 1.8},
+          {x: 400, y: 100, size: 2.0},
+          {x: 700, y: 135, size: 1.6},
+          {x: 1000, y: 110, size: 1.9},
+          {x: 1300, y: 130, size: 1.7},
+          {x: 50, y: 140, size: 1.5},
+          {x: 850, y: 95, size: 1.4},
+          {x: 1150, y: 125, size: 1.6},
         ];
 
         cloudPositions.forEach(cloud => {
@@ -4519,26 +4731,42 @@ void ACutsceneManager::PlayCutscene()
       function drawPixelCloud(x, y, scale) {
         ctx.save();
         
-        // Cloud body (series of overlapping circles for pixel look)
+        // Cloud body (series of overlapping circles for bigger, more prominent look)
         ctx.fillStyle = colors.cloud;
         
-        const size = 20 * scale;
+        const size = 25 * scale; // Increased base size
         
-        // Main cloud circles
+        // Main cloud circles - bigger and more detailed
         ctx.beginPath();
-        ctx.arc(x - 15 * scale, y, size * 0.8, 0, Math.PI * 2);
-        ctx.arc(x, y - 5 * scale, size, 0, Math.PI * 2);
-        ctx.arc(x + 15 * scale, y, size * 0.8, 0, Math.PI * 2);
-        ctx.arc(x + 8 * scale, y + 8 * scale, size * 0.6, 0, Math.PI * 2);
-        ctx.arc(x - 8 * scale, y + 8 * scale, size * 0.6, 0, Math.PI * 2);
+        ctx.arc(x - 20 * scale, y, size * 0.9, 0, Math.PI * 2);
+        ctx.arc(x - 10 * scale, y - 8 * scale, size * 0.7, 0, Math.PI * 2);
+        ctx.arc(x, y - 10 * scale, size, 0, Math.PI * 2);
+        ctx.arc(x + 10 * scale, y - 8 * scale, size * 0.7, 0, Math.PI * 2);
+        ctx.arc(x + 20 * scale, y, size * 0.9, 0, Math.PI * 2);
+        ctx.arc(x + 12 * scale, y + 10 * scale, size * 0.6, 0, Math.PI * 2);
+        ctx.arc(x - 12 * scale, y + 10 * scale, size * 0.6, 0, Math.PI * 2);
+        ctx.arc(x, y + 5 * scale, size * 0.8, 0, Math.PI * 2);
         ctx.fill();
         
-        // Cloud outline (subtle)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.lineWidth = 1;
+        // Cloud shadow for depth
+        ctx.fillStyle = 'rgba(200, 220, 255, 0.6)';
         ctx.beginPath();
-        ctx.arc(x, y - 5 * scale, size, 0, Math.PI * 2);
+        ctx.arc(x + 2, y + 8 * scale, size * 0.9, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Cloud outline (more visible)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y - 10 * scale, size, 0, Math.PI * 2);
         ctx.stroke();
+        
+        // Add extra cloud puffs for more detail
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.beginPath();
+        ctx.arc(x - 8 * scale, y - 3 * scale, size * 0.4, 0, Math.PI * 2);
+        ctx.arc(x + 8 * scale, y - 3 * scale, size * 0.4, 0, Math.PI * 2);
+        ctx.fill();
         
         ctx.restore();
       }
