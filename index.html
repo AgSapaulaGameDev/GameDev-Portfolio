@@ -3524,11 +3524,9 @@ void ACutsceneManager::PlayCutscene()
       }
     }
 
-    // Side-Scroll Platform Game Animation with Cute Characters
+    // Mario-style Platform Game Animation
     function initPlatformGame() {
       const canvas = document.getElementById('platformGame');
-      if (!canvas) return;
-
       const ctx = canvas.getContext('2d');
 
       function resizeCanvas() {
@@ -3547,70 +3545,15 @@ void ACutsceneManager::PlayCutscene()
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
-      // Game state for side-scroll character collection style
-      const game = {
-        player: {
-          x: 50,
-          y: canvas.height - 100,
-          width: 28,
-          height: 28,
-          velocityX: 0,
-          velocityY: 0,
-          speed: 2.5,
-          jumpPower: 12,
-          onGround: false,
-          direction: 1,
-          animFrame: 0,
-          animTimer: 0,
-          characterType: 'ninja' // ninja, viking, or mage
-        },
-        camera: {
-          x: 0,
-          y: 0
-        },
-        platforms: [
-          { x: 0, y: canvas.height - 40, width: 200, height: 40, type: 'grass' },
-          { x: 250, y: canvas.height - 80, width: 150, height: 20, type: 'wood' },
-          { x: 450, y: canvas.height - 120, width: 200, height: 20, type: 'stone' },
-          { x: 700, y: canvas.height - 160, width: 150, height: 20, type: 'grass' },
-          { x: 900, y: canvas.height - 100, width: 200, height: 20, type: 'wood' },
-          { x: 1150, y: canvas.height - 140, width: 150, height: 20, type: 'stone' }
-        ],
-        collectibles: [
-          { x: 300, y: canvas.height - 120, collected: false, type: 'gem' },
-          { x: 500, y: canvas.height - 160, collected: false, type: 'star' },
-          { x: 750, y: canvas.height - 200, collected: false, type: 'gem' },
-          { x: 950, y: canvas.height - 140, collected: false, type: 'star' },
-          { x: 1200, y: canvas.height - 180, collected: false, type: 'gem' }
-        ],
-        enemies: [
-          { x: 350, y: canvas.height - 100, width: 24, height: 24, velocityX: -1, direction: -1, type: 'demon' },
-          { x: 550, y: canvas.height - 140, width: 24, height: 24, velocityX: 1, direction: 1, type: 'demon' },
-          { x: 1000, y: canvas.height - 120, width: 24, height: 24, velocityX: -1, direction: -1, type: 'demon' }
-        ],
-        backgroundElements: [
-          { x: 100, y: canvas.height - 60, type: 'tree' },
-          { x: 600, y: canvas.height - 80, type: 'rock' },
-          { x: 800, y: canvas.height - 70, type: 'bush' },
-          { x: 1300, y: canvas.height - 65, type: 'tree' }
-        ]
-      };
+      // Game entities
+      let platforms = [];
+      let coins = [];
+      let enemies = [];
+      let powerUps = [];
+      let particles = [];
+      let character = null;
 
-      const keys = {};
-
-      // Input handling for character control
-      window.addEventListener('keydown', (e) => {
-        keys[e.key.toLowerCase()] = true;
-        if (e.key === ' ' || e.key === 'ArrowUp') {
-          e.preventDefault();
-        }
-      });
-
-      window.addEventListener('keyup', (e) => {
-        keys[e.key.toLowerCase()] = false;
-      });
-
-      // Colors and themes (updated for cute character style)
+      // Colors and themes (updated for character customization)
       const colors = {
         // Character colors
         characterTop: '#1A1A1A', // Black top
