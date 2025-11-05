@@ -630,13 +630,13 @@
       position: absolute;
       inset: 0;
       pointer-events: none;
-      opacity: 0.3;
+      opacity: 0.6; /* Increased opacity to make it more visible */
     }
 
     /* Mobile optimizations for canvas */
     @media (max-width: 768px) {
       .canvas-bg {
-        opacity: 0.25; /* Slightly more transparent on mobile */
+        opacity: 0.5; /* Increased opacity for mobile too */
       }
       
       /* Ensure canvas doesn't overflow on mobile */
@@ -3538,16 +3538,33 @@ void ACutsceneManager::PlayCutscene()
     // Mario-style Platform Game Animation
     function initPlatformGame() {
       const canvas = document.getElementById('platformGame');
+      if (!canvas) {
+        console.error('Platform game canvas not found!');
+        return;
+      }
+      
       const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Canvas context not found!');
+        return;
+      }
+      
+      console.log('Platform game initializing...');
+      console.log('Canvas element:', canvas);
+      console.log('Canvas context:', ctx);
 
       function resizeCanvas() {
+        // Get the hero section dimensions
+        const heroSection = canvas.parentElement.parentElement;
         canvas.width = window.innerWidth;
-        // Mobile-responsive height
-        if (window.innerWidth <= 768) {
-          canvas.height = Math.max(window.innerHeight * 0.8, 600); // Smaller on mobile
-        } else {
-          canvas.height = Math.max(window.innerHeight, 900); // Original size on desktop
+        canvas.height = heroSection.offsetHeight || window.innerHeight;
+        
+        // Minimum height for mobile
+        if (window.innerWidth <= 768 && canvas.height < 600) {
+          canvas.height = 600;
         }
+        
+        console.log('Canvas resized to:', canvas.width, 'x', canvas.height);
         
         // Update scale factors for all game elements
         updateGameElementScales();
@@ -3598,6 +3615,11 @@ void ACutsceneManager::PlayCutscene()
       }
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
+
+      // Test drawing to make sure canvas is working
+      ctx.fillStyle = 'red';
+      ctx.fillRect(50, 50, 100, 100);
+      console.log('Test rectangle drawn at 50,50');
 
       // Game entities
       let platforms = [];
@@ -4209,8 +4231,12 @@ void ACutsceneManager::PlayCutscene()
 
       // Initialize game world
       function initGameWorld() {
+        console.log('Initializing game world...');
+        console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+        
         // Create Mario
         mario = new Mario();
+        console.log('Mario created:', mario);
 
         // Create platforms
         platforms = [
@@ -4534,6 +4560,9 @@ void ACutsceneManager::PlayCutscene()
 
       // Main game loop
       function animate() {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         drawBackground();
 
         // Update and draw animated clouds
