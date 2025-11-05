@@ -3638,7 +3638,7 @@ void ACutsceneManager::PlayCutscene()
           // Mobile-responsive sizing
           const isMobile = window.innerWidth <= 768;
           this.width = isMobile ? 32 : 48; // Smaller on mobile
-          this.height = isMobile ? 32 : 48; // Smaller on mobile
+          this.height = isMobile ? 48 : 72; // Maintain proportions
           this.vx = 2.5; 
           this.vy = 0;
           this.gravity = 0.6; 
@@ -3714,49 +3714,48 @@ void ACutsceneManager::PlayCutscene()
             ctx.translate(-this.x - this.width, 0);
           } else {
             ctx.scale(this.scale, this.scale);
-            ctx.translate(this.x / this.scale, 0);
+            ctx.translate(this.x, 0);
           }
 
           // Draw Mario (simplified pixel art style) - Responsive scale
           const frame = Math.floor(this.animFrame);
-          const baseY = this.y / this.scale;
           
           // Hat
           ctx.fillStyle = colors.mario;
-          ctx.fillRect(6, baseY + 6, 36, 12);
+          ctx.fillRect(6, this.y + 6, 36, 12);
           
           // Face
           ctx.fillStyle = '#FFDBAC';
-          ctx.fillRect(12, baseY + 12, 24, 18);
+          ctx.fillRect(12, this.y + 12, 24, 18);
           
           // Shirt
           ctx.fillStyle = '#0066CC';
-          ctx.fillRect(6, baseY + 24, 36, 12);
+          ctx.fillRect(6, this.y + 24, 36, 12);
           
           // Overalls
           ctx.fillStyle = '#FF0000';
-          ctx.fillRect(12, baseY + 30, 24, 12);
+          ctx.fillRect(12, this.y + 30, 24, 12);
           
           // Legs (animated)
           ctx.fillStyle = '#8B4513';
           if (this.onGround && Math.abs(this.vx) > 0) {
             // Walking animation
             const legOffset = frame % 2 === 0 ? 0 : 3;
-            ctx.fillRect(12 + legOffset, baseY + 36, 9, 12);
-            ctx.fillRect(27 - legOffset, baseY + 36, 9, 12);
+            ctx.fillRect(12 + legOffset, this.y + 36, 9, 12);
+            ctx.fillRect(27 - legOffset, this.y + 36, 9, 12);
           } else {
             // Standing
-            ctx.fillRect(15, baseY + 36, 9, 12);
-            ctx.fillRect(24, baseY + 36, 9, 12);
+            ctx.fillRect(15, this.y + 36, 9, 12);
+            ctx.fillRect(24, this.y + 36, 9, 12);
           }
 
           // Eyes
           ctx.fillStyle = '#000000';
-          ctx.fillRect(15, baseY + 15, 3, 3);
-          ctx.fillRect(30, baseY + 15, 3, 3);
+          ctx.fillRect(15, this.y + 15, 3, 3);
+          ctx.fillRect(30, this.y + 15, 3, 3);
 
           // Mustache
-          ctx.fillRect(18, baseY + 21, 12, 3);
+          ctx.fillRect(18, this.y + 21, 12, 3);
 
           ctx.restore();
         }
@@ -3782,30 +3781,25 @@ void ACutsceneManager::PlayCutscene()
           // Apply mobile scaling
           ctx.scale(this.scale, this.scale);
           
-          const scaledX = this.x / this.scale;
-          const scaledY = this.y / this.scale;
-          const scaledWidth = this.width / this.scale;
-          const scaledHeight = this.height / this.scale;
-          
           if (this.type === 'floating') {
             // Floating platform animation
             const floatOffset = Math.sin(Date.now() * 0.002 + this.animOffset) * 5;
             this.y += floatOffset * 0.1;
           }
 
-          // Draw platform based on type (using scaled coordinates)
+          // Draw platform based on type (use original coordinates, scaling is handled by ctx.scale)
           switch (this.type) {
             case 'brick':
-              this.drawBrickPlatform(scaledX, scaledY, scaledWidth, scaledHeight);
+              this.drawBrickPlatform(this.x, this.y, this.width, this.height);
               break;
             case 'pipe':
-              this.drawPipe(scaledX, scaledY, scaledWidth, scaledHeight);
+              this.drawPipe(this.x, this.y, this.width, this.height);
               break;
             case 'cloud':
-              this.drawCloudPlatform(scaledX, scaledY, scaledWidth, scaledHeight);
+              this.drawCloudPlatform(this.x, this.y, this.width, this.height);
               break;
             default:
-              this.drawNormalPlatform(scaledX, scaledY, scaledWidth, scaledHeight);
+              this.drawNormalPlatform(this.x, this.y, this.width, this.height);
           }
           
           ctx.restore();
@@ -3977,23 +3971,19 @@ void ACutsceneManager::PlayCutscene()
           // Apply mobile scaling
           ctx.scale(this.scale, this.scale);
           
-          const x = this.x / this.scale;
-          const y = this.y / this.scale;
-          const size = this.size / this.scale;
-          
-          ctx.translate(x + size/2, y + size/2);
+          ctx.translate(this.x + this.size/2, this.y + this.size/2);
           ctx.rotate(this.rotation);
           
           // Coin body
           ctx.fillStyle = colors.coin;
           ctx.beginPath();
-          ctx.arc(0, 0, size/2, 0, Math.PI * 2);
+          ctx.arc(0, 0, this.size/2, 0, Math.PI * 2);
           ctx.fill();
           
           // Coin highlight
           ctx.fillStyle = '#FFFFE0';
           ctx.beginPath();
-          ctx.arc(-2, -2, size/4, 0, Math.PI * 2);
+          ctx.arc(-2, -2, this.size/4, 0, Math.PI * 2);
           ctx.fill();
           
           // Coin center
@@ -4058,47 +4048,42 @@ void ACutsceneManager::PlayCutscene()
           // Apply mobile scaling
           ctx.scale(this.scale, this.scale);
           
-          const x = this.x / this.scale;
-          const y = this.y / this.scale;
-          const width = this.width / this.scale;
-          const height = this.height / this.scale;
-          
           // Ghost body (white like in the image) - Responsive scale
           ctx.fillStyle = colors.enemy;
           
           // Main ghost body (rounded top, wavy bottom)
           ctx.beginPath();
-          ctx.arc(x + width/2, y + 12, 15, Math.PI, 0, false);
-          ctx.lineTo(x + width - 3, y + height - 6);
+          ctx.arc(this.x + this.width/2, this.y + 12, 15, Math.PI, 0, false);
+          ctx.lineTo(this.x + this.width - 3, this.y + this.height - 6);
           
           // Wavy bottom edge
           for (let i = 0; i < 3; i++) {
-            const waveX = x + width - 3 - (i * 9);
-            ctx.lineTo(waveX, y + height);
-            ctx.lineTo(waveX - 4, y + height - 6);
+            const waveX = this.x + this.width - 3 - (i * 9);
+            ctx.lineTo(waveX, this.y + this.height);
+            ctx.lineTo(waveX - 4, this.y + this.height - 6);
           }
           
-          ctx.lineTo(x + 3, y + height - 6);
+          ctx.lineTo(this.x + 3, this.y + this.height - 6);
           ctx.closePath();
           ctx.fill();
           
           // Ghost glow effect
           ctx.fillStyle = colors.enemyGlow;
           ctx.beginPath();
-          ctx.arc(x + width/2, y + 12, 12, Math.PI, 0, false);
-          ctx.lineTo(x + width - 6, y + height - 9);
-          ctx.lineTo(x + 6, y + height - 9);
+          ctx.arc(this.x + this.width/2, this.y + 12, 12, Math.PI, 0, false);
+          ctx.lineTo(this.x + this.width - 6, this.y + this.height - 9);
+          ctx.lineTo(this.x + 6, this.y + this.height - 9);
           ctx.closePath();
           ctx.fill();
           
           // Eyes (simple black dots)
           ctx.fillStyle = '#000000';
           const eyeOffset = Math.floor(this.animFrame) === 0 ? 0 : 1;
-          ctx.fillRect(x + 9 + eyeOffset, y + 9, 3, 3);
-          ctx.fillRect(x + 24 + eyeOffset, y + 9, 3, 3);
+          ctx.fillRect(this.x + 9 + eyeOffset, this.y + 9, 3, 3);
+          ctx.fillRect(this.x + 24 + eyeOffset, this.y + 9, 3, 3);
           
           // Simple mouth
-          ctx.fillRect(x + 15, y + 18, 6, 1);
+          ctx.fillRect(this.x + 15, this.y + 18, 6, 1);
           
           ctx.restore();
         }
