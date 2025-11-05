@@ -633,6 +633,20 @@
       opacity: 0.3;
     }
 
+    /* Mobile optimizations for canvas */
+    @media (max-width: 768px) {
+      .canvas-bg {
+        opacity: 0.25; /* Slightly more transparent on mobile */
+      }
+      
+      /* Ensure canvas doesn't overflow on mobile */
+      #platformGame {
+        max-width: 100vw;
+        max-height: 80vh;
+        object-fit: contain;
+      }
+    }
+
     .canvas-trail {
       position: fixed;
       inset: 0;
@@ -3528,7 +3542,59 @@ void ACutsceneManager::PlayCutscene()
 
       function resizeCanvas() {
         canvas.width = window.innerWidth;
-        canvas.height = Math.max(window.innerHeight, 900); // More moderate size increase
+        // Mobile-responsive height
+        if (window.innerWidth <= 768) {
+          canvas.height = Math.max(window.innerHeight * 0.8, 600); // Smaller on mobile
+        } else {
+          canvas.height = Math.max(window.innerHeight, 900); // Original size on desktop
+        }
+        
+        // Update scale factors for all game elements
+        updateGameElementScales();
+      }
+
+      function updateGameElementScales() {
+        const isMobile = window.innerWidth <= 768;
+        const scale = isMobile ? 0.7 : 1.0;
+        
+        // Update Mario scale
+        if (mario) {
+          mario.isMobile = isMobile;
+          mario.scale = scale;
+          mario.width = isMobile ? 32 : 48;
+          mario.height = isMobile ? 48 : 72;
+        }
+        
+        // Update platform scales
+        platforms.forEach(platform => {
+          platform.isMobile = isMobile;
+          platform.scale = scale;
+        });
+        
+        // Update enemy scales
+        enemies.forEach(enemy => {
+          enemy.isMobile = isMobile;
+          enemy.scale = scale;
+          enemy.width = isMobile ? 28 : 36;
+          enemy.height = isMobile ? 28 : 36;
+          enemy.vx = enemy.vx > 0 ? 1.2 * scale : -1.2 * scale;
+        });
+        
+        // Update coin scales
+        coins.forEach(coin => {
+          coin.isMobile = isMobile;
+          coin.scale = scale;
+          coin.size = isMobile ? 14 : 18;
+        });
+        
+        // Update snow scales
+        if (typeof snowflakes !== 'undefined') {
+          snowflakes.forEach(snowflake => {
+            snowflake.isMobile = isMobile;
+            snowflake.scale = scale;
+            snowflake.size = (Math.random() * 3 + 1) * scale;
+          });
+        }
       }
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
@@ -3569,8 +3635,10 @@ void ACutsceneManager::PlayCutscene()
         constructor() {
           this.x = 150;
           this.y = canvas.height - 80;
-          this.width = 48; // More moderate size increase
-          this.height = 48; // More moderate size increase
+          // Mobile-responsive sizing
+          const isMobile = window.innerWidth <= 768;
+          this.width = isMobile ? 32 : 48; // Smaller on mobile
+          this.height = isMobile ? 32 : 48; // Smaller on mobile
           this.vx = 2.5; 
           this.vy = 0;
           this.gravity = 0.6; 
@@ -3580,6 +3648,7 @@ void ACutsceneManager::PlayCutscene()
           this.animFrame = 0;
           this.animSpeed = 0.2;
           this.jumpCooldown = 0;
+          this.scale = isMobile ? 0.7 : 1; // Scale factor for drawing
         }
 
         update() {
@@ -3641,51 +3710,53 @@ void ACutsceneManager::PlayCutscene()
           
           // Flip sprite based on direction
           if (this.direction < 0) {
-            ctx.scale(-1, 1);
+            ctx.scale(-this.scale, this.scale);
             ctx.translate(-this.x - this.width, 0);
           } else {
-            ctx.translate(this.x, 0);
+            ctx.scale(this.scale, this.scale);
+            ctx.translate(this.x / this.scale, 0);
           }
 
-          // Draw Mario (simplified pixel art style) - Moderate scale
+          // Draw Mario (simplified pixel art style) - Responsive scale
           const frame = Math.floor(this.animFrame);
+          const baseY = this.y / this.scale;
           
           // Hat
           ctx.fillStyle = colors.mario;
-          ctx.fillRect(6, this.y + 6, 36, 12);
+          ctx.fillRect(6, baseY + 6, 36, 12);
           
           // Face
           ctx.fillStyle = '#FFDBAC';
-          ctx.fillRect(12, this.y + 12, 24, 18);
+          ctx.fillRect(12, baseY + 12, 24, 18);
           
           // Shirt
           ctx.fillStyle = '#0066CC';
-          ctx.fillRect(6, this.y + 24, 36, 12);
+          ctx.fillRect(6, baseY + 24, 36, 12);
           
           // Overalls
           ctx.fillStyle = '#FF0000';
-          ctx.fillRect(12, this.y + 30, 24, 12);
+          ctx.fillRect(12, baseY + 30, 24, 12);
           
           // Legs (animated)
           ctx.fillStyle = '#8B4513';
           if (this.onGround && Math.abs(this.vx) > 0) {
             // Walking animation
             const legOffset = frame % 2 === 0 ? 0 : 3;
-            ctx.fillRect(12 + legOffset, this.y + 36, 9, 12);
-            ctx.fillRect(27 - legOffset, this.y + 36, 9, 12);
+            ctx.fillRect(12 + legOffset, baseY + 36, 9, 12);
+            ctx.fillRect(27 - legOffset, baseY + 36, 9, 12);
           } else {
             // Standing
-            ctx.fillRect(15, this.y + 36, 9, 12);
-            ctx.fillRect(24, this.y + 36, 9, 12);
+            ctx.fillRect(15, baseY + 36, 9, 12);
+            ctx.fillRect(24, baseY + 36, 9, 12);
           }
 
           // Eyes
           ctx.fillStyle = '#000000';
-          ctx.fillRect(15, this.y + 15, 3, 3);
-          ctx.fillRect(30, this.y + 15, 3, 3);
+          ctx.fillRect(15, baseY + 15, 3, 3);
+          ctx.fillRect(30, baseY + 15, 3, 3);
 
           // Mustache
-          ctx.fillRect(18, this.y + 21, 12, 3);
+          ctx.fillRect(18, baseY + 21, 12, 3);
 
           ctx.restore();
         }
@@ -3700,10 +3771,21 @@ void ACutsceneManager::PlayCutscene()
           this.height = height;
           this.type = type;
           this.animOffset = Math.random() * Math.PI * 2;
+          // Mobile responsiveness
+          this.isMobile = window.innerWidth <= 768;
+          this.scale = this.isMobile ? 0.7 : 1.0;
         }
 
         draw() {
           ctx.save();
+          
+          // Apply mobile scaling
+          ctx.scale(this.scale, this.scale);
+          
+          const scaledX = this.x / this.scale;
+          const scaledY = this.y / this.scale;
+          const scaledWidth = this.width / this.scale;
+          const scaledHeight = this.height / this.scale;
           
           if (this.type === 'floating') {
             // Floating platform animation
@@ -3711,87 +3793,87 @@ void ACutsceneManager::PlayCutscene()
             this.y += floatOffset * 0.1;
           }
 
-          // Draw platform based on type
+          // Draw platform based on type (using scaled coordinates)
           switch (this.type) {
             case 'brick':
-              this.drawBrickPlatform();
+              this.drawBrickPlatform(scaledX, scaledY, scaledWidth, scaledHeight);
               break;
             case 'pipe':
-              this.drawPipe();
+              this.drawPipe(scaledX, scaledY, scaledWidth, scaledHeight);
               break;
             case 'cloud':
-              this.drawCloudPlatform();
+              this.drawCloudPlatform(scaledX, scaledY, scaledWidth, scaledHeight);
               break;
             default:
-              this.drawNormalPlatform();
+              this.drawNormalPlatform(scaledX, scaledY, scaledWidth, scaledHeight);
           }
           
           ctx.restore();
         }
 
-        drawNormalPlatform() {
-          // Draw pixel-perfect platform like in the image - Moderate scale
+        drawNormalPlatform(x = this.x, y = this.y, width = this.width, height = this.height) {
+          // Draw pixel-perfect platform like in the image - Responsive scale
           const pixelSize = 6; // Moderate pixel size increase
           
           // Main platform body (green)
           ctx.fillStyle = colors.platform;
-          ctx.fillRect(this.x, this.y, this.width, this.height);
+          ctx.fillRect(x, y, width, height);
           
           // Top grass texture
           ctx.fillStyle = colors.platformLight;
-          for (let x = 0; x < this.width; x += pixelSize * 2) {
+          for (let px = 0; px < width; px += pixelSize * 2) {
             // Small grass blades on top
-            ctx.fillRect(this.x + x, this.y - 3, pixelSize, 3);
-            ctx.fillRect(this.x + x + pixelSize, this.y - 1, pixelSize, 1);
+            ctx.fillRect(x + px, y - 3, pixelSize, 3);
+            ctx.fillRect(x + px + pixelSize, y - 1, pixelSize, 1);
           }
           
           // Bottom shadow/dirt
           ctx.fillStyle = colors.platformDark;
-          ctx.fillRect(this.x, this.y + this.height - 6, this.width, 6);
+          ctx.fillRect(x, y + height - 6, width, 6);
           
           // Side highlights and shadows for 3D effect
           ctx.fillStyle = colors.platformLight;
-          ctx.fillRect(this.x, this.y, 3, this.height);
+          ctx.fillRect(x, y, 3, height);
           
           ctx.fillStyle = colors.platformDark;
-          ctx.fillRect(this.x + this.width - 3, this.y, 3, this.height);
+          ctx.fillRect(x + width - 3, y, 3, height);
         }
 
-        drawBrickPlatform() {
+        drawBrickPlatform(x = this.x, y = this.y, width = this.width, height = this.height) {
           // Draw brown brick platforms
           ctx.fillStyle = colors.brick;
-          ctx.fillRect(this.x, this.y, this.width, this.height);
+          ctx.fillRect(x, y, width, height);
           
-          // Brick pattern - Moderate scale
+          // Brick pattern - Responsive scale
           const brickWidth = 24; // Moderate brick size
           const brickHeight = 12; // Moderate brick size
           
           ctx.fillStyle = '#A0522D'; // Lighter brown for highlights
-          for (let y = 0; y < this.height; y += brickHeight) {
-            for (let x = 0; x < this.width; x += brickWidth) {
+          for (let py = 0; py < height; py += brickHeight) {
+            for (let px = 0; px < width; px += brickWidth) {
               // Offset every other row
-              const offsetX = (y / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
-              const brickX = this.x + x + offsetX;
+              const offsetX = (py / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
+              const brickX = x + px + offsetX;
               
-              if (brickX < this.x + this.width) {
+              if (brickX < x + width) {
                 // Brick highlight
-                ctx.fillRect(brickX, this.y + y, Math.min(brickWidth - 1, this.x + this.width - brickX), 1);
-                ctx.fillRect(brickX, this.y + y, 1, brickHeight - 1);
+                ctx.fillRect(brickX, y + py, Math.min(brickWidth - 1, x + width - brickX), 1);
+                ctx.fillRect(brickX, y + py, 1, brickHeight - 1);
               }
             }
           }
           
           // Dark outlines
           ctx.fillStyle = '#654321';
-          for (let y = 0; y < this.height; y += brickHeight) {
-            for (let x = 0; x < this.width; x += brickWidth) {
-              const offsetX = (y / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
-              const brickX = this.x + x + offsetX;
+          for (let py = 0; py < height; py += brickHeight) {
+            for (let px = 0; px < width; px += brickWidth) {
+              const offsetX = (py / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
+              const brickX = x + px + offsetX;
               
-              if (brickX < this.x + this.width) {
+              if (brickX < x + width) {
                 // Brick outline
-                ctx.fillRect(brickX + brickWidth - 1, this.y + y, 1, brickHeight);
-                ctx.fillRect(brickX, this.y + y + brickHeight - 1, Math.min(brickWidth, this.x + this.width - brickX), 1);
+                ctx.fillRect(brickX + brickWidth - 1, y + py, 1, brickHeight);
+                ctx.fillRect(brickX, y + py + brickHeight - 1, Math.min(brickWidth, x + width - brickX), 1);
               }
             }
           }
@@ -3860,11 +3942,14 @@ void ACutsceneManager::PlayCutscene()
         constructor(x, y) {
           this.x = x;
           this.y = y;
-          this.size = 18; // Moderate coin size increase
           this.rotation = 0;
           this.rotationSpeed = 0.1;
           this.floatOffset = Math.random() * Math.PI * 2;
           this.collected = false;
+          // Mobile responsiveness
+          this.isMobile = window.innerWidth <= 768;
+          this.scale = this.isMobile ? 0.7 : 1.0;
+          this.size = (this.isMobile ? 14 : 18); // Smaller on mobile
         }
 
         update() {
@@ -3888,19 +3973,27 @@ void ACutsceneManager::PlayCutscene()
           if (this.collected) return;
           
           ctx.save();
-          ctx.translate(this.x + this.size/2, this.y + this.size/2);
+          
+          // Apply mobile scaling
+          ctx.scale(this.scale, this.scale);
+          
+          const x = this.x / this.scale;
+          const y = this.y / this.scale;
+          const size = this.size / this.scale;
+          
+          ctx.translate(x + size/2, y + size/2);
           ctx.rotate(this.rotation);
           
           // Coin body
           ctx.fillStyle = colors.coin;
           ctx.beginPath();
-          ctx.arc(0, 0, this.size/2, 0, Math.PI * 2);
+          ctx.arc(0, 0, size/2, 0, Math.PI * 2);
           ctx.fill();
           
           // Coin highlight
           ctx.fillStyle = '#FFFFE0';
           ctx.beginPath();
-          ctx.arc(-2, -2, this.size/4, 0, Math.PI * 2);
+          ctx.arc(-2, -2, size/4, 0, Math.PI * 2);
           ctx.fill();
           
           // Coin center
@@ -3918,12 +4011,15 @@ void ACutsceneManager::PlayCutscene()
         constructor(x, y, direction = -1) {
           this.x = x;
           this.y = y;
-          this.width = 36; // Moderate size increase
-          this.height = 36; // Moderate size increase
-          this.vx = 1.2 * direction; // Allow different directions
           this.direction = direction;
           this.animFrame = 0;
           this.animSpeed = 0.1;
+          // Mobile responsiveness
+          this.isMobile = window.innerWidth <= 768;
+          this.scale = this.isMobile ? 0.7 : 1.0;
+          this.width = (this.isMobile ? 28 : 36); // Smaller on mobile
+          this.height = (this.isMobile ? 28 : 36); // Smaller on mobile
+          this.vx = 1.2 * direction * this.scale; // Scale speed with size
         }
 
         update() {
@@ -3959,42 +4055,50 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
-          // Ghost body (white like in the image) - Moderate scale
+          // Apply mobile scaling
+          ctx.scale(this.scale, this.scale);
+          
+          const x = this.x / this.scale;
+          const y = this.y / this.scale;
+          const width = this.width / this.scale;
+          const height = this.height / this.scale;
+          
+          // Ghost body (white like in the image) - Responsive scale
           ctx.fillStyle = colors.enemy;
           
           // Main ghost body (rounded top, wavy bottom)
           ctx.beginPath();
-          ctx.arc(this.x + this.width/2, this.y + 12, 15, Math.PI, 0, false);
-          ctx.lineTo(this.x + this.width - 3, this.y + this.height - 6);
+          ctx.arc(x + width/2, y + 12, 15, Math.PI, 0, false);
+          ctx.lineTo(x + width - 3, y + height - 6);
           
           // Wavy bottom edge
           for (let i = 0; i < 3; i++) {
-            const waveX = this.x + this.width - 3 - (i * 9);
-            ctx.lineTo(waveX, this.y + this.height);
-            ctx.lineTo(waveX - 4, this.y + this.height - 6);
+            const waveX = x + width - 3 - (i * 9);
+            ctx.lineTo(waveX, y + height);
+            ctx.lineTo(waveX - 4, y + height - 6);
           }
           
-          ctx.lineTo(this.x + 3, this.y + this.height - 6);
+          ctx.lineTo(x + 3, y + height - 6);
           ctx.closePath();
           ctx.fill();
           
           // Ghost glow effect
           ctx.fillStyle = colors.enemyGlow;
           ctx.beginPath();
-          ctx.arc(this.x + this.width/2, this.y + 12, 12, Math.PI, 0, false);
-          ctx.lineTo(this.x + this.width - 6, this.y + this.height - 9);
-          ctx.lineTo(this.x + 6, this.y + this.height - 9);
+          ctx.arc(x + width/2, y + 12, 12, Math.PI, 0, false);
+          ctx.lineTo(x + width - 6, y + height - 9);
+          ctx.lineTo(x + 6, y + height - 9);
           ctx.closePath();
           ctx.fill();
           
           // Eyes (simple black dots)
           ctx.fillStyle = '#000000';
           const eyeOffset = Math.floor(this.animFrame) === 0 ? 0 : 1;
-          ctx.fillRect(this.x + 9 + eyeOffset, this.y + 9, 3, 3);
-          ctx.fillRect(this.x + 24 + eyeOffset, this.y + 9, 3, 3);
+          ctx.fillRect(x + 9 + eyeOffset, y + 9, 3, 3);
+          ctx.fillRect(x + 24 + eyeOffset, y + 9, 3, 3);
           
           // Simple mouth
-          ctx.fillRect(this.x + 15, this.y + 18, 6, 1);
+          ctx.fillRect(x + 15, y + 18, 6, 1);
           
           ctx.restore();
         }
@@ -4031,10 +4135,13 @@ void ACutsceneManager::PlayCutscene()
         constructor() {
           this.x = Math.random() * canvas.width;
           this.y = -10;
-          this.size = Math.random() * 3 + 1; // 1-4px snowflakes
           this.speed = Math.random() * 1 + 0.5; // 0.5-1.5 fall speed
           this.drift = Math.random() * 0.5 - 0.25; // -0.25 to 0.25 horizontal drift
           this.opacity = Math.random() * 0.7 + 0.3; // 0.3-1.0 opacity
+          // Mobile responsiveness
+          this.isMobile = window.innerWidth <= 768;
+          this.scale = this.isMobile ? 0.7 : 1.0;
+          this.size = (Math.random() * 3 + 1) * this.scale; // Scaled snowflake size
         }
 
         update() {
