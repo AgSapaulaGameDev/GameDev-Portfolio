@@ -4084,76 +4084,91 @@ void ACutsceneManager::PlayCutscene()
           // Ground platforms - Moderate thickness
           new Platform(0, canvas.height - 30, canvas.width, 30, 'normal'),
           
-          // Lower level platforms - Moderate thickness
-          new Platform(200, canvas.height - 120, 120, 30, 'normal'),
-          new Platform(400, canvas.height - 140, 80, 30, 'brick'),
-          new Platform(600, canvas.height - 100, 100, 30, 'cloud'),
-          new Platform(900, canvas.height - 160, 120, 30, 'normal'),
-          new Platform(1200, canvas.height - 110, 100, 30, 'normal'),
+          // Lower level platforms - Better distributed
+          new Platform(150, canvas.height - 120, 100, 30, 'normal'),
+          new Platform(350, canvas.height - 140, 80, 30, 'brick'),
+          new Platform(550, canvas.height - 100, 100, 30, 'cloud'),
+          new Platform(750, canvas.height - 160, 100, 30, 'normal'),
+          new Platform(950, canvas.height - 110, 80, 30, 'brick'),
+          new Platform(1150, canvas.height - 130, 120, 30, 'normal'),
           
-          // Mid level platforms - Moderate thickness
-          new Platform(150, canvas.height - 220, 100, 30, 'normal'),
-          new Platform(350, canvas.height - 260, 80, 30, 'cloud'),
-          new Platform(550, canvas.height - 240, 120, 30, 'brick'),
-          new Platform(750, canvas.height - 220, 100, 30, 'normal'),
-          new Platform(1000, canvas.height - 260, 80, 30, 'normal'),
+          // Mid level platforms - More spread out
+          new Platform(100, canvas.height - 220, 80, 30, 'cloud'),
+          new Platform(280, canvas.height - 260, 100, 30, 'normal'),
+          new Platform(480, canvas.height - 240, 80, 30, 'brick'),
+          new Platform(680, canvas.height - 220, 120, 30, 'normal'),
+          new Platform(900, canvas.height - 280, 80, 30, 'cloud'),
+          new Platform(1100, canvas.height - 240, 100, 30, 'normal'),
           
-          // Higher platforms - Moderate thickness
-          new Platform(100, canvas.height - 340, 80, 30, 'cloud'),
-          new Platform(300, canvas.height - 360, 100, 30, 'normal'),
-          new Platform(500, canvas.height - 380, 80, 30, 'brick'),
-          new Platform(700, canvas.height - 400, 120, 30, 'normal'),
-          new Platform(900, canvas.height - 360, 80, 30, 'cloud'),
-          new Platform(1100, canvas.height - 340, 100, 30, 'normal'),
+          // Higher platforms - Evenly spaced
+          new Platform(200, canvas.height - 340, 80, 30, 'normal'),
+          new Platform(400, canvas.height - 380, 100, 30, 'cloud'),
+          new Platform(600, canvas.height - 360, 80, 30, 'brick'),
+          new Platform(800, canvas.height - 400, 100, 30, 'normal'),
+          new Platform(1000, canvas.height - 360, 120, 30, 'cloud'),
+          new Platform(1200, canvas.height - 380, 80, 30, 'normal'),
           
-          // Ladders connecting platforms - Moderate scale
-          new Platform(180, canvas.height - 220, 24, 100, 'pipe'), // This will render as a ladder
-          new Platform(520, canvas.height - 260, 24, 140, 'pipe'),
-          new Platform(780, canvas.height - 220, 24, 180, 'pipe'),
+          // Ladders connecting platforms - Better distributed
+          new Platform(320, canvas.height - 220, 24, 100, 'pipe'), // Left-center ladder
+          new Platform(620, canvas.height - 260, 24, 140, 'pipe'), // Center ladder  
+          new Platform(940, canvas.height - 220, 24, 120, 'pipe'), // Right-center ladder
+          new Platform(1240, canvas.height - 280, 24, 160, 'pipe'), // Right side ladder
         ];
 
-        // Create coins
+        // Create coins - Better distributed across screen
         coins = [
-          // Lower level coins
-          new Coin(250, canvas.height - 150),
-          new Coin(280, canvas.height - 150),
-          new Coin(440, canvas.height - 170),
-          new Coin(650, canvas.height - 130),
-          new Coin(950, canvas.height - 190),
-          new Coin(1250, canvas.height - 140),
+          // Lower level coins - Spread evenly
+          new Coin(180, canvas.height - 150),
+          new Coin(380, canvas.height - 170),
+          new Coin(580, canvas.height - 130),
+          new Coin(780, canvas.height - 190),
+          new Coin(980, canvas.height - 140),
+          new Coin(1180, canvas.height - 160),
           
-          // Mid level coins
-          new Coin(200, canvas.height - 230),
-          new Coin(400, canvas.height - 270),
-          new Coin(600, canvas.height - 250),
-          new Coin(800, canvas.height - 230),
-          new Coin(1050, canvas.height - 270),
+          // Mid level coins - Better spacing
+          new Coin(130, canvas.height - 250),
+          new Coin(330, canvas.height - 290),
+          new Coin(530, canvas.height - 270),
+          new Coin(730, canvas.height - 250),
+          new Coin(930, canvas.height - 310),
+          new Coin(1130, canvas.height - 270),
           
-          // High level coins
-          new Coin(150, canvas.height - 330),
-          new Coin(350, canvas.height - 350),
-          new Coin(550, canvas.height - 370),
-          new Coin(750, canvas.height - 390),
-          new Coin(950, canvas.height - 350),
-          new Coin(1150, canvas.height - 330),
+          // High level coins - Evenly distributed
+          new Coin(230, canvas.height - 370),
+          new Coin(430, canvas.height - 410),
+          new Coin(630, canvas.height - 390),
+          new Coin(830, canvas.height - 430),
+          new Coin(1030, canvas.height - 390),
+          new Coin(1230, canvas.height - 410),
           
-          // Floating coins
-          new Coin(300, canvas.height - 200),
-          new Coin(700, canvas.height - 280),
-          new Coin(500, canvas.height - 400),
+          // Floating coins in gaps
+          new Coin(80, canvas.height - 180),
+          new Coin(480, canvas.height - 320),
+          new Coin(880, canvas.height - 200),
+          new Coin(1280, canvas.height - 300),
         ];
 
-        // Create enemies (white ghosts)
+        // Create enemies (white ghosts) - Better distributed
         enemies = [
-          new Enemy(250, canvas.height - 140),
-          new Enemy(450, canvas.height - 60),
-          new Enemy(650, canvas.height - 120),
-          new Enemy(850, canvas.height - 60),
-          new Enemy(1100, canvas.height - 130),
-          new Enemy(200, canvas.height - 220),
-          new Enemy(600, canvas.height - 240),
-          new Enemy(400, canvas.height - 340),
-          new Enemy(800, canvas.height - 380),
+          // Ground level enemies - spread across width
+          new Enemy(300, canvas.height - 60),
+          new Enemy(700, canvas.height - 60),
+          new Enemy(1100, canvas.height - 60),
+          
+          // Lower platform enemies
+          new Enemy(200, canvas.height - 150),
+          new Enemy(600, canvas.height - 130),
+          new Enemy(1000, canvas.height - 140),
+          
+          // Mid platform enemies  
+          new Enemy(150, canvas.height - 250),
+          new Enemy(550, canvas.height - 270),
+          new Enemy(950, canvas.height - 250),
+          new Enemy(1200, canvas.height - 270),
+          
+          // High platform enemies
+          new Enemy(450, canvas.height - 410),
+          new Enemy(850, canvas.height - 430),
         ];
 
         // Create animated clouds
@@ -4215,12 +4230,13 @@ void ACutsceneManager::PlayCutscene()
       }
 
       function drawTrees() {
-        // Draw pixel art trees like in the image
+        // Draw pixel art trees like in the image - Better distributed
         const treePositions = [
-          {x: 50, y: canvas.height - 120, scale: 1},
-          {x: canvas.width - 150, y: canvas.height - 120, scale: 1.2},
-          {x: 500, y: canvas.height - 100, scale: 0.8},
-          {x: 1100, y: canvas.height - 110, scale: 1.1},
+          {x: 80, y: canvas.height - 120, scale: 1},
+          {x: 400, y: canvas.height - 100, scale: 0.9},
+          {x: 700, y: canvas.height - 110, scale: 1.1},
+          {x: 1000, y: canvas.height - 120, scale: 0.8},
+          {x: 1300, y: canvas.height - 115, scale: 1.2},
         ];
 
         treePositions.forEach(tree => {
