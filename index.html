@@ -3528,7 +3528,7 @@ void ACutsceneManager::PlayCutscene()
 
       function resizeCanvas() {
         canvas.width = window.innerWidth;
-        canvas.height = Math.max(window.innerHeight, 1200); // Much bigger minimum height for better visibility
+        canvas.height = Math.max(window.innerHeight, 900); // More moderate size increase
       }
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
@@ -3567,13 +3567,13 @@ void ACutsceneManager::PlayCutscene()
       class Mario {
         constructor() {
           this.x = 150;
-          this.y = canvas.height - 150;
-          this.width = 64; // Double the size
-          this.height = 64; // Double the size
-          this.vx = 3; // Slightly faster
+          this.y = canvas.height - 80;
+          this.width = 48; // More moderate size increase
+          this.height = 48; // More moderate size increase
+          this.vx = 2.5; 
           this.vy = 0;
-          this.gravity = 0.8; // Adjust for bigger character
-          this.jumpPower = -18; // Stronger jump for bigger character
+          this.gravity = 0.6; 
+          this.jumpPower = -15; 
           this.onGround = false;
           this.direction = 1;
           this.animFrame = 0;
@@ -3610,9 +3610,9 @@ void ACutsceneManager::PlayCutscene()
             }
           });
 
-          // Ground collision - Updated for scaled platform
-          if (this.y + this.height > canvas.height - 40) { // Double the ground thickness
-            this.y = canvas.height - 40 - this.height;
+          // Ground collision - Updated for moderate platform
+          if (this.y + this.height > canvas.height - 30) { 
+            this.y = canvas.height - 30 - this.height;
             this.vy = 0;
             this.onGround = true;
           }
@@ -3646,45 +3646,45 @@ void ACutsceneManager::PlayCutscene()
             ctx.translate(this.x, 0);
           }
 
-          // Draw Mario (simplified pixel art style) - Scaled up 2x
+          // Draw Mario (simplified pixel art style) - Moderate scale
           const frame = Math.floor(this.animFrame);
           
           // Hat
           ctx.fillStyle = colors.mario;
-          ctx.fillRect(8, this.y + 8, 48, 16);
+          ctx.fillRect(6, this.y + 6, 36, 12);
           
           // Face
           ctx.fillStyle = '#FFDBAC';
-          ctx.fillRect(16, this.y + 16, 32, 24);
+          ctx.fillRect(12, this.y + 12, 24, 18);
           
           // Shirt
           ctx.fillStyle = '#0066CC';
-          ctx.fillRect(8, this.y + 32, 48, 16);
+          ctx.fillRect(6, this.y + 24, 36, 12);
           
           // Overalls
           ctx.fillStyle = '#FF0000';
-          ctx.fillRect(16, this.y + 40, 32, 16);
+          ctx.fillRect(12, this.y + 30, 24, 12);
           
           // Legs (animated)
           ctx.fillStyle = '#8B4513';
           if (this.onGround && Math.abs(this.vx) > 0) {
             // Walking animation
-            const legOffset = frame % 2 === 0 ? 0 : 4;
-            ctx.fillRect(16 + legOffset, this.y + 48, 12, 16);
-            ctx.fillRect(36 - legOffset, this.y + 48, 12, 16);
+            const legOffset = frame % 2 === 0 ? 0 : 3;
+            ctx.fillRect(12 + legOffset, this.y + 36, 9, 12);
+            ctx.fillRect(27 - legOffset, this.y + 36, 9, 12);
           } else {
             // Standing
-            ctx.fillRect(20, this.y + 48, 12, 16);
-            ctx.fillRect(32, this.y + 48, 12, 16);
+            ctx.fillRect(15, this.y + 36, 9, 12);
+            ctx.fillRect(24, this.y + 36, 9, 12);
           }
 
           // Eyes
           ctx.fillStyle = '#000000';
-          ctx.fillRect(20, this.y + 20, 4, 4);
-          ctx.fillRect(40, this.y + 20, 4, 4);
+          ctx.fillRect(15, this.y + 15, 3, 3);
+          ctx.fillRect(30, this.y + 15, 3, 3);
 
           // Mustache
-          ctx.fillRect(24, this.y + 28, 16, 4);
+          ctx.fillRect(18, this.y + 21, 12, 3);
 
           ctx.restore();
         }
@@ -3729,8 +3729,8 @@ void ACutsceneManager::PlayCutscene()
         }
 
         drawNormalPlatform() {
-          // Draw pixel-perfect platform like in the image - Scaled up
-          const pixelSize = 8; // Double the pixel size for better visibility
+          // Draw pixel-perfect platform like in the image - Moderate scale
+          const pixelSize = 6; // Moderate pixel size increase
           
           // Main platform body (green)
           ctx.fillStyle = colors.platform;
@@ -3740,20 +3740,20 @@ void ACutsceneManager::PlayCutscene()
           ctx.fillStyle = colors.platformLight;
           for (let x = 0; x < this.width; x += pixelSize * 2) {
             // Small grass blades on top
-            ctx.fillRect(this.x + x, this.y - 4, pixelSize, 4);
-            ctx.fillRect(this.x + x + pixelSize, this.y - 2, pixelSize, 2);
+            ctx.fillRect(this.x + x, this.y - 3, pixelSize, 3);
+            ctx.fillRect(this.x + x + pixelSize, this.y - 1, pixelSize, 1);
           }
           
           // Bottom shadow/dirt
           ctx.fillStyle = colors.platformDark;
-          ctx.fillRect(this.x, this.y + this.height - 8, this.width, 8);
+          ctx.fillRect(this.x, this.y + this.height - 6, this.width, 6);
           
           // Side highlights and shadows for 3D effect
           ctx.fillStyle = colors.platformLight;
-          ctx.fillRect(this.x, this.y, 4, this.height);
+          ctx.fillRect(this.x, this.y, 3, this.height);
           
           ctx.fillStyle = colors.platformDark;
-          ctx.fillRect(this.x + this.width - 4, this.y, 4, this.height);
+          ctx.fillRect(this.x + this.width - 3, this.y, 3, this.height);
         }
 
         drawBrickPlatform() {
@@ -3761,9 +3761,9 @@ void ACutsceneManager::PlayCutscene()
           ctx.fillStyle = colors.brick;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Brick pattern - Scaled up
-          const brickWidth = 32; // Double the brick size
-          const brickHeight = 16; // Double the brick size
+          // Brick pattern - Moderate scale
+          const brickWidth = 24; // Moderate brick size
+          const brickHeight = 12; // Moderate brick size
           
           ctx.fillStyle = '#A0522D'; // Lighter brown for highlights
           for (let y = 0; y < this.height; y += brickHeight) {
@@ -3797,29 +3797,29 @@ void ACutsceneManager::PlayCutscene()
         }
 
         drawPipe() {
-          // Draw ladder instead of pipe to match the image - Scaled up
-          const ladderWidth = 32; // Double the ladder width
+          // Draw ladder instead of pipe to match the image - Moderate scale
+          const ladderWidth = 24; // Moderate ladder width
           const ladderHeight = this.height;
           const centerX = this.x + (this.width - ladderWidth) / 2;
           
           // Ladder sides
           ctx.fillStyle = colors.ladder;
-          ctx.fillRect(centerX, this.y, 6, ladderHeight); // Double thickness
-          ctx.fillRect(centerX + ladderWidth - 6, this.y, 6, ladderHeight);
+          ctx.fillRect(centerX, this.y, 4, ladderHeight); 
+          ctx.fillRect(centerX + ladderWidth - 4, this.y, 4, ladderHeight);
           
           // Ladder rungs
-          const rungSpacing = 24; // Double the spacing
+          const rungSpacing = 18; // Moderate spacing
           for (let y = 0; y < ladderHeight; y += rungSpacing) {
-            ctx.fillRect(centerX, this.y + y, ladderWidth, 6); // Double thickness
+            ctx.fillRect(centerX, this.y + y, ladderWidth, 4); 
           }
           
           // Highlight for 3D effect
           ctx.fillStyle = '#DEB887';
-          ctx.fillRect(centerX, this.y, 2, ladderHeight); // Double thickness
-          ctx.fillRect(centerX + ladderWidth - 6, this.y, 2, ladderHeight);
+          ctx.fillRect(centerX, this.y, 1, ladderHeight); 
+          ctx.fillRect(centerX + ladderWidth - 4, this.y, 1, ladderHeight);
           
           for (let y = 0; y < ladderHeight; y += rungSpacing) {
-            ctx.fillRect(centerX, this.y + y, ladderWidth, 2); // Double thickness
+            ctx.fillRect(centerX, this.y + y, ladderWidth, 1); 
           }
         }
 
@@ -3859,7 +3859,7 @@ void ACutsceneManager::PlayCutscene()
         constructor(x, y) {
           this.x = x;
           this.y = y;
-          this.size = 24; // Double the coin size
+          this.size = 18; // Moderate coin size increase
           this.rotation = 0;
           this.rotationSpeed = 0.1;
           this.floatOffset = Math.random() * Math.PI * 2;
@@ -3917,9 +3917,9 @@ void ACutsceneManager::PlayCutscene()
         constructor(x, y) {
           this.x = x;
           this.y = y;
-          this.width = 48; // Double the enemy size
-          this.height = 48; // Double the enemy size
-          this.vx = -1.5; // Slightly faster movement
+          this.width = 36; // Moderate size increase
+          this.height = 36; // Moderate size increase
+          this.vx = -1.2; 
           this.direction = -1;
           this.animFrame = 0;
           this.animSpeed = 0.1;
@@ -3958,42 +3958,42 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
-          // Ghost body (white like in the image) - Scaled up
+          // Ghost body (white like in the image) - Moderate scale
           ctx.fillStyle = colors.enemy;
           
           // Main ghost body (rounded top, wavy bottom)
           ctx.beginPath();
-          ctx.arc(this.x + this.width/2, this.y + 16, 20, Math.PI, 0, false);
-          ctx.lineTo(this.x + this.width - 4, this.y + this.height - 8);
+          ctx.arc(this.x + this.width/2, this.y + 12, 15, Math.PI, 0, false);
+          ctx.lineTo(this.x + this.width - 3, this.y + this.height - 6);
           
           // Wavy bottom edge
           for (let i = 0; i < 3; i++) {
-            const waveX = this.x + this.width - 4 - (i * 12);
+            const waveX = this.x + this.width - 3 - (i * 9);
             ctx.lineTo(waveX, this.y + this.height);
-            ctx.lineTo(waveX - 6, this.y + this.height - 8);
+            ctx.lineTo(waveX - 4, this.y + this.height - 6);
           }
           
-          ctx.lineTo(this.x + 4, this.y + this.height - 8);
+          ctx.lineTo(this.x + 3, this.y + this.height - 6);
           ctx.closePath();
           ctx.fill();
           
           // Ghost glow effect
           ctx.fillStyle = colors.enemyGlow;
           ctx.beginPath();
-          ctx.arc(this.x + this.width/2, this.y + 16, 16, Math.PI, 0, false);
-          ctx.lineTo(this.x + this.width - 8, this.y + this.height - 12);
-          ctx.lineTo(this.x + 8, this.y + this.height - 12);
+          ctx.arc(this.x + this.width/2, this.y + 12, 12, Math.PI, 0, false);
+          ctx.lineTo(this.x + this.width - 6, this.y + this.height - 9);
+          ctx.lineTo(this.x + 6, this.y + this.height - 9);
           ctx.closePath();
           ctx.fill();
           
           // Eyes (simple black dots)
           ctx.fillStyle = '#000000';
-          const eyeOffset = Math.floor(this.animFrame) === 0 ? 0 : 2;
-          ctx.fillRect(this.x + 12 + eyeOffset, this.y + 12, 4, 4);
-          ctx.fillRect(this.x + 32 + eyeOffset, this.y + 12, 4, 4);
+          const eyeOffset = Math.floor(this.animFrame) === 0 ? 0 : 1;
+          ctx.fillRect(this.x + 9 + eyeOffset, this.y + 9, 3, 3);
+          ctx.fillRect(this.x + 24 + eyeOffset, this.y + 9, 3, 3);
           
           // Simple mouth
-          ctx.fillRect(this.x + 20, this.y + 24, 8, 2);
+          ctx.fillRect(this.x + 15, this.y + 18, 6, 1);
           
           ctx.restore();
         }
@@ -4081,35 +4081,35 @@ void ACutsceneManager::PlayCutscene()
 
         // Create platforms
         platforms = [
-          // Ground platforms - Scaled up thickness
-          new Platform(0, canvas.height - 40, canvas.width, 40, 'normal'),
+          // Ground platforms - Moderate thickness
+          new Platform(0, canvas.height - 30, canvas.width, 30, 'normal'),
           
-          // Lower level platforms - Scaled up thickness
-          new Platform(200, canvas.height - 160, 120, 40, 'normal'),
-          new Platform(400, canvas.height - 180, 80, 40, 'brick'),
-          new Platform(600, canvas.height - 140, 100, 40, 'cloud'),
-          new Platform(900, canvas.height - 200, 120, 40, 'normal'),
-          new Platform(1200, canvas.height - 150, 100, 40, 'normal'),
+          // Lower level platforms - Moderate thickness
+          new Platform(200, canvas.height - 120, 120, 30, 'normal'),
+          new Platform(400, canvas.height - 140, 80, 30, 'brick'),
+          new Platform(600, canvas.height - 100, 100, 30, 'cloud'),
+          new Platform(900, canvas.height - 160, 120, 30, 'normal'),
+          new Platform(1200, canvas.height - 110, 100, 30, 'normal'),
           
-          // Mid level platforms - Scaled up thickness
-          new Platform(150, canvas.height - 280, 100, 40, 'normal'),
-          new Platform(350, canvas.height - 320, 80, 40, 'cloud'),
-          new Platform(550, canvas.height - 300, 120, 40, 'brick'),
-          new Platform(750, canvas.height - 280, 100, 40, 'normal'),
-          new Platform(1000, canvas.height - 320, 80, 40, 'normal'),
+          // Mid level platforms - Moderate thickness
+          new Platform(150, canvas.height - 220, 100, 30, 'normal'),
+          new Platform(350, canvas.height - 260, 80, 30, 'cloud'),
+          new Platform(550, canvas.height - 240, 120, 30, 'brick'),
+          new Platform(750, canvas.height - 220, 100, 30, 'normal'),
+          new Platform(1000, canvas.height - 260, 80, 30, 'normal'),
           
-          // Higher platforms - Scaled up thickness
-          new Platform(100, canvas.height - 400, 80, 40, 'cloud'),
-          new Platform(300, canvas.height - 420, 100, 40, 'normal'),
-          new Platform(500, canvas.height - 440, 80, 40, 'brick'),
-          new Platform(700, canvas.height - 460, 120, 40, 'normal'),
-          new Platform(900, canvas.height - 420, 80, 40, 'cloud'),
-          new Platform(1100, canvas.height - 400, 100, 40, 'normal'),
+          // Higher platforms - Moderate thickness
+          new Platform(100, canvas.height - 340, 80, 30, 'cloud'),
+          new Platform(300, canvas.height - 360, 100, 30, 'normal'),
+          new Platform(500, canvas.height - 380, 80, 30, 'brick'),
+          new Platform(700, canvas.height - 400, 120, 30, 'normal'),
+          new Platform(900, canvas.height - 360, 80, 30, 'cloud'),
+          new Platform(1100, canvas.height - 340, 100, 30, 'normal'),
           
-          // Ladders connecting platforms - Scaled up
-          new Platform(180, canvas.height - 280, 32, 120, 'pipe'), // This will render as a ladder
-          new Platform(520, canvas.height - 320, 32, 180, 'pipe'),
-          new Platform(780, canvas.height - 280, 32, 220, 'pipe'),
+          // Ladders connecting platforms - Moderate scale
+          new Platform(180, canvas.height - 220, 24, 100, 'pipe'), // This will render as a ladder
+          new Platform(520, canvas.height - 260, 24, 140, 'pipe'),
+          new Platform(780, canvas.height - 220, 24, 180, 'pipe'),
         ];
 
         // Create coins
@@ -4304,7 +4304,7 @@ void ACutsceneManager::PlayCutscene()
 
       function drawPixelCloud(x, y, scale, fillStyle) {
         ctx.save();
-        const pixelSize = 8 * scale; // Double the cloud pixel size for better visibility
+        const pixelSize = 6 * scale; // Moderate cloud pixel size
         
         ctx.fillStyle = fillStyle;
         
