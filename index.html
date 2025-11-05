@@ -3541,6 +3541,7 @@ void ACutsceneManager::PlayCutscene()
       let particles = [];
       let mario = null;
       let animatedClouds = []; // Add animated clouds array
+      let snowflakes = []; // Add snow array
 
       // Colors and themes - Updated for pixel art style
       const colors = {
@@ -4025,6 +4026,46 @@ void ACutsceneManager::PlayCutscene()
         }
       }
 
+      // Snow class for winter atmosphere
+      class Snow {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = -10;
+          this.size = Math.random() * 3 + 1; // 1-4px snowflakes
+          this.speed = Math.random() * 1 + 0.5; // 0.5-1.5 fall speed
+          this.drift = Math.random() * 0.5 - 0.25; // -0.25 to 0.25 horizontal drift
+          this.opacity = Math.random() * 0.7 + 0.3; // 0.3-1.0 opacity
+        }
+
+        update() {
+          this.y += this.speed;
+          this.x += this.drift;
+          
+          // Reset when off screen
+          if (this.y > canvas.height + 10) {
+            this.y = -10;
+            this.x = Math.random() * canvas.width;
+          }
+          
+          // Wrap horizontally
+          if (this.x > canvas.width + 10) {
+            this.x = -10;
+          } else if (this.x < -10) {
+            this.x = canvas.width + 10;
+          }
+        }
+
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = this.opacity;
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
       // Particle system
       class Particle {
         constructor(x, y, vx, vy, color, life) {
@@ -4164,35 +4205,26 @@ void ACutsceneManager::PlayCutscene()
           new Coin(1680, canvas.height - 320),
         ];
 
-        // Create enemies (white ghosts) - Better distributed + more on right + mixed directions
+        // Create enemies (white ghosts) - Reduced number for cleaner look
         enemies = [
-          // Ground level enemies - spread across width + extended right + mixed directions
-          new Enemy(200, canvas.height - 60, 1),   // Moving right
-          new Enemy(500, canvas.height - 60, -1),  // Moving left
-          new Enemy(800, canvas.height - 60, 1),   // Moving right
-          new Enemy(1100, canvas.height - 60, -1), // Moving left
-          new Enemy(1400, canvas.height - 60, 1),  // Moving right
-          new Enemy(1700, canvas.height - 60, -1), // Moving left
+          // Ground level enemies - fewer but well distributed
+          new Enemy(400, canvas.height - 60, -1),  // Moving left
+          new Enemy(900, canvas.height - 60, 1),   // Moving right
+          new Enemy(1400, canvas.height - 60, -1), // Moving left
           
-          // Lower platform enemies + more on right + mixed directions
-          new Enemy(180, canvas.height - 150, -1),
-          new Enemy(580, canvas.height - 130, 1),
-          new Enemy(980, canvas.height - 140, -1),
-          new Enemy(1380, canvas.height - 170, 1),
-          new Enemy(1580, canvas.height - 150, -1),
+          // Lower platform enemies - reduced
+          new Enemy(300, canvas.height - 150, 1),
+          new Enemy(800, canvas.height - 140, -1),
+          new Enemy(1300, canvas.height - 170, 1),
           
-          // Mid platform enemies + extended right + mixed directions
-          new Enemy(130, canvas.height - 250, 1),
-          new Enemy(530, canvas.height - 270, -1),
-          new Enemy(930, canvas.height - 250, 1),
-          new Enemy(1330, canvas.height - 290, -1),
-          new Enemy(1530, canvas.height - 250, 1),
+          // Mid platform enemies - fewer
+          new Enemy(200, canvas.height - 250, -1),
+          new Enemy(700, canvas.height - 270, 1),
+          new Enemy(1200, canvas.height - 290, -1),
           
-          // High platform enemies + more on right + mixed directions
-          new Enemy(430, canvas.height - 410, 1),
-          new Enemy(830, canvas.height - 430, -1),
-          new Enemy(1230, canvas.height - 410, 1),
-          new Enemy(1630, canvas.height - 390, -1),
+          // High platform enemies - minimal
+          new Enemy(500, canvas.height - 410, 1),
+          new Enemy(1000, canvas.height - 430, -1),
         ];
 
         // Create animated clouds
@@ -4209,6 +4241,12 @@ void ACutsceneManager::PlayCutscene()
           new AnimatedCloud(600, 10, 1.8, 0.06),
           new AnimatedCloud(1200, 20, 1.4, 0.09),
         ];
+
+        // Create snow for winter atmosphere
+        snowflakes = [];
+        for (let i = 0; i < 100; i++) { // 100 snowflakes
+          snowflakes.push(new Snow());
+        }
       }
 
       // Draw background
@@ -4412,6 +4450,12 @@ void ACutsceneManager::PlayCutscene()
           cloud.draw();
         });
 
+        // Update and draw snow
+        snowflakes.forEach(snowflake => {
+          snowflake.update();
+          snowflake.draw();
+        });
+
         // Update and draw platforms
         platforms.forEach(platform => platform.draw());
 
@@ -4449,6 +4493,11 @@ void ACutsceneManager::PlayCutscene()
           const x = Math.random() * canvas.width;
           const y = Math.random() * canvas.height * 0.3;
           particles.push(new Particle(x, y, 0, 1, '#FFFFFF', 60));
+        }
+
+        // Occasionally add new snowflakes for dynamic effect
+        if (Math.random() < 0.02 && snowflakes.length < 120) {
+          snowflakes.push(new Snow());
         }
 
         requestAnimationFrame(animate);
