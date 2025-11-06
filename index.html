@@ -3554,22 +3554,33 @@ void ACutsceneManager::PlayCutscene()
       const canvas = document.getElementById('platformGame');
       const ctx = canvas.getContext('2d');
 
+      let worldInitialized = false;
+
       function resizeCanvas() {
         canvas.width = window.innerWidth;
-        canvas.height = Math.max(window.innerHeight, 900); // More moderate size increase
+        // Use exact viewport height so the canvas matches visible area on mobile
+        canvas.height = window.innerHeight;
+
+        // If the world has already been initialized, re-create game world so positions match the new size
+        if (worldInitialized) {
+          initGameWorld();
+        }
       }
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
       // Game entities
-      let platforms = [];
-      let coins = [];
-      let enemies = [];
-      let powerUps = [];
-      let particles = [];
-      let mario = null;
-      let animatedClouds = []; // Add animated clouds array
-      let snowflakes = []; // Add snow array
+  let platforms = [];
+  let coins = [];
+  let enemies = [];
+  let powerUps = [];
+  let particles = [];
+  let mario = null;
+  let animatedClouds = []; // Add animated clouds array
+  let snowflakes = []; // Add snow array
+  let backgroundCloudsSmall = [];
+  let backgroundCloudsMid = [];
+  let backgroundCloudsLarge = [];
 
       // Colors and themes - Updated for pixel art style
       const colors = {
@@ -3733,11 +3744,14 @@ void ACutsceneManager::PlayCutscene()
         draw() {
           ctx.save();
           
-          if (this.type === 'floating') {
-            // Floating platform animation
-            const floatOffset = Math.sin(Date.now() * 0.002 + this.animOffset) * 5;
-            this.y += floatOffset * 0.1;
-          }
+            // Compute floating offset without mutating this.y to avoid cumulative drift
+            let floatOffset = 0;
+            if (this.type === 'floating') {
+              // Floating platform animation (visual only)
+              floatOffset = Math.sin(Date.now() * 0.002 + this.animOffset) * 5;
+              // We'll translate the drawing context by this offset below instead of changing this.y
+              ctx.translate(0, floatOffset * 0.1);
+            }
 
           // Draw platform based on type
           switch (this.type) {
@@ -3754,6 +3768,7 @@ void ACutsceneManager::PlayCutscene()
               this.drawNormalPlatform();
           }
           
+          // Restore context; any translate applied earlier is reverted here
           ctx.restore();
         }
 
@@ -4270,11 +4285,49 @@ void ACutsceneManager::PlayCutscene()
           new AnimatedCloud(1200, 20, 1.4, 0.09),
         ];
 
+        // Precompute background cloud layers (stable shapes/positions to avoid per-frame randomness)
+        backgroundCloudsSmall = [];
+        backgroundCloudsMid = [];
+        backgroundCloudsLarge = [];
+
+        // Small background clouds
+        for (let i = 0; i < 12; i++) {
+          backgroundCloudsSmall.push({
+            x: Math.random() * (canvas.width + 400) - 200,
+            y: 10 + Math.random() * 80,
+            size: 0.3 + Math.random() * 0.3,
+            fillStyle: 'rgba(255, 255, 255, 0.4)'
+          });
+        }
+
+        // Mid-ground clouds
+        for (let i = 0; i < 10; i++) {
+          backgroundCloudsMid.push({
+            x: Math.random() * (canvas.width + 400) - 200,
+            y: 30 + Math.random() * 90,
+            size: 0.5 + Math.random() * 0.5,
+            fillStyle: 'rgba(255, 255, 255, 0.7)'
+          });
+        }
+
+        // Foreground larger clouds
+        for (let i = 0; i < 8; i++) {
+          backgroundCloudsLarge.push({
+            x: Math.random() * (canvas.width + 400) - 200,
+            y: 10 + Math.random() * 100,
+            size: 0.8 + Math.random() * 0.6,
+            fillStyle: 'rgba(255, 255, 255, 0.9)'
+          });
+        }
+
         // Create snow for winter atmosphere
         snowflakes = [];
         for (let i = 0; i < 100; i++) { // 100 snowflakes
           snowflakes.push(new Snow());
         }
+
+          // Mark world as initialized so future resize events will re-create the world
+          worldInitialized = true;
       }
 
       // Draw background
@@ -4366,47 +4419,17 @@ void ACutsceneManager::PlayCutscene()
       }
 
       function drawClouds() {
-        // Background clouds (smaller, more transparent)
-        drawCloudLayer(0.3, 0.6, '#FFFFFF', 'rgba(255, 255, 255, 0.4)');
-        
-        // Mid-ground clouds
-        drawCloudLayer(0.5, 0.8, '#FFFFFF', 'rgba(255, 255, 255, 0.7)');
-        
-        // Foreground clouds (larger, more opaque)
-        drawCloudLayer(0.8, 1.2, '#FFFFFF', 'rgba(255, 255, 255, 0.9)');
-      }
+        // Draw precomputed cloud layers to avoid per-frame jitter
+        backgroundCloudsSmall.forEach(cloud => {
+          if (cloud.x < canvas.width + 200 && cloud.x > -200) drawPixelCloud(cloud.x, cloud.y, cloud.size, cloud.fillStyle);
+        });
 
-      function drawCloudLayer(minScale, maxScale, color, fillStyle) {
-        const cloudPositions = [
-          {x: 80, y: 40, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 220, y: 60, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 380, y: 30, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 520, y: 70, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 680, y: 45, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 820, y: 25, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 950, y: 55, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 1100, y: 35, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 1250, y: 65, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 1400, y: 40, size: minScale + Math.random() * (maxScale - minScale)},
-          
-          // Additional clouds for bigger canvas
-          {x: 150, y: 90, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 450, y: 100, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 750, y: 85, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 1050, y: 95, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 1350, y: 80, size: minScale + Math.random() * (maxScale - minScale)},
-          
-          // High altitude clouds
-          {x: 300, y: 15, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 600, y: 10, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 900, y: 20, size: minScale + Math.random() * (maxScale - minScale)},
-          {x: 1200, y: 5, size: minScale + Math.random() * (maxScale - minScale)},
-        ];
+        backgroundCloudsMid.forEach(cloud => {
+          if (cloud.x < canvas.width + 200 && cloud.x > -200) drawPixelCloud(cloud.x, cloud.y, cloud.size, cloud.fillStyle);
+        });
 
-        cloudPositions.forEach(cloud => {
-          if (cloud.x < canvas.width + 100) { // Only draw clouds that might be visible
-            drawPixelCloud(cloud.x, cloud.y, cloud.size, fillStyle);
-          }
+        backgroundCloudsLarge.forEach(cloud => {
+          if (cloud.x < canvas.width + 200 && cloud.x > -200) drawPixelCloud(cloud.x, cloud.y, cloud.size, cloud.fillStyle);
         });
       }
 
@@ -4428,11 +4451,9 @@ void ACutsceneManager::PlayCutscene()
         ctx.fillRect(x + pixelSize, y + pixelSize * 4, pixelSize * 2, pixelSize);
         ctx.fillRect(x + pixelSize * 5, y + pixelSize * 4, pixelSize * 2, pixelSize);
         
-        // Add some random extra bumps for variety
-        if (Math.random() > 0.5) {
+        // Add deterministic extra bumps for larger clouds to avoid per-frame jitter
+        if (scale > 1.2) {
           ctx.fillRect(x - pixelSize, y + pixelSize * 2, pixelSize, pixelSize);
-        }
-        if (Math.random() > 0.5) {
           ctx.fillRect(x + pixelSize * 8, y + pixelSize * 2, pixelSize, pixelSize);
         }
         
