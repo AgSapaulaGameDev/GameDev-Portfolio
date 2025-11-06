@@ -31,6 +31,11 @@
       --radius: 0.5rem;
     }
 
+    html,
+    body {
+      height: 100%;
+    }
+
     body {
       background-color: var(--background);
       color: var(--foreground);
@@ -125,7 +130,9 @@
 
     /* Hero Section */
     .hero {
-      min-height: 100vh;
+      /* Use a mobile-friendly viewport height. We set --vh in JS to account for mobile browser UI chrome.
+         Fallback to 100vh where custom property isn't available. */
+      min-height: calc(var(--vh, 1vh) * 100);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1967,12 +1974,32 @@
         border-radius: 2px;
       }
     }
+
+    /* Mobile override for canvas positioning to avoid fixed-position issues on some mobile browsers */
+    @media (max-width: 768px) {
+      .canvas-trail,
+      .canvas-bg {
+        /* Fixed canvas can cause mispositioning or clipping on mobile — use absolute so it flows with viewport height. */
+        position: absolute;
+      }
+    }
   </style>
 </head>
 
 <body>
   <!-- Mouse Trail Canvas -->
   <canvas id="mouseTrail" class="canvas-trail"></canvas>
+
+  <!-- Fix mobile viewport height for full-screen sections: set --vh to 1% of the window.innerHeight -->
+  <script>
+    (function() {
+      function setVh() {
+        document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+      }
+      setVh();
+      window.addEventListener('resize', setVh);
+    })();
+  </script>
 
   <!-- Navigation -->
   <nav class="nav">
