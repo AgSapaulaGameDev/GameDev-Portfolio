@@ -3694,87 +3694,82 @@ void ACutsceneManager::PlayCutscene()
             ctx.translate(this.x, 0);
           }
 
-          // Draw Blue Ninja character (inspired by sprite sheet)
+          // Draw cute blue ninja character like the reference image
           const frame = Math.floor(this.animFrame);
           const y = this.y;
           
-          // Character outline (very dark)
-          ctx.fillStyle = colors.ninjaOutline;
-          ctx.fillRect(4, y + 4, 40, 40);
+          // === HEAD (round, bigger proportion like in reference) ===
+          ctx.fillStyle = colors.ninjaMask; // Light blue head
+          ctx.beginPath();
+          ctx.arc(this.width/2, y + 16, 14, 0, Math.PI * 2); // Round head
+          ctx.fill();
           
-          // Main body (dark blue)
+          // Head outline
+          ctx.strokeStyle = colors.ninjaOutline;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(this.width/2, y + 16, 14, 0, Math.PI * 2);
+          ctx.stroke();
+          
+          // === BODY (smaller, more proportional) ===
+          ctx.fillStyle = colors.ninjaBody; // Dark blue body
+          ctx.fillRect(16, y + 28, 16, 12); // Smaller rectangular body
+          
+          // Body outline
+          ctx.strokeStyle = colors.ninjaOutline;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(16, y + 28, 16, 12);
+          
+          // === ARMS (small, simple) ===
           ctx.fillStyle = colors.ninjaBody;
-          ctx.fillRect(6, y + 6, 36, 36);
+          // Left arm
+          ctx.fillRect(12, y + 30, 6, 8);
+          ctx.strokeRect(12, y + 30, 6, 8);
+          // Right arm  
+          ctx.fillRect(30, y + 30, 6, 8);
+          ctx.strokeRect(30, y + 30, 6, 8);
           
-          // Head/mask area (light blue)
-          ctx.fillStyle = colors.ninjaMask;
-          ctx.fillRect(12, y + 8, 24, 20);
-          
-          // Body suit details
-          ctx.fillStyle = colors.ninjaBodyLight;
-          // Chest area highlight
-          ctx.fillRect(15, y + 22, 18, 12);
-          
-          // Arms
-          ctx.fillStyle = colors.ninjaBody;
-          ctx.fillRect(6, y + 20, 8, 16); // Left arm
-          ctx.fillRect(34, y + 20, 8, 16); // Right arm
-          
-          // Arm highlights
-          ctx.fillStyle = colors.ninjaBodyLight;
-          ctx.fillRect(7, y + 21, 2, 14); // Left arm highlight
-          ctx.fillRect(35, y + 21, 2, 14); // Right arm highlight
-          
-          // Legs (animated for walking)
+          // === LEGS (animated, small and cute) ===
           ctx.fillStyle = colors.ninjaBody;
           if (this.onGround && Math.abs(this.vx) > 0) {
-            // Walking animation - legs alternate
-            const legOffset = frame % 2 === 0 ? 0 : 2;
-            ctx.fillRect(12 + legOffset, y + 34, 8, 14); // Left leg
-            ctx.fillRect(28 - legOffset, y + 34, 8, 14); // Right leg
-            
-            // Leg highlights
-            ctx.fillStyle = colors.ninjaBodyLight;
-            ctx.fillRect(13 + legOffset, y + 35, 2, 12); // Left leg highlight
-            ctx.fillRect(29 - legOffset, y + 35, 2, 12); // Right leg highlight
+            // Walking animation - simple leg movement
+            const legOffset = frame % 2 === 0 ? 0 : 1;
+            // Left leg
+            ctx.fillRect(18 + legOffset, y + 38, 5, 10);
+            ctx.strokeRect(18 + legOffset, y + 38, 5, 10);
+            // Right leg
+            ctx.fillRect(25 - legOffset, y + 38, 5, 10);
+            ctx.strokeRect(25 - legOffset, y + 38, 5, 10);
           } else {
             // Standing pose
-            ctx.fillRect(15, y + 34, 8, 14); // Left leg
-            ctx.fillRect(25, y + 34, 8, 14); // Right leg
-            
-            // Leg highlights
-            ctx.fillStyle = colors.ninjaBodyLight;
-            ctx.fillRect(16, y + 35, 2, 12); // Left leg highlight
-            ctx.fillRect(26, y + 35, 2, 12); // Right leg highlight
+            ctx.fillRect(19, y + 38, 5, 10); // Left leg
+            ctx.strokeRect(19, y + 38, 5, 10);
+            ctx.fillRect(24, y + 38, 5, 10); // Right leg
+            ctx.strokeRect(24, y + 38, 5, 10);
           }
           
-          // Eyes (white with black pupils)
-          ctx.fillStyle = colors.ninjaEyes;
-          ctx.fillRect(16, y + 14, 4, 4); // Left eye
-          ctx.fillRect(28, y + 14, 4, 4); // Right eye
+          // === EYES (large, cute white eyes like reference) ===
+          ctx.fillStyle = colors.ninjaEyes; // White
+          ctx.beginPath();
+          ctx.arc(20, y + 14, 4, 0, Math.PI * 2); // Left eye
+          ctx.arc(28, y + 14, 4, 0, Math.PI * 2); // Right eye
+          ctx.fill();
           
-          // Eye pupils
+          // Eye pupils (small black dots)
           ctx.fillStyle = colors.ninjaEyePupils;
-          ctx.fillRect(17, y + 15, 2, 2); // Left pupil
-          ctx.fillRect(29, y + 15, 2, 2); // Right pupil
+          ctx.beginPath();
+          ctx.arc(20, y + 14, 1.5, 0, Math.PI * 2); // Left pupil
+          ctx.arc(28, y + 14, 1.5, 0, Math.PI * 2); // Right pupil
+          ctx.fill();
           
-          // Mask/head details
-          ctx.fillStyle = colors.ninjaBodyDark;
-          // Head shadow/depth
-          ctx.fillRect(12, y + 26, 24, 2);
-          
-          // Add some ninja-style details
-          ctx.fillStyle = colors.ninjaBodyDark;
-          // Belt/sash
-          ctx.fillRect(12, y + 28, 24, 3);
-          
-          // Ninja weapon outline (small sword/kunai on back)
-          if (!this.onGround || Math.random() < 0.7) { // Show weapon most of the time
-            ctx.fillStyle = colors.ninjaOutline;
-            ctx.fillRect(38, y + 12, 2, 8); // Weapon handle
-            ctx.fillStyle = '#C0C0C0'; // Silver blade
-            ctx.fillRect(37, y + 8, 4, 6); // Weapon blade
-          }
+          // === NINJA MASK DETAILS ===
+          // Simple ninja mask line across face
+          ctx.strokeStyle = colors.ninjaBodyDark;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(10, y + 18);
+          ctx.lineTo(38, y + 18);
+          ctx.stroke();
 
           ctx.restore();
         }
