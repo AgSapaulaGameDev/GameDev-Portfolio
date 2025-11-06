@@ -3582,7 +3582,7 @@ void ACutsceneManager::PlayCutscene()
   let backgroundCloudsMid = [];
   let backgroundCloudsLarge = [];
 
-      // Colors and themes - Updated for pixel art style
+      // Colors and themes - Updated for blue ninja character
       const colors = {
         mario: '#FF6B35',
         ground: '#8B4513',
@@ -3600,7 +3600,15 @@ void ACutsceneManager::PlayCutscene()
         brick: '#8B4513',
         tree: '#228B22',
         treeTrunk: '#8B4513',
-        ladder: '#CD853F'
+        ladder: '#CD853F',
+        // Blue ninja character colors
+        ninjaBody: '#2E5C8A', // Dark blue body
+        ninjaBodyLight: '#4A90E2', // Light blue highlights
+        ninjaBodyDark: '#1E3A5F', // Darker blue shadows
+        ninjaMask: '#87CEEB', // Light blue mask/face
+        ninjaEyes: '#FFFFFF', // White eyes
+        ninjaEyePupils: '#000000', // Black pupils
+        ninjaOutline: '#0F1419' // Very dark outline
       };
 
       // Mario character
@@ -3686,45 +3694,87 @@ void ACutsceneManager::PlayCutscene()
             ctx.translate(this.x, 0);
           }
 
-          // Draw Mario (simplified pixel art style) - Moderate scale
+          // Draw Blue Ninja character (inspired by sprite sheet)
           const frame = Math.floor(this.animFrame);
+          const y = this.y;
           
-          // Hat
-          ctx.fillStyle = colors.mario;
-          ctx.fillRect(6, this.y + 6, 36, 12);
+          // Character outline (very dark)
+          ctx.fillStyle = colors.ninjaOutline;
+          ctx.fillRect(4, y + 4, 40, 40);
           
-          // Face
-          ctx.fillStyle = '#FFDBAC';
-          ctx.fillRect(12, this.y + 12, 24, 18);
+          // Main body (dark blue)
+          ctx.fillStyle = colors.ninjaBody;
+          ctx.fillRect(6, y + 6, 36, 36);
           
-          // Shirt
-          ctx.fillStyle = '#0066CC';
-          ctx.fillRect(6, this.y + 24, 36, 12);
+          // Head/mask area (light blue)
+          ctx.fillStyle = colors.ninjaMask;
+          ctx.fillRect(12, y + 8, 24, 20);
           
-          // Overalls
-          ctx.fillStyle = '#FF0000';
-          ctx.fillRect(12, this.y + 30, 24, 12);
+          // Body suit details
+          ctx.fillStyle = colors.ninjaBodyLight;
+          // Chest area highlight
+          ctx.fillRect(15, y + 22, 18, 12);
           
-          // Legs (animated)
-          ctx.fillStyle = '#8B4513';
+          // Arms
+          ctx.fillStyle = colors.ninjaBody;
+          ctx.fillRect(6, y + 20, 8, 16); // Left arm
+          ctx.fillRect(34, y + 20, 8, 16); // Right arm
+          
+          // Arm highlights
+          ctx.fillStyle = colors.ninjaBodyLight;
+          ctx.fillRect(7, y + 21, 2, 14); // Left arm highlight
+          ctx.fillRect(35, y + 21, 2, 14); // Right arm highlight
+          
+          // Legs (animated for walking)
+          ctx.fillStyle = colors.ninjaBody;
           if (this.onGround && Math.abs(this.vx) > 0) {
-            // Walking animation
-            const legOffset = frame % 2 === 0 ? 0 : 3;
-            ctx.fillRect(12 + legOffset, this.y + 36, 9, 12);
-            ctx.fillRect(27 - legOffset, this.y + 36, 9, 12);
+            // Walking animation - legs alternate
+            const legOffset = frame % 2 === 0 ? 0 : 2;
+            ctx.fillRect(12 + legOffset, y + 34, 8, 14); // Left leg
+            ctx.fillRect(28 - legOffset, y + 34, 8, 14); // Right leg
+            
+            // Leg highlights
+            ctx.fillStyle = colors.ninjaBodyLight;
+            ctx.fillRect(13 + legOffset, y + 35, 2, 12); // Left leg highlight
+            ctx.fillRect(29 - legOffset, y + 35, 2, 12); // Right leg highlight
           } else {
-            // Standing
-            ctx.fillRect(15, this.y + 36, 9, 12);
-            ctx.fillRect(24, this.y + 36, 9, 12);
+            // Standing pose
+            ctx.fillRect(15, y + 34, 8, 14); // Left leg
+            ctx.fillRect(25, y + 34, 8, 14); // Right leg
+            
+            // Leg highlights
+            ctx.fillStyle = colors.ninjaBodyLight;
+            ctx.fillRect(16, y + 35, 2, 12); // Left leg highlight
+            ctx.fillRect(26, y + 35, 2, 12); // Right leg highlight
           }
-
-          // Eyes
-          ctx.fillStyle = '#000000';
-          ctx.fillRect(15, this.y + 15, 3, 3);
-          ctx.fillRect(30, this.y + 15, 3, 3);
-
-          // Mustache
-          ctx.fillRect(18, this.y + 21, 12, 3);
+          
+          // Eyes (white with black pupils)
+          ctx.fillStyle = colors.ninjaEyes;
+          ctx.fillRect(16, y + 14, 4, 4); // Left eye
+          ctx.fillRect(28, y + 14, 4, 4); // Right eye
+          
+          // Eye pupils
+          ctx.fillStyle = colors.ninjaEyePupils;
+          ctx.fillRect(17, y + 15, 2, 2); // Left pupil
+          ctx.fillRect(29, y + 15, 2, 2); // Right pupil
+          
+          // Mask/head details
+          ctx.fillStyle = colors.ninjaBodyDark;
+          // Head shadow/depth
+          ctx.fillRect(12, y + 26, 24, 2);
+          
+          // Add some ninja-style details
+          ctx.fillStyle = colors.ninjaBodyDark;
+          // Belt/sash
+          ctx.fillRect(12, y + 28, 24, 3);
+          
+          // Ninja weapon outline (small sword/kunai on back)
+          if (!this.onGround || Math.random() < 0.7) { // Show weapon most of the time
+            ctx.fillStyle = colors.ninjaOutline;
+            ctx.fillRect(38, y + 12, 2, 8); // Weapon handle
+            ctx.fillStyle = '#C0C0C0'; // Silver blade
+            ctx.fillRect(37, y + 8, 4, 6); // Weapon blade
+          }
 
           ctx.restore();
         }
