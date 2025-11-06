@@ -3801,11 +3801,11 @@ void ACutsceneManager::PlayCutscene()
         }
 
         drawBrickPlatform() {
-          // Draw brown brick platforms
+          // Draw brown brick platforms with proper containment
           ctx.fillStyle = colors.brick;
           ctx.fillRect(this.x, this.y, this.width, this.height);
           
-          // Brick pattern - Moderate scale
+          // Brick pattern - contained within platform boundaries
           const brickWidth = 24; // Moderate brick size
           const brickHeight = 12; // Moderate brick size
           
@@ -3816,25 +3816,27 @@ void ACutsceneManager::PlayCutscene()
               const offsetX = (y / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
               const brickX = this.x + x + offsetX;
               
-              if (brickX < this.x + this.width) {
+              // Only draw if brick is within platform bounds
+              if (brickX >= this.x && brickX + brickWidth <= this.x + this.width) {
                 // Brick highlight
-                ctx.fillRect(brickX, this.y + y, Math.min(brickWidth - 1, this.x + this.width - brickX), 1);
+                ctx.fillRect(brickX, this.y + y, brickWidth - 1, 1);
                 ctx.fillRect(brickX, this.y + y, 1, brickHeight - 1);
               }
             }
           }
           
-          // Dark outlines
+          // Dark outlines - also contained within bounds
           ctx.fillStyle = '#654321';
           for (let y = 0; y < this.height; y += brickHeight) {
             for (let x = 0; x < this.width; x += brickWidth) {
               const offsetX = (y / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
               const brickX = this.x + x + offsetX;
               
-              if (brickX < this.x + this.width) {
+              // Only draw if brick is within platform bounds
+              if (brickX >= this.x && brickX + brickWidth <= this.x + this.width) {
                 // Brick outline
                 ctx.fillRect(brickX + brickWidth - 1, this.y + y, 1, brickHeight);
-                ctx.fillRect(brickX, this.y + y + brickHeight - 1, Math.min(brickWidth, this.x + this.width - brickX), 1);
+                ctx.fillRect(brickX, this.y + y + brickHeight - 1, brickWidth, 1);
               }
             }
           }
@@ -4198,13 +4200,13 @@ void ACutsceneManager::PlayCutscene()
           new Platform(1400, canvas.height - 340, 100, 30, 'brick'),
           new Platform(1600, canvas.height - 360, 80, 30, 'cloud'),
           
-          // Ladders connecting platforms - Better distributed + more on right
-          new Platform(320, canvas.height - 220, 24, 100, 'pipe'), // Left-center ladder
-          new Platform(620, canvas.height - 260, 24, 140, 'pipe'), // Center ladder  
-          new Platform(940, canvas.height - 220, 24, 120, 'pipe'), // Right-center ladder
-          new Platform(1240, canvas.height - 280, 24, 160, 'pipe'), // Right side ladder
-          new Platform(1440, canvas.height - 240, 24, 120, 'pipe'), // Far right ladder
-          new Platform(1640, canvas.height - 220, 24, 140, 'pipe'), // Extreme right ladder
+          // Ladders connecting platforms - Anchored to platform tops to prevent floating
+          new Platform(320, canvas.height - 260, 24, 140, 'pipe'), // Anchored to mid platform at y-260
+          new Platform(620, canvas.height - 360, 24, 120, 'pipe'), // Anchored to high platform at y-360  
+          new Platform(940, canvas.height - 280, 24, 160, 'pipe'), // Anchored to mid platform at y-280
+          new Platform(1240, canvas.height - 380, 24, 140, 'pipe'), // Anchored to high platform at y-380
+          new Platform(1440, canvas.height - 340, 24, 120, 'pipe'), // Anchored to high platform at y-340
+          new Platform(1640, canvas.height - 360, 24, 140, 'pipe'), // Anchored to high platform at y-360
         ];
 
         // Create coins - Better distributed across screen + extended right
@@ -4270,19 +4272,19 @@ void ACutsceneManager::PlayCutscene()
           new Enemy(1000, canvas.height - 430, -1),
         ];
 
-        // Create animated clouds
+        // Create animated clouds - also bigger and more visible
         animatedClouds = [
-          new AnimatedCloud(-50, 30, 0.8, 0.2),
-          new AnimatedCloud(200, 50, 1.1, 0.15),
-          new AnimatedCloud(500, 25, 0.9, 0.25),
-          new AnimatedCloud(800, 70, 1.3, 0.1),
-          new AnimatedCloud(1100, 40, 0.7, 0.3),
-          new AnimatedCloud(1400, 60, 1.0, 0.18),
+          new AnimatedCloud(-50, 80, 1.2, 0.2), // Bigger and lower
+          new AnimatedCloud(200, 120, 1.5, 0.15), // Bigger and lower
+          new AnimatedCloud(500, 60, 1.3, 0.25), // Bigger and lower
+          new AnimatedCloud(800, 140, 1.8, 0.1), // Much bigger and lower
+          new AnimatedCloud(1100, 100, 1.1, 0.3), // Bigger and lower
+          new AnimatedCloud(1400, 130, 1.4, 0.18), // Bigger and lower
           
-          // Additional layer of slower, bigger clouds
-          new AnimatedCloud(100, 15, 1.5, 0.08),
-          new AnimatedCloud(600, 10, 1.8, 0.06),
-          new AnimatedCloud(1200, 20, 1.4, 0.09),
+          // Additional layer of slower, bigger clouds - even more prominent
+          new AnimatedCloud(100, 50, 2.0, 0.08), // Much bigger
+          new AnimatedCloud(600, 30, 2.5, 0.06), // Much bigger
+          new AnimatedCloud(1200, 70, 2.2, 0.09), // Much bigger
         ];
 
         // Precompute background cloud layers (stable shapes/positions to avoid per-frame randomness)
@@ -4290,32 +4292,32 @@ void ACutsceneManager::PlayCutscene()
         backgroundCloudsMid = [];
         backgroundCloudsLarge = [];
 
-        // Small background clouds
-        for (let i = 0; i < 12; i++) {
+        // Small background clouds - bigger and lower for visibility
+        for (let i = 0; i < 8; i++) {
           backgroundCloudsSmall.push({
             x: Math.random() * (canvas.width + 400) - 200,
-            y: 10 + Math.random() * 80,
-            size: 0.3 + Math.random() * 0.3,
-            fillStyle: 'rgba(255, 255, 255, 0.4)'
+            y: 60 + Math.random() * 120, // Lower: was 10-90, now 60-180
+            size: 0.8 + Math.random() * 0.6, // Bigger: was 0.3-0.6, now 0.8-1.4
+            fillStyle: 'rgba(255, 255, 255, 0.5)' // Slightly more opaque
           });
         }
 
-        // Mid-ground clouds
-        for (let i = 0; i < 10; i++) {
+        // Mid-ground clouds - bigger and lower
+        for (let i = 0; i < 6; i++) {
           backgroundCloudsMid.push({
             x: Math.random() * (canvas.width + 400) - 200,
-            y: 30 + Math.random() * 90,
-            size: 0.5 + Math.random() * 0.5,
+            y: 80 + Math.random() * 140, // Lower: was 30-120, now 80-220
+            size: 1.0 + Math.random() * 0.8, // Bigger: was 0.5-1.0, now 1.0-1.8
             fillStyle: 'rgba(255, 255, 255, 0.7)'
           });
         }
 
-        // Foreground larger clouds
-        for (let i = 0; i < 8; i++) {
+        // Foreground larger clouds - bigger and lower
+        for (let i = 0; i < 5; i++) {
           backgroundCloudsLarge.push({
             x: Math.random() * (canvas.width + 400) - 200,
-            y: 10 + Math.random() * 100,
-            size: 0.8 + Math.random() * 0.6,
+            y: 40 + Math.random() * 160, // Lower: was 10-110, now 40-200
+            size: 1.4 + Math.random() * 1.0, // Bigger: was 0.8-1.4, now 1.4-2.4
             fillStyle: 'rgba(255, 255, 255, 0.9)'
           });
         }
