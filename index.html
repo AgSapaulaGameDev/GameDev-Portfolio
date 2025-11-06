@@ -144,7 +144,7 @@
     .hero-content {
       text-align: center;
       position: relative;
-      z-index: 10;
+      z-index: 20; /* raise hero content above canvas on mobile */
       max-width: 4xl;
     }
 
@@ -638,13 +638,14 @@
       inset: 0;
       pointer-events: none;
       opacity: 0.3;
+      z-index: 0; /* keep canvas background behind content */
     }
 
     .canvas-trail {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 50;
+      z-index: 0; /* keep trail behind most UI elements; nav uses 50 */
       mix-blend-mode: screen;
     }
 
