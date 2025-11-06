@@ -3694,105 +3694,121 @@ void ACutsceneManager::PlayCutscene()
             ctx.translate(this.x, 0);
           }
 
-          // Draw cute blue ninja character - rounded blob shape like the ghosts
+          // Draw humanoid blue ninja character like the reference
           const frame = Math.floor(this.animFrame);
           const y = this.y;
           const centerX = this.width / 2;
           
-          // === MAIN BODY (rounded blob shape like ghosts) ===
-          ctx.fillStyle = colors.ninjaMask; // Light blue main body
+          // === HEAD (round, blue ninja head) ===
+          ctx.fillStyle = colors.ninjaMask; // Light blue head
           ctx.beginPath();
+          ctx.arc(centerX, y + 12, 10, 0, Math.PI * 2); // Round head
+          ctx.fill();
           
-          // Create rounded blob shape similar to ghost
-          ctx.arc(centerX, y + 20, 18, Math.PI, 0, false); // Top rounded part (head area)
-          ctx.lineTo(centerX + 18, y + 35); // Right side down
+          // Head outline
+          ctx.strokeStyle = colors.ninjaOutline;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(centerX, y + 12, 10, 0, Math.PI * 2);
+          ctx.stroke();
           
-          // Bottom wavy edge (like ghost bottom but smaller waves)
-          const waveSize = 4;
-          const numWaves = 4;
-          for (let i = 0; i < numWaves; i++) {
-            const waveX = centerX + 18 - (i * (36 / numWaves));
-            ctx.lineTo(waveX, y + 40);
-            ctx.lineTo(waveX - (36 / numWaves) / 2, y + 35);
-          }
+          // === NINJA MASK/HOOD ===
+          ctx.fillStyle = colors.ninjaBody; // Darker blue for mask
+          ctx.beginPath();
+          ctx.arc(centerX, y + 12, 10, Math.PI + 0.5, -0.5, false); // Top part of head (hood)
+          ctx.fill();
           
-          ctx.lineTo(centerX - 18, y + 35); // Left side back up
-          ctx.closePath();
+          // === BODY (rounded rectangle, humanoid torso) ===
+          ctx.fillStyle = colors.ninjaBody; // Dark blue body
+          ctx.fillRect(centerX - 8, y + 20, 16, 14); // Main torso
+          
+          // Round the body corners
+          ctx.fillStyle = colors.ninjaBody;
+          ctx.beginPath();
+          ctx.roundRect(centerX - 8, y + 20, 16, 14, 3); // Rounded rectangle
           ctx.fill();
           
           // Body outline
           ctx.strokeStyle = colors.ninjaOutline;
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(centerX - 8, y + 20, 16, 14, 3);
           ctx.stroke();
           
-          // === INNER BODY SHADING (darker blue) ===
-          ctx.fillStyle = colors.ninjaBody; // Darker blue for inner area
+          // === ARMS (small, rounded) ===
+          ctx.fillStyle = colors.ninjaBody;
+          // Left arm
           ctx.beginPath();
-          ctx.arc(centerX, y + 22, 14, Math.PI, 0, false); // Inner rounded area
-          ctx.lineTo(centerX + 14, y + 32);
+          ctx.arc(centerX - 10, y + 26, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
           
-          // Smaller inner waves
-          for (let i = 0; i < 3; i++) {
-            const waveX = centerX + 14 - (i * (28 / 3));
-            ctx.lineTo(waveX, y + 36);
-            ctx.lineTo(waveX - (28 / 3) / 2, y + 32);
+          // Right arm
+          ctx.beginPath();
+          ctx.arc(centerX + 10, y + 26, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          
+          // === LEGS (animated, humanoid legs) ===
+          ctx.fillStyle = colors.ninjaBody;
+          if (this.onGround && Math.abs(this.vx) > 0) {
+            // Walking animation - legs move alternately
+            const legOffset = frame % 2 === 0 ? 0 : 2;
+            
+            // Left leg
+            ctx.fillRect(centerX - 6 + legOffset, y + 32, 4, 12);
+            ctx.strokeRect(centerX - 6 + legOffset, y + 32, 4, 12);
+            
+            // Right leg
+            ctx.fillRect(centerX + 2 - legOffset, y + 32, 4, 12);
+            ctx.strokeRect(centerX + 2 - legOffset, y + 32, 4, 12);
+            
+            // Feet
+            ctx.fillRect(centerX - 6 + legOffset, y + 42, 6, 3);
+            ctx.strokeRect(centerX - 6 + legOffset, y + 42, 6, 3);
+            ctx.fillRect(centerX + 2 - legOffset, y + 42, 6, 3);
+            ctx.strokeRect(centerX + 2 - legOffset, y + 42, 6, 3);
+          } else {
+            // Standing pose
+            ctx.fillRect(centerX - 5, y + 32, 4, 12); // Left leg
+            ctx.strokeRect(centerX - 5, y + 32, 4, 12);
+            ctx.fillRect(centerX + 1, y + 32, 4, 12); // Right leg
+            ctx.strokeRect(centerX + 1, y + 32, 4, 12);
+            
+            // Feet
+            ctx.fillRect(centerX - 5, y + 42, 6, 3);
+            ctx.strokeRect(centerX - 5, y + 42, 6, 3);
+            ctx.fillRect(centerX + 1, y + 42, 6, 3);
+            ctx.strokeRect(centerX + 1, y + 42, 6, 3);
           }
           
-          ctx.lineTo(centerX - 14, y + 32);
-          ctx.closePath();
-          ctx.fill();
-          
-          // === EYES (large, cute white eyes) ===
+          // === EYES (large white eyes like reference) ===
           ctx.fillStyle = colors.ninjaEyes; // White
           ctx.beginPath();
-          ctx.arc(centerX - 6, y + 18, 4, 0, Math.PI * 2); // Left eye
-          ctx.arc(centerX + 6, y + 18, 4, 0, Math.PI * 2); // Right eye
+          ctx.arc(centerX - 3, y + 10, 2.5, 0, Math.PI * 2); // Left eye
+          ctx.arc(centerX + 3, y + 10, 2.5, 0, Math.PI * 2); // Right eye
           ctx.fill();
           
           // Eye outlines
           ctx.strokeStyle = colors.ninjaOutline;
-          ctx.lineWidth = 1;
+          ctx.lineWidth = 0.5;
           ctx.beginPath();
-          ctx.arc(centerX - 6, y + 18, 4, 0, Math.PI * 2);
-          ctx.arc(centerX + 6, y + 18, 4, 0, Math.PI * 2);
+          ctx.arc(centerX - 3, y + 10, 2.5, 0, Math.PI * 2);
+          ctx.arc(centerX + 3, y + 10, 2.5, 0, Math.PI * 2);
           ctx.stroke();
           
-          // Eye pupils (animated - look in direction of movement)
+          // Eye pupils
           ctx.fillStyle = colors.ninjaEyePupils;
-          const pupilOffsetX = this.direction > 0 ? 0.5 : -0.5;
           ctx.beginPath();
-          ctx.arc(centerX - 6 + pupilOffsetX, y + 18, 1.5, 0, Math.PI * 2); // Left pupil
-          ctx.arc(centerX + 6 + pupilOffsetX, y + 18, 1.5, 0, Math.PI * 2); // Right pupil
+          ctx.arc(centerX - 3, y + 10, 1, 0, Math.PI * 2); // Left pupil
+          ctx.arc(centerX + 3, y + 10, 1, 0, Math.PI * 2); // Right pupil
           ctx.fill();
           
-          // === SIMPLE NINJA FEATURES ===
-          // Small ninja mouth (optional, simple line)
-          if (this.onGround) {
-            ctx.strokeStyle = colors.ninjaBodyDark;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(centerX, y + 24, 2, 0, Math.PI); // Small smile
-            ctx.stroke();
-          }
-          
-          // Tiny ninja details on the body
-          ctx.fillStyle = colors.ninjaBodyDark;
-          // Small belt/sash indicator
-          ctx.fillRect(centerX - 8, y + 28, 16, 1);
-          
-          // Small floating animation if in air
-          if (!this.onGround) {
-            // Add slight glow effect when jumping (like the reference ninja)
-            ctx.shadowColor = colors.ninjaMask;
-            ctx.shadowBlur = 4;
-            ctx.fillStyle = colors.ninjaMask;
-            ctx.globalAlpha = 0.3;
-            ctx.beginPath();
-            ctx.arc(centerX, y + 20, 20, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.globalAlpha = 1;
-            ctx.shadowBlur = 0;
-          }
+          // === NINJA DETAILS ===
+          // Chest detail (small ninja symbol or belt)
+          ctx.fillStyle = colors.ninjaBodyLight;
+          ctx.fillRect(centerX - 2, y + 24, 4, 2);
+          ctx.strokeRect(centerX - 2, y + 24, 4, 2);
 
           ctx.restore();
         }
