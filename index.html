@@ -57,60 +57,54 @@
       left: 0;
       right: 0;
       z-index: 50;
-      background: rgba(0, 0, 0, 0.95);
+      background: rgba(34, 40, 56, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(0);
+    }
+
+    .nav.scrolled {
+      background: rgba(34, 40, 56, 0.95);
       backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav.hidden {
+      transform: translateY(-100%);
+    }
+
+    .nav.hidden:hover {
+      transform: translateY(0);
     }
 
     .nav-content {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
+      padding: 1rem;
+      transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav.scrolled .nav-content {
+      padding: 0.75rem 1rem;
     }
 
     .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
       font-size: 1.5rem;
       font-weight: bold;
-      color: var(--foreground);
-      text-decoration: none;
+      color: var(--primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .nav-logo::before {
-      content: '';
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, #FFD700, #FFA500);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .nav.scrolled .nav-logo {
       font-size: 1.25rem;
-      font-weight: bold;
-      color: #000;
-      position: relative;
-    }
-
-    .nav-logo::after {
-      content: 'S';
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #000;
     }
 
     .nav-links {
       display: flex;
-      gap: 3rem;
+      gap: 2rem;
       align-items: center;
     }
 
@@ -119,52 +113,36 @@
       border: none;
       color: var(--foreground);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       font-size: 1rem;
-      font-weight: 500;
-      text-decoration: none;
-      position: relative;
-      padding: 0.5rem 0;
     }
 
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: #FFD700;
-      transition: width 0.3s ease;
+    .nav.scrolled .nav-link {
+      font-size: 0.9rem;
     }
 
     .nav-link:hover {
-      color: #FFD700;
-    }
-
-    .nav-link:hover::after {
-      width: 100%;
+      color: var(--primary);
     }
 
     .nav-button {
-      background: linear-gradient(135deg, #FFD700, #FFA500);
-      color: #000;
+      background: var(--primary);
+      color: var(--primary-foreground);
       border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 25px;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
       cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 600;
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav.scrolled .nav-button {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
     }
 
     .nav-button:hover {
-      background: linear-gradient(135deg, #FFA500, #FFD700);
-      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
-      transform: translateY(-2px);
+      background: hsl(188, 95%, 45%);
+      box-shadow: 0 0 30px hsla(188, 95%, 50%, 0.5);
     }
 
     .mobile-menu-button {
@@ -173,33 +151,26 @@
       border: none;
       color: var(--foreground);
       cursor: pointer;
-      padding: 0.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav.scrolled .mobile-menu-button {
+      transform: scale(0.9);
     }
 
     .mobile-nav {
       display: none;
       flex-direction: column;
       gap: 1rem;
-      padding: 2rem;
-      background: rgba(0, 0, 0, 0.98);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+      background: rgba(34, 40, 56, 0.95);
+      backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .mobile-nav.open {
       display: flex;
-    }
-
-    .mobile-nav .nav-link {
-      padding: 1rem 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      text-align: center;
-      font-size: 1.1rem;
-    }
-
-    .mobile-nav .nav-button {
-      margin-top: 1rem;
-      align-self: center;
-      width: 200px;
     }
 
     /* Hero Section */
@@ -723,68 +694,6 @@
       mix-blend-mode: screen;
     }
 
-    /* Scroll Animations */
-    .scroll-reveal {
-      opacity: 0;
-      transform: translateY(60px);
-      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .scroll-reveal.revealed {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .scroll-reveal-left {
-      opacity: 0;
-      transform: translateX(-60px);
-      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .scroll-reveal-left.revealed {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .scroll-reveal-right {
-      opacity: 0;
-      transform: translateX(60px);
-      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .scroll-reveal-right.revealed {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .scroll-reveal-scale {
-      opacity: 0;
-      transform: scale(0.8);
-      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .scroll-reveal-scale.revealed {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .scroll-reveal-fade {
-      opacity: 0;
-      transition: opacity 1s ease-out;
-    }
-
-    .scroll-reveal-fade.revealed {
-      opacity: 1;
-    }
-
-    /* Staggered animation delays */
-    .scroll-reveal:nth-child(1) { transition-delay: 0.1s; }
-    .scroll-reveal:nth-child(2) { transition-delay: 0.2s; }
-    .scroll-reveal:nth-child(3) { transition-delay: 0.3s; }
-    .scroll-reveal:nth-child(4) { transition-delay: 0.4s; }
-    .scroll-reveal:nth-child(5) { transition-delay: 0.5s; }
-    .scroll-reveal:nth-child(6) { transition-delay: 0.6s; }
-
     /* Animations */
     @keyframes fadeIn {
       from {
@@ -824,30 +733,12 @@
 
     /* Responsive Design */
     @media (max-width: 768px) {
-      .nav-content {
-        padding: 0 1rem;
-      }
-
       .nav-links {
         display: none;
       }
 
       .mobile-menu-button {
         display: block;
-      }
-
-      .nav-logo {
-        font-size: 1.25rem;
-      }
-
-      .nav-logo::before {
-        width: 35px;
-        height: 35px;
-      }
-
-      .nav-logo::after {
-        left: 12px;
-        font-size: 1.1rem;
       }
 
       .hero-buttons {
@@ -2158,15 +2049,15 @@
 
   <!-- Navigation -->
   <nav class="nav">
-    <div class="nav-content">
-      <a href="#" class="nav-logo">SnapFolio</a>
+    <div class="container nav-content">
+      <div class="nav-logo">GameDev</div>
 
       <div class="nav-links">
-        <a href="#" class="nav-link" onclick="scrollToSection('hero')">Home</a>
-        <a href="#" class="nav-link" onclick="scrollToSection('about')">About</a>
-        <a href="#" class="nav-link" onclick="scrollToSection('projects')">Services</a>
-        <a href="#" class="nav-link" onclick="scrollToSection('skills')">Portfolio</a>
-        <button class="nav-button" onclick="scrollToSection('contact')">Contact Us</button>
+        <button class="nav-link" onclick="scrollToSection('about')">About</button>
+        <button class="nav-link" onclick="scrollToSection('projects')">Projects</button>
+        <button class="nav-link" onclick="scrollToSection('skills')">Skills</button>
+        <button class="nav-link" onclick="scrollToSection('contact')">Contact</button>
+        <button class="nav-button" onclick="scrollToSection('contact')">Get In Touch</button>
       </div>
 
       <button class="mobile-menu-button" onclick="toggleMobileMenu()">
@@ -2179,11 +2070,10 @@
     </div>
 
     <div id="mobileNav" class="mobile-nav">
-      <a href="#" class="nav-link" onclick="scrollToSection('hero')">Home</a>
-      <a href="#" class="nav-link" onclick="scrollToSection('about')">About</a>
-      <a href="#" class="nav-link" onclick="scrollToSection('projects')">Services</a>
-      <a href="#" class="nav-link" onclick="scrollToSection('skills')">Portfolio</a>
-      <button class="nav-button" onclick="scrollToSection('contact')">Contact Us</button>
+      <button class="nav-link" onclick="scrollToSection('about')">About</button>
+      <button class="nav-link" onclick="scrollToSection('projects')">Projects</button>
+      <button class="nav-link" onclick="scrollToSection('skills')">Skills</button>
+      <button class="nav-link" onclick="scrollToSection('contact')">Contact</button>
     </div>
   </nav>
 
@@ -2247,17 +2137,17 @@
   <!-- About Section -->
   <section id="about" class="section">
     <div class="container">
-      <h2 class="section-title scroll-reveal">
+      <h2 class="section-title">
         About <span class="primary">Me</span>
       </h2>
 
       <div class="about-content">
-        <div class="about-image scroll-reveal-left">
+        <div class="about-image">
           <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"
             alt="Profile" class="profile-image">
         </div>
 
-        <div class="scroll-reveal-right">
+        <div>
           <p class="about-text">
             I'm a passionate game developer with expertise in creating immersive 3D experiences—from
             detailed modeling and fluid animation to fully playable, engaging games.
@@ -2271,7 +2161,7 @@
       </div>
 
       <div class="grid grid-3">
-        <div class="card scroll-reveal">
+        <div class="card">
           <div class="skill-card-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
               <path d="M2 12C2 12 7 7 12 7s10 5 10 5-5 5-10 5S2 12 2 12z" />
@@ -2283,7 +2173,7 @@
             systems.</p>
         </div>
 
-        <div class="card scroll-reveal">
+        <div class="card">
           <div class="skill-card-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -2294,7 +2184,7 @@
             animations.</p>
         </div>
 
-        <div class="card scroll-reveal">
+        <div class="card">
           <div class="skill-card-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -2312,11 +2202,11 @@
   <!-- Projects Section -->
   <section id="projects" class="section section-alt">
     <div class="container">
-      <h2 class="section-title scroll-reveal">
+      <h2 class="section-title">
         Featured <span class="primary">Projects</span>
       </h2>
 
-      <div class="project-filters scroll-reveal-fade">
+      <div class="project-filters">
         <button class="filter-button active" onclick="filterProjects('All')">All</button>
         <button class="filter-button" onclick="filterProjects('Games')">Games</button>
         <button class="filter-button" onclick="filterProjects('3D Models')">3D Models</button>
@@ -2403,12 +2293,12 @@
   <!-- Skills Section -->
   <section id="skills" class="section">
     <div class="container">
-      <h2 class="section-title scroll-reveal">
+      <h2 class="section-title">
         Technical <span class="primary">Skills</span>
       </h2>
 
       <div class="grid grid-2 mb-12">
-        <div class="card scroll-reveal">
+        <div class="card">
           <h3 class="text-2xl font-bold mb-6">Game Engines</h3>
           <div class="skill-progress">
             <div class="skill-header">
@@ -2439,7 +2329,7 @@
           </div>
         </div>
 
-        <div class="card scroll-reveal">
+        <div class="card">
           <h3 class="text-2xl font-bold mb-6">3D Software</h3>
           <div class="skill-progress">
             <div class="skill-header">
@@ -2470,7 +2360,7 @@
           </div>
         </div>
 
-        <div class="card scroll-reveal">
+        <div class="card">
           <h3 class="text-2xl font-bold mb-6">Programming</h3>
           <div class="skill-progress">
             <div class="skill-header">
@@ -2501,7 +2391,7 @@
           </div>
         </div>
 
-        <div class="card scroll-reveal">
+        <div class="card">
           <h3 class="text-2xl font-bold mb-6">Design</h3>
           <div class="skill-progress">
             <div class="skill-header">
@@ -2533,7 +2423,7 @@
         </div>
       </div>
 
-      <div class="text-center scroll-reveal">
+      <div class="text-center">
         <h3 class="text-2xl font-bold mb-8">Additional Tools & Technologies</h3>
         <div class="tools-grid">
           <span class="tool-tag">Git</span>
@@ -2556,14 +2446,14 @@
   <!-- Contact Section -->
   <section id="contact" class="section">
     <div class="container">
-      <div class="text-center mb-12 scroll-reveal">
+      <div class="text-center mb-12">
         <h2 class="section-title">
           Get In <span class="primary relative">Touch</span>
         </h2>
       </div>
 
       <div class="contact-content">
-        <div class="scroll-reveal-left">
+        <div>
           <div class="mb-8">
             <h3 class="text-2xl font-bold mb-4">Let's Create Something Amazing</h3>
             <p class="text-lg" style="color: var(--muted-foreground);">
@@ -2627,7 +2517,7 @@
           </div>
         </div>
 
-        <div class="contact-form scroll-reveal-right">
+        <div class="contact-form">
           <form onsubmit="handleFormSubmit(event)">
             <div class="form-group">
               <label for="name" class="form-label">Name</label>
@@ -3291,6 +3181,46 @@ void ACutsceneManager::PlayCutscene()
         closeMobileMenu();
       }
     }
+
+    // Header scroll animation
+    let lastScrollTop = 0;
+    let scrollTimeout;
+    
+    function handleNavScroll() {
+      const nav = document.querySelector('.nav');
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Add scrolled class when scrolled down
+      if (currentScroll > 50) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+      
+      // Hide/show nav based on scroll direction
+      if (currentScroll > lastScrollTop && currentScroll > 100) {
+        // Scrolling down
+        nav.classList.add('hidden');
+      } else {
+        // Scrolling up
+        nav.classList.remove('hidden');
+      }
+      
+      lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+    }
+    
+    // Throttled scroll listener for better performance
+    window.addEventListener('scroll', () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      scrollTimeout = setTimeout(handleNavScroll, 10);
+    });
+
+    // Initialize nav on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      handleNavScroll();
+    });
 
     // Mobile menu toggle
     function toggleMobileMenu() {
@@ -4893,47 +4823,6 @@ void ACutsceneManager::PlayCutscene()
       initPlatformGame();
       initMouseTrail();
 
-      // Initialize scroll animations
-      const initScrollAnimations = () => {
-        const scrollElements = document.querySelectorAll('.scroll-reveal, .scroll-reveal-left, .scroll-reveal-right, .scroll-reveal-scale, .scroll-reveal-fade');
-        
-        const observerOptions = {
-          threshold: 0.1,
-          rootMargin: '0px 0px -50px 0px'
-        };
-
-        const scrollObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('revealed');
-            }
-          });
-        }, observerOptions);
-
-        scrollElements.forEach(element => {
-          scrollObserver.observe(element);
-        });
-
-        // Add scroll animations to project cards when they're loaded
-        const observeProjectCards = () => {
-          const projectCards = document.querySelectorAll('.project-card');
-          projectCards.forEach((card, index) => {
-            card.classList.add('scroll-reveal');
-            card.style.transitionDelay = `${index * 0.1}s`;
-            scrollObserver.observe(card);
-          });
-        };
-
-        // Watch for project cards to be added
-        const projectGrid = document.getElementById('projectsGrid');
-        if (projectGrid) {
-          const gridObserver = new MutationObserver(() => {
-            observeProjectCards();
-          });
-          gridObserver.observe(projectGrid, { childList: true });
-        }
-      };
-
       // Animate progress bars when they come into view
       const observeProgressBars = () => {
         const progressBars = document.querySelectorAll('.progress-fill');
@@ -4948,8 +4837,6 @@ void ACutsceneManager::PlayCutscene()
         progressBars.forEach(bar => observer.observe(bar));
       };
 
-      // Initialize animations
-      initScrollAnimations();
       observeProgressBars();
     });
   </script>
