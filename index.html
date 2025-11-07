@@ -723,6 +723,68 @@
       mix-blend-mode: screen;
     }
 
+    /* Scroll Animations */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(60px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scroll-reveal-left {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .scroll-reveal-left.revealed {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .scroll-reveal-right {
+      opacity: 0;
+      transform: translateX(60px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .scroll-reveal-right.revealed {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .scroll-reveal-scale {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .scroll-reveal-scale.revealed {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .scroll-reveal-fade {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
+
+    .scroll-reveal-fade.revealed {
+      opacity: 1;
+    }
+
+    /* Staggered animation delays */
+    .scroll-reveal:nth-child(1) { transition-delay: 0.1s; }
+    .scroll-reveal:nth-child(2) { transition-delay: 0.2s; }
+    .scroll-reveal:nth-child(3) { transition-delay: 0.3s; }
+    .scroll-reveal:nth-child(4) { transition-delay: 0.4s; }
+    .scroll-reveal:nth-child(5) { transition-delay: 0.5s; }
+    .scroll-reveal:nth-child(6) { transition-delay: 0.6s; }
+
     /* Animations */
     @keyframes fadeIn {
       from {
@@ -2185,17 +2247,17 @@
   <!-- About Section -->
   <section id="about" class="section">
     <div class="container">
-      <h2 class="section-title">
+      <h2 class="section-title scroll-reveal">
         About <span class="primary">Me</span>
       </h2>
 
       <div class="about-content">
-        <div class="about-image">
+        <div class="about-image scroll-reveal-left">
           <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"
             alt="Profile" class="profile-image">
         </div>
 
-        <div>
+        <div class="scroll-reveal-right">
           <p class="about-text">
             I'm a passionate game developer with expertise in creating immersive 3D experiences—from
             detailed modeling and fluid animation to fully playable, engaging games.
@@ -2209,7 +2271,7 @@
       </div>
 
       <div class="grid grid-3">
-        <div class="card">
+        <div class="card scroll-reveal">
           <div class="skill-card-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
               <path d="M2 12C2 12 7 7 12 7s10 5 10 5-5 5-10 5S2 12 2 12z" />
@@ -2221,7 +2283,7 @@
             systems.</p>
         </div>
 
-        <div class="card">
+        <div class="card scroll-reveal">
           <div class="skill-card-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -2232,7 +2294,7 @@
             animations.</p>
         </div>
 
-        <div class="card">
+        <div class="card scroll-reveal">
           <div class="skill-card-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -2250,11 +2312,11 @@
   <!-- Projects Section -->
   <section id="projects" class="section section-alt">
     <div class="container">
-      <h2 class="section-title">
+      <h2 class="section-title scroll-reveal">
         Featured <span class="primary">Projects</span>
       </h2>
 
-      <div class="project-filters">
+      <div class="project-filters scroll-reveal-fade">
         <button class="filter-button active" onclick="filterProjects('All')">All</button>
         <button class="filter-button" onclick="filterProjects('Games')">Games</button>
         <button class="filter-button" onclick="filterProjects('3D Models')">3D Models</button>
@@ -2341,12 +2403,12 @@
   <!-- Skills Section -->
   <section id="skills" class="section">
     <div class="container">
-      <h2 class="section-title">
+      <h2 class="section-title scroll-reveal">
         Technical <span class="primary">Skills</span>
       </h2>
 
       <div class="grid grid-2 mb-12">
-        <div class="card">
+        <div class="card scroll-reveal">
           <h3 class="text-2xl font-bold mb-6">Game Engines</h3>
           <div class="skill-progress">
             <div class="skill-header">
@@ -2377,7 +2439,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card scroll-reveal">
           <h3 class="text-2xl font-bold mb-6">3D Software</h3>
           <div class="skill-progress">
             <div class="skill-header">
@@ -2408,7 +2470,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card scroll-reveal">
           <h3 class="text-2xl font-bold mb-6">Programming</h3>
           <div class="skill-progress">
             <div class="skill-header">
@@ -2439,7 +2501,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card scroll-reveal">
           <h3 class="text-2xl font-bold mb-6">Design</h3>
           <div class="skill-progress">
             <div class="skill-header">
@@ -2471,7 +2533,7 @@
         </div>
       </div>
 
-      <div class="text-center">
+      <div class="text-center scroll-reveal">
         <h3 class="text-2xl font-bold mb-8">Additional Tools & Technologies</h3>
         <div class="tools-grid">
           <span class="tool-tag">Git</span>
@@ -2494,14 +2556,14 @@
   <!-- Contact Section -->
   <section id="contact" class="section">
     <div class="container">
-      <div class="text-center mb-12">
+      <div class="text-center mb-12 scroll-reveal">
         <h2 class="section-title">
           Get In <span class="primary relative">Touch</span>
         </h2>
       </div>
 
       <div class="contact-content">
-        <div>
+        <div class="scroll-reveal-left">
           <div class="mb-8">
             <h3 class="text-2xl font-bold mb-4">Let's Create Something Amazing</h3>
             <p class="text-lg" style="color: var(--muted-foreground);">
@@ -2565,7 +2627,7 @@
           </div>
         </div>
 
-        <div class="contact-form">
+        <div class="contact-form scroll-reveal-right">
           <form onsubmit="handleFormSubmit(event)">
             <div class="form-group">
               <label for="name" class="form-label">Name</label>
@@ -4831,6 +4893,47 @@ void ACutsceneManager::PlayCutscene()
       initPlatformGame();
       initMouseTrail();
 
+      // Initialize scroll animations
+      const initScrollAnimations = () => {
+        const scrollElements = document.querySelectorAll('.scroll-reveal, .scroll-reveal-left, .scroll-reveal-right, .scroll-reveal-scale, .scroll-reveal-fade');
+        
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        };
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+            }
+          });
+        }, observerOptions);
+
+        scrollElements.forEach(element => {
+          scrollObserver.observe(element);
+        });
+
+        // Add scroll animations to project cards when they're loaded
+        const observeProjectCards = () => {
+          const projectCards = document.querySelectorAll('.project-card');
+          projectCards.forEach((card, index) => {
+            card.classList.add('scroll-reveal');
+            card.style.transitionDelay = `${index * 0.1}s`;
+            scrollObserver.observe(card);
+          });
+        };
+
+        // Watch for project cards to be added
+        const projectGrid = document.getElementById('projectsGrid');
+        if (projectGrid) {
+          const gridObserver = new MutationObserver(() => {
+            observeProjectCards();
+          });
+          gridObserver.observe(projectGrid, { childList: true });
+        }
+      };
+
       // Animate progress bars when they come into view
       const observeProgressBars = () => {
         const progressBars = document.querySelectorAll('.progress-fill');
@@ -4845,6 +4948,8 @@ void ACutsceneManager::PlayCutscene()
         progressBars.forEach(bar => observer.observe(bar));
       };
 
+      // Initialize animations
+      initScrollAnimations();
       observeProgressBars();
     });
   </script>
