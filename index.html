@@ -71,13 +71,7 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
-    .nav.hidden {
-      transform: translateY(-100%);
-    }
 
-    .nav.hidden:hover {
-      transform: translateY(0);
-    }
 
     .nav-content {
       display: flex;
@@ -3183,30 +3177,21 @@ void ACutsceneManager::PlayCutscene()
     }
 
     // Header scroll animation
-    let lastScrollTop = 0;
     let scrollTimeout;
     
     function handleNavScroll() {
       const nav = document.querySelector('.nav');
       const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
       
-      // Add scrolled class when scrolled down
+      // Add scrolled class when scrolled down (minimizes the header)
       if (currentScroll > 50) {
         nav.classList.add('scrolled');
       } else {
         nav.classList.remove('scrolled');
       }
       
-      // Hide/show nav based on scroll direction
-      if (currentScroll > lastScrollTop && currentScroll > 100) {
-        // Scrolling down
-        nav.classList.add('hidden');
-      } else {
-        // Scrolling up
-        nav.classList.remove('hidden');
-      }
-      
-      lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+      // Remove the hidden class logic - header should always stay visible
+      nav.classList.remove('hidden');
     }
     
     // Throttled scroll listener for better performance
