@@ -2616,132 +2616,43 @@
   <script>
     // Projects data
     const projects = [
+      // 3D Models
       {
         id: 1,
-        title: "Fantasy RPG Adventure",
-        description: "Open-world RPG with dynamic combat system and quest mechanics.",
-        category: "Games",
-        image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80",
-        tags: ["Unity", "C#", "Blender"],
-        fullDescription: "An immersive open-world RPG featuring a dynamic combat system, branching questlines, and rich character development. Players explore a vast fantasy world filled with ancient mysteries, dangerous creatures, and epic adventures. The game features real-time combat with magical abilities, crafting systems, and multiple storyline paths that respond to player choices.",
+        title: "Door Console",
+        description: "Detailed 3D model of a futuristic door console with interactive elements.",
+        category: "3D Models",
+        image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80",
+        tags: ["Blender", "3D Modeling"],
+        fullDescription: "A highly detailed futuristic door console featuring interactive buttons, displays, and mechanical components. Perfect for sci-fi environments and game assets.",
         features: [
-          "Dynamic real-time combat system with combo attacks",
-          "Open-world exploration with 50+ unique locations",
-          "Character progression with multiple skill trees",
-          "Crafting system with 200+ recipes",
-          "Branching storylines with multiple endings",
-          "Co-op multiplayer support for up to 4 players"
+          "High-poly detailed modeling",
+          "PBR materials and textures",
+          "Modular component design",
+          "Game-ready optimization",
+          "Multiple texture variants"
         ],
         images: [
-          "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80",
-          "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&q=80",
-          "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80"
+          "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80"
         ],
-        code: [
-          {
-            language: "C#",
-            title: "Player Controller",
-            content: `public class PlayerController : MonoBehaviour
-{
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float jumpForce = 10f;
-    private Rigidbody rb;
-    private bool isGrounded;
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-    }
-
-    void Update()
-    {
-        HandleMovement();
-        HandleJump();
-    }
-
-    private void HandleMovement()
-    {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-        
-        Vector3 movement = new Vector3(horizontal, 0, vertical) * moveSpeed;
-        rb.velocity = new Vector3(movement.x, rb.velocity.y, movement.z);
-    }
-
-    private void HandleJump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
-    }
-}`
-          },
-          {
-            language: "C#",
-            title: "Combat System",
-            content: `public class CombatSystem : MonoBehaviour
-{
-    [SerializeField] private int maxHealth = 100;
-    [SerializeField] private int currentHealth;
-    [SerializeField] private int attackDamage = 25;
-    
-    public UnityEvent OnHealthChanged;
-    public UnityEvent OnDeath;
-
-    void Start()
-    {
-        currentHealth = maxHealth;
-    }
-
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        
-        OnHealthChanged.Invoke();
-        
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    public void Attack(GameObject target)
-    {
-        CombatSystem targetCombat = target.GetComponent<CombatSystem>();
-        if (targetCombat != null)
-        {
-            targetCombat.TakeDamage(attackDamage);
-        }
-    }
-
-    private void Die()
-    {
-        OnDeath.Invoke();
-        // Handle death logic
-    }
-}`
-          }
-        ],
-        liveDemo: "https://example.com/rpg-demo",
-        sourceCode: "https://github.com/example/fantasy-rpg"
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
       },
       {
         id: 2,
-        title: "Sci-Fi Character Model",
-        description: "High-poly futuristic character with PBR textures and rigging.",
+        title: "Cooking Environment",
+        description: "Complete 3D kitchen environment with detailed appliances and utensils.",
         category: "3D Models",
-        image: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&q=80",
-        tags: ["Blender", "Substance Painter"],
-        fullDescription: "A highly detailed sci-fi character model created for next-gen game engines. Features advanced PBR materials, detailed facial rigging for animations, and modular armor components. The character is optimized for real-time rendering while maintaining high visual fidelity.",
+        image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
+        tags: ["Blender", "Environment Design"],
+        fullDescription: "A fully realized kitchen environment featuring modern appliances, detailed textures, and realistic lighting setup. Includes all necessary props for cooking scenes.",
         features: [
-          "High-poly base mesh with clean topology",
-          "PBR textures at 4K resolution",
-          "Facial rigging with 50+ blend shapes",
-          "Modular armor system with 12 variants",
-          "LOD models for performance optimization",
-          "Compatible with Unity and Unreal Engine"
+          "Complete kitchen environment",
+          "Realistic appliance models",
+          "Detailed prop collection",
+          "Optimized for real-time rendering",
+          "Modular asset system"
         ],
         images: [
           "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800&q=80",
@@ -3235,8 +3146,316 @@ void ACutsceneManager::PlayCutscene()
 }`
           }
         ],
-        liveDemo: "https://youtube.com/watch?v=example",
-        sourceCode: "https://github.com/example/cinematic-cutscene"
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 3,
+        title: "Chef Character",
+        description: "Stylized chef character model with professional attire and accessories.",
+        category: "3D Models",
+        image: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&q=80",
+        tags: ["Blender", "Character Modeling"],
+        fullDescription: "A charming chef character model featuring traditional chef attire, detailed facial features, and professional cooking accessories.",
+        features: [
+          "Stylized character design",
+          "Professional chef attire",
+          "Facial rigging ready",
+          "Multiple pose variations",
+          "High-quality textures"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 4,
+        title: "Weapon",
+        description: "Detailed weapon model with realistic materials and wear patterns.",
+        category: "3D Models",
+        image: "https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=800&q=80",
+        tags: ["Blender", "Weapon Design"],
+        fullDescription: "A meticulously crafted weapon model featuring realistic wear patterns, detailed materials, and game-ready topology.",
+        features: [
+          "Realistic weapon design",
+          "Detailed wear and damage",
+          "PBR material workflow",
+          "Multiple LOD versions",
+          "Animation-ready rigging"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 5,
+        title: "Washing Machine",
+        description: "Modern washing machine 3D model with detailed internals and materials.",
+        category: "3D Models",
+        image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&q=80",
+        tags: ["Blender", "Product Design"],
+        fullDescription: "A modern washing machine model with detailed internal components, realistic materials, and accurate proportions for architectural visualization.",
+        features: [
+          "Accurate product dimensions",
+          "Detailed internal components",
+          "Realistic material setup",
+          "Multiple brand variants",
+          "Animation-ready parts"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 6,
+        title: "Wall",
+        description: "Modular wall system with various textures and architectural details.",
+        category: "3D Models",
+        image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&q=80",
+        tags: ["Blender", "Architecture"],
+        fullDescription: "A versatile modular wall system featuring various architectural styles, textures, and detail elements for building environments.",
+        features: [
+          "Modular wall system",
+          "Multiple texture variants",
+          "Architectural detail elements",
+          "Seamless tiling patterns",
+          "Damage and wear options"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 7,
+        title: "Chess Piece",
+        description: "Elegant chess piece set with detailed craftsmanship and materials.",
+        category: "3D Models",
+        image: "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=800&q=80",
+        tags: ["Blender", "Product Design"],
+        fullDescription: "An elegant chess piece collection featuring traditional designs with modern materials and detailed craftsmanship.",
+        features: [
+          "Complete chess piece set",
+          "Traditional design elements",
+          "Premium material finishes",
+          "Multiple material variants",
+          "High-detail sculpting"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 8,
+        title: "Helicopter",
+        description: "Realistic helicopter animation with detailed rotor mechanics and flight dynamics.",
+        category: "Animations",
+        image: "https://images.unsplash.com/photo-1544620286-8ec9f1b6e19b?w=800&q=80",
+        tags: ["Blender", "Animation"],
+        fullDescription: "A realistic helicopter animation showcasing detailed rotor mechanics, flight dynamics, and aerial maneuvers with professional timing and physics.",
+        features: [
+          "Realistic rotor blade animation",
+          "Flight dynamics simulation",
+          "Detailed mechanical movements",
+          "Professional timing curves",
+          "Multiple flight sequences"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1544620286-8ec9f1b6e19b?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 9,
+        title: "Billiards",
+        description: "Physics-accurate billiards animation with realistic ball interactions.",
+        category: "Animations",
+        image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800&q=80",
+        tags: ["Blender", "Physics Animation"],
+        fullDescription: "A physics-accurate billiards animation featuring realistic ball interactions, table physics, and professional shot sequences.",
+        features: [
+          "Physics-based ball movement",
+          "Realistic collision system",
+          "Professional shot sequences",
+          "Accurate table physics",
+          "Multiple game scenarios"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 10,
+        title: "Set Drive Helicopter",
+        description: "Advanced helicopter animation using set-driven keys for complex mechanical systems.",
+        category: "Animations",
+        image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=800&q=80",
+        tags: ["Maya", "Set Driven Keys"],
+        fullDescription: "An advanced helicopter animation utilizing set-driven keys to create complex mechanical relationships between rotor systems and control surfaces.",
+        features: [
+          "Set-driven key automation",
+          "Complex mechanical relationships",
+          "Automated control systems",
+          "Realistic helicopter physics",
+          "Professional rigging setup"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 11,
+        title: "Minatamis",
+        description: "Sweet-themed mobile game with colorful graphics and engaging gameplay.",
+        category: "Games",
+        image: "https://images.unsplash.com/photo-1606313564200-e75d1b610418?w=800&q=80",
+        tags: ["Unity", "Mobile Game"],
+        fullDescription: "A delightful sweet-themed mobile game featuring colorful graphics, engaging match-3 mechanics, and progressive difficulty levels.",
+        features: [
+          "Colorful candy-themed graphics",
+          "Engaging match-3 gameplay",
+          "Progressive difficulty system",
+          "Mobile-optimized controls",
+          "Achievement system"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1606313564200-e75d1b610418?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 12,
+        title: "Tusok Tusok",
+        description: "Traditional Filipino game digitally recreated with modern gameplay elements.",
+        category: "Games",
+        image: "https://images.unsplash.com/photo-1556909114-54fb2617e5ce?w=800&q=80",
+        tags: ["Unity", "Cultural Game"],
+        fullDescription: "A digital recreation of the traditional Filipino game 'Tusok Tusok' featuring modern gameplay mechanics while preserving cultural authenticity.",
+        features: [
+          "Traditional Filipino gameplay",
+          "Cultural authenticity",
+          "Modern UI/UX design",
+          "Multiplayer support",
+          "Educational elements"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1556909114-54fb2617e5ce?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 13,
+        title: "Agent Snow",
+        description: "Stealth-action game featuring winter environments and tactical gameplay.",
+        category: "Games",
+        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80",
+        tags: ["Unity", "Stealth Action"],
+        fullDescription: "A stealth-action game set in winter environments where players control Agent Snow through tactical missions requiring strategy and precision.",
+        features: [
+          "Stealth-based gameplay mechanics",
+          "Winter environment settings",
+          "Tactical mission structure",
+          "Advanced AI systems",
+          "Multiple infiltration routes"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 14,
+        title: "Platformer",
+        description: "Classic 2D platformer with modern mechanics and level design.",
+        category: "Games",
+        image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80",
+        tags: ["Unity", "2D Platformer"],
+        fullDescription: "A classic 2D platformer featuring modern mechanics, creative level design, and smooth character controls with retro-inspired aesthetics.",
+        features: [
+          "Classic platformer mechanics",
+          "Modern level design",
+          "Smooth character controls",
+          "Retro-inspired graphics",
+          "Progressive difficulty curve"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 15,
+        title: "Space Shooter",
+        description: "Fast-paced space combat game with dynamic enemies and power-ups.",
+        category: "Games",
+        image: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80",
+        tags: ["Unity", "Arcade Shooter"],
+        fullDescription: "A fast-paced space combat game featuring dynamic enemy patterns, power-up systems, and increasing difficulty with retro arcade aesthetics.",
+        features: [
+          "Fast-paced arcade action",
+          "Dynamic enemy patterns",
+          "Power-up upgrade system",
+          "Retro space aesthetics",
+          "High score system"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
+      },
+      {
+        id: 16,
+        title: "Hangman",
+        description: "Digital word-guessing game with educational themes and multiplayer support.",
+        category: "Games",
+        image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=80",
+        tags: ["Unity", "Educational Game"],
+        fullDescription: "A digital implementation of the classic Hangman game featuring educational word categories, multiplayer support, and progressive difficulty levels.",
+        features: [
+          "Classic word-guessing gameplay",
+          "Educational word categories",
+          "Multiplayer support",
+          "Progressive difficulty",
+          "Learning achievements"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=80"
+        ],
+        code: [],
+        liveDemo: "#",
+        sourceCode: "#"
       }
     ];
 
