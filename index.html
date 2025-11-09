@@ -1598,6 +1598,26 @@
       opacity: 1;
     }
 
+    .project-detail-image::after {
+      content: '🔍 Click to enlarge';
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .project-detail-image:hover::after {
+      opacity: 1;
+    }
+
     .image-gallery {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -3797,8 +3817,11 @@ void ACutsceneManager::PlayCutscene()
       
       // Populate modal content
       document.getElementById('modalTitle').textContent = project.title;
-      document.getElementById('modalMainImage').src = project.image;
-      document.getElementById('modalMainImage').alt = project.title;
+      const mainImage = document.getElementById('modalMainImage');
+      mainImage.src = project.image;
+      mainImage.alt = project.title;
+      mainImage.onclick = () => openImagePreview(project.image);
+      mainImage.style.cursor = 'pointer';
       document.getElementById('modalDescription').textContent = project.fullDescription || project.description;
       
       // Update tags with staggered animation
