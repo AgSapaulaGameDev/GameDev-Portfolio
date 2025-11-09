@@ -1599,23 +1599,33 @@
     }
 
     .project-detail-image::after {
-      content: '🔍 Click to enlarge';
+      content: '�️ Click for full view';
       position: absolute;
       bottom: 1rem;
       right: 1rem;
-      background: rgba(0, 0, 0, 0.8);
+      background: linear-gradient(135deg, 
+        hsla(188, 95%, 50%, 0.9), 
+        hsla(188, 95%, 45%, 0.9)
+      );
       color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 2rem;
       font-size: 0.875rem;
+      font-weight: 600;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(15px);
+      border: 1px solid hsla(188, 95%, 50%, 0.3);
+      box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 20px hsla(188, 95%, 50%, 0.2);
+      transform: translateY(10px) scale(0.9);
     }
 
     .project-detail-image:hover::after {
       opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
     .image-gallery {
