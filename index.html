@@ -2771,7 +2771,65 @@
           "CE2.jpg",
           "CE3.jpg"
         ],
-        liveDemo: "https://sketchfab.com/3d-models/sci-fi-character"
+        code: [
+          {
+            language: "Python",
+            title: "Blender Automation Script",
+            content: `import bpy
+import bmesh
+
+def create_character_base():
+    # Clear existing mesh
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete(use_global=False)
+    
+    # Add base mesh
+    bpy.ops.mesh.primitive_cube_add()
+    obj = bpy.context.active_object
+    
+    # Enter edit mode and create base topology
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode='EDIT')
+    
+    # Subdivide for detail
+    bpy.ops.mesh.subdivide(number_cuts=3)
+    
+    # Apply subdivision surface modifier
+    bpy.ops.object.mode_set(mode='OBJECT')
+    modifier = obj.modifiers.new(name="SubSurf", type='SUBSURF')
+    modifier.levels = 2
+    
+    return obj
+
+def setup_materials():
+    # Create PBR material
+    mat = bpy.data.materials.new(name="CharacterMaterial")
+    mat.use_nodes = True
+    
+    # Get material nodes
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    
+    # Clear default nodes
+    nodes.clear()
+    
+    # Add Principled BSDF
+    bsdf = nodes.new(type='ShaderNodeBsdfPrincipled')
+    output = nodes.new(type='ShaderNodeOutputMaterial')
+    
+    # Link BSDF to output
+    links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
+    
+    return mat
+
+# Execute script
+character = create_character_base()
+material = setup_materials()
+character.data.materials.append(material)`
+          }
+        ],
+        liveDemo: "https://sketchfab.com/3d-models/sci-fi-character",
+        sourceCode: "https://github.com/example/sci-fi-character"
       },
       {
         id: 3,
@@ -3734,6 +3792,9 @@ void ACutsceneManager::PlayCutscene()
       // Mobile-specific handling
       const isMobile = window.innerWidth <= 768;
       
+      // Check if this is a 3D Models project
+      const is3DModel = project.category === '3D Models';
+      
       // Populate modal content
       document.getElementById('modalTitle').textContent = project.title;
       document.getElementById('modalMainImage').src = project.image;
@@ -3765,13 +3826,37 @@ void ACutsceneManager::PlayCutscene()
 
       // Update links
       document.getElementById('liveDemoLink').href = project.liveDemo || '#';
-      document.getElementById('sourceCodeLink').href = project.sourceCode || '#';
+      
+      // Hide/show source code button based on project category
+      const sourceCodeLink = document.getElementById('sourceCodeLink');
+      if (is3DModel) {
+        sourceCodeLink.style.display = 'none';
+      } else {
+        sourceCodeLink.style.display = 'flex';
+        sourceCodeLink.href = project.sourceCode || '#';
+      }
+
+      // Hide/show tabs based on project category
+      const videosTab = document.querySelector('button[onclick="switchTab(\'videos\')"]');
+      const codeTab = document.querySelector('button[onclick="switchTab(\'code\')"]');
+      
+      if (is3DModel) {
+        // Hide Video and Code tabs for 3D Models
+        videosTab.style.display = 'none';
+        codeTab.style.display = 'none';
+      } else {
+        // Show Video and Code tabs for other projects
+        videosTab.style.display = 'block';
+        codeTab.style.display = 'block';
+      }
 
       // Populate image gallery
       populateImageGallery(project.images || [project.image]);
       
-      // Populate code blocks
-      populateCodeBlocks(project.code || []);
+      // Populate code blocks (only if not 3D Model)
+      if (!is3DModel) {
+        populateCodeBlocks(project.code || []);
+      }
       
       // Show modal with enhanced animation
       const modal = document.getElementById('projectModal');
@@ -3805,6 +3890,15 @@ void ACutsceneManager::PlayCutscene()
         modal.classList.remove('active');
         document.body.style.overflow = 'auto';
         modalElement.style.transform = '';
+        
+        // Reset tab visibility for next modal open
+        const videosTab = document.querySelector('button[onclick="switchTab(\'videos\')"]');
+        const codeTab = document.querySelector('button[onclick="switchTab(\'code\')"]');
+        const sourceCodeLink = document.getElementById('sourceCodeLink');
+        
+        if (videosTab) videosTab.style.display = 'block';
+        if (codeTab) codeTab.style.display = 'block';
+        if (sourceCodeLink) sourceCodeLink.style.display = 'flex';
       }, 200);
     }
 
