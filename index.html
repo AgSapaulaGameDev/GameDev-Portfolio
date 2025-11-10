@@ -3641,7 +3641,464 @@ void ACutsceneManager::PlayCutscene()
           "SC5.jpg"
         ],
         video: '<iframe src="https://drive.google.com/file/d/1OYMA6OVAEcyxVo2HKiDgOlDomQONDaPu/preview" width="100%" height="400" allow="autoplay"></iframe>',
-        code: [],
+        code: [
+          {
+            language: "C#",
+            title: "Game1.cs - Main Game Class",
+            code: `using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
+
+namespace Space_Shooting_FINALS
+{
+    public class Game1 : Game
+    {
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+
+        private Player player;
+        private List<Enemy> enemies;
+        private List<Bullet> bullets;
+        private List<SpaceObject> spaceObjects;
+        private Boss boss;
+
+        private int playerScore;
+        private int playerLives;
+
+        public Game1()
+        {
+            graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            System.Diagnostics.Debug.WriteLine("Initialize started");
+
+            // Initialize player, enemies, bullets, space objects, etc.
+            player = new Player();
+            enemies = new List<Enemy>();
+            bullets = new List<Bullet>();
+            spaceObjects = new List<SpaceObject>();
+            boss = new Boss();
+
+            // Populate enemies and space objects
+            for (int i = 0; i < 10; i++)
+            {
+                enemies.Add(new Enemy());
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                spaceObjects.Add(new SpaceObject());
+            }
+
+            playerScore = 0;
+            playerLives = 3;
+
+            System.Diagnostics.Debug.WriteLine("Initialize completed");
+        }
+
+        protected override void LoadContent()
+        {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            System.Diagnostics.Debug.WriteLine("LoadContent started");
+
+            // Check if player is null before loading content
+            if (player == null)
+            {
+                System.Diagnostics.Debug.WriteLine("Player is null in LoadContent method");
+                return;
+            }
+
+            // Load player content
+            player.LoadContent(Content);
+
+            // Load content for enemies, space objects, and boss
+            foreach (var enemy in enemies)
+            {
+                enemy.LoadContent(Content);
+            }
+            foreach (var spaceObject in spaceObjects)
+            {
+                spaceObject.LoadContent(Content);
+            }
+            boss.LoadContent(Content);
+
+            System.Diagnostics.Debug.WriteLine("LoadContent completed");
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+
+            // Check if player is null before updating
+            if (player == null)
+            {
+                System.Diagnostics.Debug.WriteLine("Player is null in Update method");
+                return;
+            }
+
+            player.Update(gameTime);
+
+            foreach (var enemy in enemies)
+            {
+                enemy.Update(gameTime);
+            }
+
+            foreach (var spaceObject in spaceObjects)
+            {
+                spaceObject.Update(gameTime);
+            }
+
+            foreach (var bullet in bullets)
+            {
+                bullet.Update(gameTime);
+            }
+
+            bullets.RemoveAll(b => !b.IsActive);
+
+            boss.Update(gameTime);
+
+            CheckCollisions();
+
+            base.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            spriteBatch.Begin();
+
+            // Check if player is null before drawing
+            if (player != null)
+            {
+                player.Draw(spriteBatch);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Player is null in Draw method");
+            }
+
+            foreach (var enemy in enemies)
+            {
+                enemy.Draw(spriteBatch);
+            }
+            foreach (var spaceObject in spaceObjects)
+            {
+                spaceObject.Draw(spriteBatch);
+            }
+            boss.Draw(spriteBatch);
+
+            spriteBatch.DrawString(Content.Load<SpriteFont>("font"), "Score: " + playerScore, new Vector2(10, 10), Color.White);
+            spriteBatch.DrawString(Content.Load<SpriteFont>("font"), "Lives: " + playerLives, new Vector2(10, 30), Color.White);
+
+            spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+
+        private void CheckCollisions()
+        {
+            foreach (var bullet in bullets)
+            {
+                foreach (var enemy in enemies)
+                {
+                    if (bullet.BoundingBox.Intersects(enemy.BoundingBox))
+                    {
+                        bullet.IsActive = false;
+                        enemies.Remove(enemy);
+                        playerScore += 10;
+                        break;
+                    }
+                }
+
+                if (bullet.BoundingBox.Intersects(boss.BoundingBox))
+                {
+                    bullet.IsActive = false;
+                    boss.Health -= 10;
+                    if (boss.Health <= 0)
+                    {
+                        playerScore += 100;
+                        // Handle boss defeat
+                    }
+                }
+            }
+
+            foreach (var enemy in enemies)
+            {
+                if (player.BoundingBox.Intersects(enemy.BoundingBox))
+                {
+                    player.Health -= 10;
+                    enemies.Remove(enemy);
+                    if (player.Health <= 0)
+                    {
+                        // Handle player defeat
+                    }
+                }
+            }
+
+            if (player.BoundingBox.Intersects(boss.BoundingBox))
+            {
+                player.Health -= 50;
+                if (player.Health <= 0)
+                {
+                    // Handle player defeat
+                }
+            }
+        }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Player.cs - Player Character",
+            code: `using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
+namespace Space_Shooting_FINALS
+{
+    public class Player
+    {
+        public Texture2D Texture;
+        public Vector2 Position;
+        public float Speed;
+        public int Health;
+
+        public void LoadContent(ContentManager content)
+        {
+            Texture = content.Load<Texture2D>("playerTexture");
+            Position = new Vector2(400, 500); // Example starting position
+            Speed = 5f;
+            Health = 100;
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            // Handle player movement
+            KeyboardState state = Keyboard.GetState();
+            if (state.IsKeyDown(Keys.W))
+                Position.Y -= Speed;
+            if (state.IsKeyDown(Keys.S))
+                Position.Y += Speed;
+            if (state.IsKeyDown(Keys.A))
+                Position.X -= Speed;
+            if (state.IsKeyDown(Keys.D))
+                Position.X += Speed;
+
+            // Keep player within the screen bounds
+            Position.X = MathHelper.Clamp(Position.X, 0, 800 - Texture.Width);
+            Position.Y = MathHelper.Clamp(Position.Y, 0, 600 - Texture.Height);
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(Texture, Position, Color.White);
+        }
+
+        public Rectangle BoundingBox
+        {
+            get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
+        }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Enemy.cs - Enemy AI",
+            code: `using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+
+public class Enemy
+{
+    public Texture2D Texture;
+    public Vector2 Position;
+    public float Speed;
+
+    public void LoadContent(ContentManager content)
+    {
+        Texture = content.Load<Texture2D>("enemyTexture");
+        Position = new Vector2(400, 100); // Example starting position
+        Speed = 2f;
+    }
+
+    public void Update(GameTime gameTime)
+    {
+        // Handle enemy movement
+        Position.Y += Speed;
+
+        // Reset position if off screen
+        if (Position.Y > 600)
+            Position.Y = -Texture.Height;
+    }
+
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        spriteBatch.Draw(Texture, Position, Color.White);
+    }
+
+    public Rectangle BoundingBox
+    {
+        get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Boss.cs - Boss Enemy",
+            code: `using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+
+public class Boss
+{
+    public Texture2D Texture;
+    public Vector2 Position;
+    public float Speed;
+    public int Health;
+
+    public void LoadContent(ContentManager content)
+    {
+        Texture = content.Load<Texture2D>("bossTexture");
+        Position = new Vector2(400, 50); // Example starting position
+        Speed = 1f;
+        Health = 500;
+    }
+
+    public void Update(GameTime gameTime)
+    {
+        // Handle boss movement and behavior
+        // Example: move left and right
+        Position.X += Speed;
+        if (Position.X < 0 || Position.X > 800 - Texture.Width)
+            Speed = -Speed;
+    }
+
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        spriteBatch.Draw(Texture, Position, Color.White);
+    }
+
+    public Rectangle BoundingBox
+    {
+        get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Bullet.cs - Projectile System",
+            code: `using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+
+public class Bullet
+{
+    public Texture2D Texture;
+    public Vector2 Position;
+    public float Speed;
+    public bool IsActive { get; set; }
+
+    public void LoadContent(ContentManager content)
+    {
+        Texture = content.Load<Texture2D>("bulletTexture");
+        Speed = 10f;
+        IsActive = true;
+    }
+
+    public void Update(GameTime gameTime)
+    {
+        // Handle bullet movement
+        Position.Y -= Speed;
+
+        // Deactivate bullet if off screen
+        if (Position.Y < -Texture.Height)
+        {
+            IsActive = false;
+        }
+    }
+
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        if (IsActive)
+        {
+            spriteBatch.Draw(Texture, Position, Color.White);
+        }
+    }
+
+    public Rectangle BoundingBox
+    {
+        get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "SpaceObject.cs - Background Objects",
+            code: `using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+
+public class SpaceObject
+{
+    public Texture2D Texture;
+    public Vector2 Position;
+    public float Speed;
+
+    public void LoadContent(ContentManager content)
+    {
+        Texture = content.Load<Texture2D>("spaceObjectTexture");
+        Position = new Vector2(new System.Random().Next(0, 800), new System.Random().Next(0, 600)); // Random position
+        Speed = new System.Random().Next(1, 5); // Random speed
+    }
+
+    public void Update(GameTime gameTime)
+    {
+        // Handle space object movement
+        Position.Y += Speed;
+
+        // Reset position if off screen
+        if (Position.Y > 600)
+            Position.Y = -Texture.Height;
+    }
+
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        spriteBatch.Draw(Texture, Position, Color.White);
+    }
+
+    public Rectangle BoundingBox
+    {
+        get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Program.cs - Entry Point",
+            code: `using System;
+
+namespace Space_Shooting_FINALS // Ensure this matches your project namespace
+{
+    public static class Program
+    {
+        [STAThread]
+        static void Main()
+        {
+            using (var game = new Game1())
+                game.Run();
+        }
+    }
+}`
+          }
+        ],
         liveDemo: "#",
         sourceCode: "#"
       },
