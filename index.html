@@ -5724,6 +5724,269 @@ int main() {
         ],
         liveDemo: "#",
         sourceCode: "#"
+      },
+      {
+        id: 21,
+        title: "Lucid Dreams",
+        description: "An immersive dream exploration game where players navigate surreal landscapes and solve mind-bending puzzles.",
+        category: "Games",
+        image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80",
+        tags: ["Unity", "Puzzle", "Adventure", "Surreal"],
+        fullDescription: "Lucid Dreams is a captivating adventure puzzle game that takes players on a journey through the subconscious mind. Navigate through dreamlike environments filled with impossible architecture, floating islands, and morphing landscapes. Solve intricate puzzles that defy the laws of physics while uncovering the mysteries hidden within the dream world. The game features stunning visual effects, ambient soundscapes, and innovative gameplay mechanics that blur the line between reality and imagination.",
+        features: [
+          "Surreal dreamscape environments with impossible geometry",
+          "Mind-bending puzzles that challenge perception and logic",
+          "Dynamic weather and lighting systems",
+          "Ambient audio design creating an immersive atmosphere",
+          "Non-linear exploration with hidden secrets to discover",
+          "Unique gravity-defying mechanics and object manipulation"
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80",
+          "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+          "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80"
+        ],
+        video: `<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allow="autoplay" allowfullscreen></iframe>`,
+        code: [
+          {
+            language: "C#",
+            title: "DreamController.cs - Main Dream Navigation System",
+            content: `using UnityEngine;
+using System.Collections;
+
+public class DreamController : MonoBehaviour
+{
+    [Header("Dream Environment Settings")]
+    public Transform player;
+    public Transform[] dreamLayers;
+    public Material[] dreamMaterials;
+    public Light dreamLight;
+    
+    [Header("Physics Settings")]
+    public float gravityMultiplier = 0.5f;
+    public float floatForce = 10f;
+    
+    private bool isLucidMode = false;
+    private float timeInDream = 0f;
+    
+    void Start()
+    {
+        // Initialize dream physics
+        Physics.gravity *= gravityMultiplier;
+        StartCoroutine(DreamCycle());
+    }
+    
+    void Update()
+    {
+        timeInDream += Time.deltaTime;
+        UpdateDreamState();
+        HandleLucidMode();
+    }
+    
+    void UpdateDreamState()
+    {
+        // Cycle through dream materials for morphing effect
+        float cycleTime = Mathf.Sin(timeInDream * 0.1f);
+        
+        foreach (var layer in dreamLayers)
+        {
+            if (layer != null)
+            {
+                var renderer = layer.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    renderer.material.SetFloat("_TimeOffset", cycleTime);
+                }
+            }
+        }
+        
+        // Dynamic lighting changes
+        if (dreamLight != null)
+        {
+            dreamLight.intensity = Mathf.Lerp(0.5f, 2f, 
+                (Mathf.Sin(timeInDream * 0.05f) + 1f) / 2f);
+            
+            dreamLight.color = Color.Lerp(
+                Color.blue, Color.magenta,
+                (Mathf.Cos(timeInDream * 0.03f) + 1f) / 2f
+            );
+        }
+    }
+    
+    void HandleLucidMode()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            ToggleLucidMode();
+        }
+        
+        if (isLucidMode)
+        {
+            // Allow player to manipulate dream environment
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                
+                if (Physics.Raycast(ray, out hit))
+                {
+                    StartCoroutine(DreamObjectManipulation(hit.collider.gameObject));
+                }
+            }
+        }
+    }
+    
+    void ToggleLucidMode()
+    {
+        isLucidMode = !isLucidMode;
+        
+        if (isLucidMode)
+        {
+            Debug.Log("Lucid mode activated - Reality bends to your will");
+            Time.timeScale = 0.7f; // Slow down time
+        }
+        else
+        {
+            Debug.Log("Returning to normal dream state");
+            Time.timeScale = 1f;
+        }
+    }
+    
+    IEnumerator DreamCycle()
+    {
+        while (true)
+        {
+            // Random dream events
+            yield return new WaitForSeconds(Random.Range(10f, 30f));
+            TriggerDreamEvent();
+        }
+    }
+    
+    void TriggerDreamEvent()
+    {
+        int eventType = Random.Range(0, 3);
+        
+        switch (eventType)
+        {
+            case 0:
+                StartCoroutine(GravityShift());
+                break;
+            case 1:
+                StartCoroutine(EnvironmentMorph());
+                break;
+            case 2:
+                StartCoroutine(ColorFlash());
+                break;
+        }
+    }
+    
+    IEnumerator DreamObjectManipulation(GameObject obj)
+    {
+        Vector3 originalPos = obj.transform.position;
+        Vector3 targetPos = originalPos + Vector3.up * 5f;
+        
+        float duration = 2f;
+        float elapsed = 0f;
+        
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            obj.transform.position = Vector3.Lerp(originalPos, targetPos, 
+                Mathf.Sin(t * Mathf.PI));
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        obj.transform.position = originalPos;
+    }
+    
+    IEnumerator GravityShift()
+    {
+        Vector3 originalGravity = Physics.gravity;
+        Vector3 newGravity = new Vector3(
+            Random.Range(-10f, 10f),
+            Random.Range(-20f, 5f),
+            Random.Range(-10f, 10f)
+        );
+        
+        float duration = 5f;
+        float elapsed = 0f;
+        
+        while (elapsed < duration)
+        {
+            Physics.gravity = Vector3.Lerp(originalGravity, newGravity, 
+                Mathf.Sin((elapsed / duration) * Mathf.PI));
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        Physics.gravity = originalGravity;
+    }
+    
+    IEnumerator EnvironmentMorph()
+    {
+        foreach (var layer in dreamLayers)
+        {
+            if (layer != null)
+            {
+                StartCoroutine(MorphLayer(layer));
+            }
+        }
+        
+        yield return new WaitForSeconds(3f);
+    }
+    
+    IEnumerator MorphLayer(Transform layer)
+    {
+        Vector3 originalScale = layer.localScale;
+        Vector3 morphScale = originalScale * Random.Range(0.5f, 2f);
+        
+        float duration = 3f;
+        float elapsed = 0f;
+        
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            layer.localScale = Vector3.Lerp(originalScale, morphScale, 
+                Mathf.Sin(t * Mathf.PI));
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        layer.localScale = originalScale;
+    }
+    
+    IEnumerator ColorFlash()
+    {
+        Color originalColor = dreamLight.color;
+        Color flashColor = new Color(
+            Random.Range(0f, 1f),
+            Random.Range(0f, 1f),
+            Random.Range(0f, 1f)
+        );
+        
+        // Quick flash
+        dreamLight.color = flashColor;
+        yield return new WaitForSeconds(0.1f);
+        dreamLight.color = originalColor;
+    }
+    
+    void OnDrawGizmos()
+    {
+        if (isLucidMode)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(player.position, 10f);
+        }
+    }
+}`
+          }
+        ],
+        liveDemo: "#",
+        sourceCode: "#"
       }
     ];
 
