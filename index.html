@@ -3640,7 +3640,7 @@ namespace CardMatchingGame
         category: "Games",
         image: "M2.png",
         tags: ["Unity", "Simulation", "PC Game", "Filipino Culture"],
-        fullDescription: "MinaTamis is a Filipino-themed PC simulation game where players become local dessert vendors preparing and selling classic treats like hotcakes. Blending fun gameplay with cultural learning, it celebrates Filipino culinary heritage through interactive storytelling and immersive mechanics inspired by Cooking Simulator and Cooking Mama.",
+        fullDescription: "MinaTamis is a culturally inspired PC simulation game that celebrates traditional Filipino desserts. Players take on the role of a local vendor preparing and selling classic sweets such as hotcakes and other delicacies. Combining engaging gameplay with cultural learning, the game promotes appreciation of Filipino culinary heritage through interactive storytelling and immersive mechanics. Inspired by titles like Fast Food Simulator, Cooking Simulator, and Cooking Mama, MinaTamis balances fast-paced action with strategy and creativity in a vibrant street setting. The game also serves an educational purpose—enhancing engagement, critical thinking, and cultural awareness through play.",
         contribution: "Lead Developer - Responsible for game design, Unity implementation, cultural research, and educational content integration. Developed simulation mechanics, customer interaction systems, and authentic Filipino dessert preparation workflows.",
         features: [
           "Interactive Filipino dessert preparation and selling system",
@@ -6248,7 +6248,13 @@ public class DreamController : MonoBehaviour
       const contributionContainer = document.getElementById('modalContribution');
       if (project.contribution) {
         contributionContainer.style.display = 'block';
-        contributionContainer.querySelector('p').textContent = project.contribution;
+        // Bold the role titles in contribution text
+        let contributionText = project.contribution;
+        contributionText = contributionText.replace(/Lead Developer/g, '<strong>Lead Developer</strong>');
+        contributionText = contributionText.replace(/Solo Developer/g, '<strong>Solo Developer</strong>');
+        contributionText = contributionText.replace(/Game Designer & Developer/g, '<strong>Game Designer & Developer</strong>');
+        contributionText = contributionText.replace(/Solo project/g, '<strong>Solo project</strong>');
+        contributionContainer.querySelector('p').innerHTML = contributionText;
       } else {
         contributionContainer.style.display = 'none';
       }
