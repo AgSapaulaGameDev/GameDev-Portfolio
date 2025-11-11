@@ -4402,7 +4402,9 @@ namespace Space_Shooting_FINALS // Ensure this matches your project namespace
       
       // Hide/show source code button based on project category
       const sourceCodeLink = document.getElementById('sourceCodeLink');
-      if (is3DModel) {
+      const isAnimation = project.category === 'Animations';
+      
+      if (is3DModel || isAnimation) {
         sourceCodeLink.style.display = 'none';
       } else {
         sourceCodeLink.style.display = 'flex';
@@ -4413,14 +4415,14 @@ namespace Space_Shooting_FINALS // Ensure this matches your project namespace
       const videosTab = document.querySelector('button[onclick="switchTab(\'videos\')"]');
       const codeTab = document.querySelector('button[onclick="switchTab(\'code\')"]');
       
-      if (is3DModel) {
-        // Hide Video and Code tabs for 3D Models
-        videosTab.style.display = 'none';
-        codeTab.style.display = 'none';
+      if (is3DModel || isAnimation) {
+        // Hide Video and Code tabs for 3D Models and Animations
+        if (videosTab) videosTab.style.display = 'none';
+        if (codeTab) codeTab.style.display = 'none';
       } else {
         // Show Video and Code tabs for other projects
-        videosTab.style.display = 'block';
-        codeTab.style.display = 'block';
+        if (videosTab) videosTab.style.display = 'block';
+        if (codeTab) codeTab.style.display = 'block';
       }
 
       // Populate image gallery
@@ -4429,8 +4431,8 @@ namespace Space_Shooting_FINALS // Ensure this matches your project namespace
       // Populate video content
       populateVideoContent(project.video || '');
       
-      // Populate code blocks (only if not 3D Model)
-      if (!is3DModel) {
+      // Populate code blocks (only if not 3D Model or Animation)
+      if (!is3DModel && !isAnimation) {
         populateCodeBlocks(project.code || []);
       }
       
