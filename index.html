@@ -5747,7 +5747,7 @@ int main() {
         image: "LD2.jpg",
         tags: ["C#", "Unity", "Action"],
         fullDescription: "Lucid Dreams throws players into a wild, dreamlike world where logic doesn’t exist, and the most unexpected things can become enemies. Fight absurd objects like sentient appliances, explore chaotic dreamscapes, and survive ridiculous encounters in a physics-driven sandbox filled with humor and unpredictability. Every dream is a new story of chaos and laughter.",
-        contribution: "Lead Developer - Designed and implemented the dream world physics system, created comedic AI behaviors for household objects, developed ragdoll combat mechanics, built procedural dream event systems, and crafted the surreal visual style and interactive environments.",
+        contribution: "Game Designer - Created and designed the dream world environments, developed the surreal visual style, and crafted immersive, interactive settings that enhance the game’s comedic and chaotic atmosphere.",
         features: [
            "Dynamic ragdoll physics and comedic combat",
            "Surreal enemies like possessed household objects",
@@ -6248,12 +6248,12 @@ public class DreamController : MonoBehaviour
       const contributionContainer = document.getElementById('modalContribution');
       if (project.contribution) {
         contributionContainer.style.display = 'block';
-        // Bold the role titles in contribution text with white color and larger font
+        // Bold the role titles in contribution text with white color and smaller font
         let contributionText = project.contribution;
-        contributionText = contributionText.replace(/Lead Developer/g, '<strong style="color: white; font-size: 1.125rem;">Lead Developer</strong>');
-        contributionText = contributionText.replace(/Solo Developer/g, '<strong style="color: white; font-size: 1.125rem;">Solo Developer</strong>');
-        contributionText = contributionText.replace(/Game Designer & Developer/g, '<strong style="color: white; font-size: 1.125rem;">Game Designer & Developer</strong>');
-        contributionText = contributionText.replace(/Solo project/g, '<strong style="color: white; font-size: 1.125rem;">Solo project</strong>');
+        contributionText = contributionText.replace(/Lead Developer/g, '<strong style="color: white; font-size: 1rem;">Lead Developer</strong>');
+        contributionText = contributionText.replace(/Solo Developer/g, '<strong style="color: white; font-size: 1rem;">Solo Developer</strong>');
+        contributionText = contributionText.replace(/Game Designer & Developer/g, '<strong style="color: white; font-size: 1rem;">Game Designer & Developer</strong>');
+        contributionText = contributionText.replace(/Solo project/g, '<strong style="color: white; font-size: 1rem;">Solo project</strong>');
         contributionContainer.querySelector('p').innerHTML = contributionText;
       } else {
         contributionContainer.style.display = 'none';
