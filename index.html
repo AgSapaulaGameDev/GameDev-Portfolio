@@ -6248,12 +6248,12 @@ public class DreamController : MonoBehaviour
       const contributionContainer = document.getElementById('modalContribution');
       if (project.contribution) {
         contributionContainer.style.display = 'block';
-        // Bold the role titles in contribution text
+        // Bold the role titles in contribution text with white color and larger font
         let contributionText = project.contribution;
-        contributionText = contributionText.replace(/Lead Developer/g, '<strong>Lead Developer</strong>');
-        contributionText = contributionText.replace(/Solo Developer/g, '<strong>Solo Developer</strong>');
-        contributionText = contributionText.replace(/Game Designer & Developer/g, '<strong>Game Designer & Developer</strong>');
-        contributionText = contributionText.replace(/Solo project/g, '<strong>Solo project</strong>');
+        contributionText = contributionText.replace(/Lead Developer/g, '<strong style="color: white; font-size: 1.125rem;">Lead Developer</strong>');
+        contributionText = contributionText.replace(/Solo Developer/g, '<strong style="color: white; font-size: 1.125rem;">Solo Developer</strong>');
+        contributionText = contributionText.replace(/Game Designer & Developer/g, '<strong style="color: white; font-size: 1.125rem;">Game Designer & Developer</strong>');
+        contributionText = contributionText.replace(/Solo project/g, '<strong style="color: white; font-size: 1.125rem;">Solo project</strong>');
         contributionContainer.querySelector('p').innerHTML = contributionText;
       } else {
         contributionContainer.style.display = 'none';
