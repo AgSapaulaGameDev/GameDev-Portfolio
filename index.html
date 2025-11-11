@@ -4423,9 +4423,13 @@ namespace Space_Shooting_FINALS // Ensure this matches your project namespace
       const videosTab = document.querySelector('button[onclick="switchTab(\'videos\')"]');
       const codeTab = document.querySelector('button[onclick="switchTab(\'code\')"]');
       
-      if (is3DModel || isAnimation) {
-        // Hide Video and Code tabs for 3D Models and Animations
+      if (is3DModel) {
+        // Hide Video and Code tabs for 3D Models
         if (videosTab) videosTab.style.display = 'none';
+        if (codeTab) codeTab.style.display = 'none';
+      } else if (isAnimation) {
+        // Show Video tab but hide Code tab for Animations
+        if (videosTab) videosTab.style.display = 'block';
         if (codeTab) codeTab.style.display = 'none';
       } else {
         // Show Video and Code tabs for other projects
