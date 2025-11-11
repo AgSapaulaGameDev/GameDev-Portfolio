@@ -6253,6 +6253,7 @@ public class DreamController : MonoBehaviour
         contributionText = contributionText.replace(/Lead Developer/g, '<strong style="color: white; font-size: 1rem;">Lead Developer</strong>');
         contributionText = contributionText.replace(/Solo Developer/g, '<strong style="color: white; font-size: 1rem;">Solo Developer</strong>');
         contributionText = contributionText.replace(/Game Designer & Developer/g, '<strong style="color: white; font-size: 1rem;">Game Designer & Developer</strong>');
+        contributionText = contributionText.replace(/Game Designer/g, '<strong style="color: white; font-size: 1rem;">Game Designer</strong>');
         contributionText = contributionText.replace(/Solo project/g, '<strong style="color: white; font-size: 1rem;">Solo project</strong>');
         contributionContainer.querySelector('p').innerHTML = contributionText;
       } else {
