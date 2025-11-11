@@ -3436,7 +3436,803 @@ batch_process_assets()`
           "AS13.jpg",
         ],
         video: `<iframe src="https://drive.google.com/file/d/1x09YcBf93kI7i_ClkoJMKIxbcUKMwRzt/preview" allow="autoplay" allowfullscreen></iframe>`,
-        code: [],
+        code: [
+          {
+            language: "C#",
+            title: "PlayerMotor.cs - Player Movement System",
+            content: `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerMotor : MonoBehaviour
+{
+    private CharacterController controller;
+    private Vector3 playerVelocity;
+    public float speed = 3f;
+    private bool isGrounded;
+    public float gravity = -9.8f;
+    public float jumpHeight = .1f;
+
+    private bool crouching = false;
+    private bool lerpCrouch = false;
+    private float crouchTimer = 0f;
+    private bool sprinting = false;
+
+    private PlayerHealth playerHealth;
+
+    void Start()
+    {
+        controller = GetComponent<CharacterController>();
+        playerHealth = GetComponent<PlayerHealth>();
+    }
+
+    void Update()
+    {
+        isGrounded = controller.isGrounded;
+        if (lerpCrouch)
+        {
+            crouchTimer += Time.deltaTime;
+            float p = crouchTimer / 1;
+            p *= p;
+            if (crouching)
+                controller.height = Mathf.Lerp(controller.height, 1, p);
+            else
+                controller.height = Mathf.Lerp(controller.height, 2, p);
+
+            if (p > 1)
+            {
+                lerpCrouch = false;
+                crouchTimer = 0f;
+            }
+        }
+    }
+
+    public void JumpButton()
+    {
+        Jump();
+    }
+
+    public void CrouchButton()
+    {
+        Crouch();
+    }
+
+    public void SprintButton()
+    {
+        Sprint();
+    }
+
+    public void Jump()
+    {
+        if (isGrounded)
+        {
+            playerVelocity.y = Mathf.Sqrt(jumpHeight * -3.0f * gravity);
+        }
+    }
+
+    public void Crouch()
+    {
+        crouching = !crouching;
+        crouchTimer = 0;
+        lerpCrouch = true;
+    }
+
+    public void Sprint()
+    {
+        if (playerHealth != null && playerHealth.isFrozen)
+        {
+            sprinting = false;
+            speed = 2.5f;
+            return;
+        }
+
+        sprinting = !sprinting;
+        speed = sprinting ? 5 : 3;
+    }
+
+    public void ProcessMove(Vector3 input)
+    {
+        Vector3 moveDirection = Vector3.zero;
+        moveDirection.x = input.x;
+        moveDirection.y = input.y;
+        moveDirection.z = input.z;
+        controller.Move(transform.TransformDirection(moveDirection) * speed * Time.deltaTime);
+        playerVelocity.y += gravity * Time.deltaTime;
+        if (isGrounded && playerVelocity.y < 0)
+            playerVelocity.y = -2f;
+        controller.Move(playerVelocity * speed * Time.deltaTime);
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "UnifiedEnemyAI.cs - Enemy AI System",
+            content: `using UnityEngine;
+using UnityEngine.AI;
+
+public class UnifiedEnemyAI : MonoBehaviour
+{
+    [Header("Health Settings")]
+    public int maxHealth = 100;
+    private int currentHealth;
+
+    [Header("Patrolling Settings")]
+    public Transform[] patrolPoints;
+    private int currentPatrolIndex;
+
+    [Header("Chasing and Detection")]
+    public float chaseRange = 10f;
+    public float sightRange = 15f;
+    public float fieldOfView = 60f;
+    public Transform player;
+    [SerializeField()]
+    private bool isChasing;
+
+    [Header("Shooting Settings")]
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float bulletSpeed = 15f;
+    public float fireRate = 1f;
+    [SerializeField()]
+    private float nextFireTime;
+
+    [Header("Movement Settings")]
+    public float moveSpeed = 3.5f; // Movement speed
+    public float turnSpeed = 5f; // Turning speed
+
+    private NavMeshAgent agent;
+
+    private void Start()
+    {
+        agent = GetComponent<NavMeshAgent>();
+        currentHealth = maxHealth;
+        currentPatrolIndex = 0;
+        agent.speed = moveSpeed; // Set the movement speed
+        agent.angularSpeed = turnSpeed * 100; // Convert turn speed to angular speed (degrees per second)
+        MoveToNextPatrolPoint();
+    }
+
+    private void Update()
+    {
+        if (PlayerInSight())
+        {
+            isChasing = true;
+            ChasePlayer();
+        }
+        else if (isChasing)
+        {
+            isChasing = false;
+            MoveToNextPatrolPoint();
+        }
+
+        if (!isChasing && !agent.pathPending && agent.remainingDistance < 0.5f)
+        {
+            MoveToNextPatrolPoint();
+        }
+
+        if (Time.time >= nextFireTime && isChasing && Vector3.Distance(transform.position, player.position) <= chaseRange)
+        {
+            Shoot();
+            nextFireTime = Time.time + fireRate;
+        }
+    }
+
+    private void MoveToNextPatrolPoint()
+    {
+        if (patrolPoints.Length == 0)
+            return;
+
+        agent.destination = patrolPoints[currentPatrolIndex].position;
+        currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
+    }
+
+    private void ChasePlayer()
+    {
+        agent.SetDestination(player.position);
+    }
+
+    private bool PlayerInSight()
+    {
+        Vector3 directionToPlayer = (player.position - transform.position).normalized;
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+
+        if (angleToPlayer < fieldOfView / 2f && Vector3.Distance(transform.position, player.position) <= sightRange)
+        {
+            Ray ray = new Ray(transform.position, directionToPlayer);
+            if (Physics.Raycast(ray, out RaycastHit hit, sightRange))
+            {
+                if (hit.collider.CompareTag("Player"))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void Shoot()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            Vector3 directionToPlayer = (player.position - firePoint.position).normalized;
+            rb.linearVelocity = directionToPlayer * bulletSpeed;
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage; // Reduce health by the given damage
+        Debug.Log($"Enemy Health: {currentHealth}");
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        Debug.Log("Enemy Died!");
+
+        // Add 100 points to the score
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddScore(100);
+        }
+
+        Destroy(gameObject); // Remove the enemy from the scene
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Gun.cs - Weapon System",
+            content: `using System.Collections;
+using UnityEngine;
+using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class Gun : MonoBehaviour
+{
+    [Header("Gun Settings")]
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float bulletSpeed = 50f;
+    public float fireRate = 0.2f;
+    private float nextFireTime = 0f;
+
+    [Header("Ammo Settings")]
+    public int maxAmmo = 20;
+    public int currentAmmo;
+    public float reloadTime = 2f;
+    private bool isReloading = false;
+
+    [Header("UI Settings")]
+    public TextMeshProUGUI ammoText;
+    public TextMeshProUGUI reloadingText;
+    public Button fireButton;
+    public Button reloadButton;
+
+    private bool isFiring = false;
+
+    void Start()
+    {
+        currentAmmo = maxAmmo;
+        reloadingText.gameObject.SetActive(false);
+
+        if (fireButton != null)
+        {
+            EventTrigger trigger = fireButton.gameObject.AddComponent<EventTrigger>();
+
+            EventTrigger.Entry pointerDown = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+            pointerDown.callback.AddListener((data) => { isFiring = true; });
+            trigger.triggers.Add(pointerDown);
+
+            EventTrigger.Entry pointerUp = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+            pointerUp.callback.AddListener((data) => { isFiring = false; });
+            trigger.triggers.Add(pointerUp);
+        }
+        else
+        {
+            Debug.LogError("Fire button is not assigned in the Inspector!");
+        }
+
+        if (reloadButton != null)
+        {
+            reloadButton.onClick.AddListener(ReloadButtonClicked);
+        }
+        else
+        {
+            Debug.LogError("Reload button is not assigned in the Inspector!");
+        }
+    }
+
+    void Update()
+    {
+        if (isReloading) return;
+
+        if (currentAmmo <= 0)
+        {
+            StartCoroutine(Reload());
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            StartCoroutine(Reload());
+        }
+
+        if (isFiring && Time.time >= nextFireTime)
+        {
+            nextFireTime = Time.time + fireRate;
+            Shoot();
+        }
+
+        UpdateAmmoUI();
+    }
+
+    public void ReloadButtonClicked()
+    {
+        if (!isReloading && currentAmmo < maxAmmo)
+        {
+            StartCoroutine(Reload());
+        }
+    }
+
+    void Shoot()
+    {
+        currentAmmo--;
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = firePoint.forward * bulletSpeed;
+        }
+        else
+        {
+            Debug.LogError("Bullet prefab is missing a Rigidbody component!");
+        }
+    }
+
+    IEnumerator Reload()
+    {
+        if (currentAmmo == maxAmmo) yield break;
+
+        isReloading = true;
+        reloadingText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(reloadTime);
+        currentAmmo = maxAmmo;
+        isReloading = false;
+        reloadingText.gameObject.SetActive(false);
+    }
+
+    void UpdateAmmoUI()
+    {
+        if (ammoText != null)
+        {
+            ammoText.text = $"Ammo: {currentAmmo}/{maxAmmo}";
+        }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "PlayerHealth.cs - Health Management",
+            content: `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class PlayerHealth : MonoBehaviour
+{
+    private float health;
+    private float lerpTimer;
+
+    [Header("Health Bar")]
+    public float maxHealth = 100f;
+    public float chipSpeed = 2f;
+    public Image frontHealthBar;
+    public Image backHealthBar;
+
+    [Header("Damage Overlay")]
+    public Image overlay;
+    public float duration;
+    public float fadeSpeed;
+
+    [Header("Freeze Effect")]
+    public Image freezeOverlay;
+    public float freezeDuration = 5f;
+    public float slowedSpeed = 2f;
+    private float originalSpeed;
+    public bool isFrozen = false;
+
+    [Header("Poison Effect")]
+    public Image poisonOverlay;
+    public float poisonRate = 1f;
+    public float poisonThreshold = 20f;
+    private bool isPoisoned = false;
+
+    private float durationTimer;
+    public PlayerMotor playerMotor;
+    private CameraShake cameraShake;
+
+    void Start()
+    {
+        health = maxHealth;
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0);
+
+        cameraShake = Camera.main.GetComponent<CameraShake>();
+
+        if (freezeOverlay != null)
+            freezeOverlay.color = new Color(freezeOverlay.color.r, freezeOverlay.color.g, freezeOverlay.color.b, 0);
+        if (poisonOverlay != null)
+            poisonOverlay.color = new Color(poisonOverlay.color.r, poisonOverlay.color.g, poisonOverlay.color.b, 0);
+
+        originalSpeed = slowedSpeed;
+    }
+
+    void Update()
+    {
+        health = Mathf.Clamp(health, 0, maxHealth);
+        UpdateHealthUI();
+
+        // player die
+        if (health <= 0)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
+        }
+
+        // Handle damage overlay fade
+        if (health < 100 || isPoisoned)
+        {
+            if (overlay.color.a < 1)
+            {
+                overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 1f);
+            }
+        }
+        else
+        {
+            if (overlay.color.a > 0)
+            {
+                durationTimer += Time.deltaTime;
+                if (durationTimer > duration)
+                {
+                    float tempAlpha = overlay.color.a;
+                    tempAlpha -= Time.deltaTime * fadeSpeed;
+                    overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, tempAlpha);
+                }
+            }
+        }
+
+        // Handle poison effect
+        if (isPoisoned && health > poisonThreshold)
+        {
+            health -= poisonRate * Time.deltaTime;
+        }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        lerpTimer = 0f;
+        durationTimer = 0;
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 1);
+
+        // Deduct 1 point from the score
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddScore(-1);
+        }
+
+        // Trigger camera shake on damage
+        if (cameraShake != null)
+        {
+            cameraShake.Shake();
+        }
+
+        UpdateHealthUI();
+    }
+
+    public void UpdateHealthUI()
+    {
+        float fillF = frontHealthBar.fillAmount;
+        float fillB = backHealthBar.fillAmount;
+        float hFraction = health / maxHealth;
+
+        if (fillB > hFraction)
+        {
+            frontHealthBar.fillAmount = hFraction;
+            backHealthBar.color = Color.red;
+            lerpTimer += Time.deltaTime;
+            float percentComplete = lerpTimer / chipSpeed;
+            percentComplete = percentComplete * percentComplete;
+            backHealthBar.fillAmount = Mathf.Lerp(fillB, hFraction, percentComplete);
+        }
+
+        if (fillF < hFraction)
+        {
+            backHealthBar.color = Color.green;
+            backHealthBar.fillAmount = hFraction;
+            lerpTimer += Time.deltaTime;
+            float percentComplete = lerpTimer / chipSpeed;
+            percentComplete = percentComplete * percentComplete;
+            frontHealthBar.fillAmount = Mathf.Lerp(fillF, backHealthBar.fillAmount, percentComplete);
+        }
+    }
+
+    public void RestoreHealth(float healAmount)
+    {
+        health += healAmount;
+        lerpTimer = 0f;
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "InputManager.cs - Input Handling",
+            content: `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class InputManager : MonoBehaviour
+{
+    private PlayerInput playerInput;
+    public PlayerInput.OnFootActions onFoot;
+    private PlayerMotor motor;
+    private PlayerLook look;
+
+    [SerializeField] private VirtualJoystick joystick; // Reference to the Virtual Joystick
+
+    private void Start()
+    {
+        // Lock the cursor to the center
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    void Awake()
+    {
+        playerInput = new PlayerInput();
+        onFoot = playerInput.OnFoot;
+
+        motor = GetComponent<PlayerMotor>();
+        look = GetComponent<PlayerLook>();
+
+        // Bind inputs
+        onFoot.Jump.performed += ctx => motor.Jump();
+        onFoot.Crouch.performed += ctx => motor.Crouch();
+        onFoot.Sprint.performed += ctx => motor.Sprint();
+    }
+
+    void FixedUpdate()
+    {
+        Vector3 moveInput;
+
+        if (joystick != null)
+        {
+            Vector2 joystickInput = joystick.Handle.anchoredPosition.normalized; // Use exposed Handle property
+            moveInput = new Vector3(joystickInput.x, 0, joystickInput.y);
+        }
+        else
+        {
+            moveInput = onFoot.Movement.ReadValue<Vector3>(); // Use keyboard/controller input
+        }
+
+        motor.ProcessMove(moveInput);
+    }
+
+    private void LateUpdate()
+    {
+        look.ProcessLook(onFoot.Look.ReadValue<Vector2>());
+    }
+
+    private void OnEnable()
+    {
+        onFoot.Enable();
+    }
+
+    private void OnDisable()
+    {
+        onFoot.Disable();
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Bullet.cs - Projectile System",
+            content: `using UnityEngine;
+
+public class Bullet : MonoBehaviour
+{
+    public int damage = 20;
+    public float lifeTime = 2f;
+
+    void Start()
+    {
+        Destroy(gameObject, lifeTime);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        UnifiedEnemyAI enemy = collision.collider.GetComponent<UnifiedEnemyAI>();
+        if (enemy != null)
+        {
+            enemy.TakeDamage(damage);
+        }
+
+        SlimeBossAI boss = collision.collider.GetComponent<SlimeBossAI>();
+        if (boss != null)
+        {
+            boss.TakeDamage(damage);
+        }
+
+        Destroy(gameObject);
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "EnemyBullet.cs - Enemy Projectiles",
+            content: `using UnityEngine;
+
+public class EnemyBullet : MonoBehaviour
+{
+    public int damage = 20; // Bullet damage
+    public float lifeTime = 2f;
+
+    void Start()
+    {
+        Destroy(gameObject, lifeTime); // Destroy bullet after some time
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Check if the collided object is the player
+        PlayerHealth playerHealth = collision.collider.GetComponent<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(damage); // Deal damage to the player
+        }
+
+        Destroy(gameObject); // Destroy the bullet on impact
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "CameraShake.cs - Screen Effects",
+            content: `using System.Collections;
+using UnityEngine;
+
+public class CameraShake : MonoBehaviour
+{
+    private Vector3 originalPosition;
+    public float shakeDuration = 0.5f;
+    public float shakeMagnitude = 0.1f;
+    private float shakeTimeRemaining;
+
+    void Start()
+    {
+        originalPosition = transform.localPosition;
+    }
+
+    public void Shake()
+    {
+        shakeTimeRemaining = shakeDuration;
+        StartCoroutine(ShakeCoroutine());
+    }
+
+    private IEnumerator ShakeCoroutine()
+    {
+        while (shakeTimeRemaining > 0)
+        {
+            float x = Random.Range(-shakeMagnitude, shakeMagnitude);
+            float y = Random.Range(-shakeMagnitude, shakeMagnitude);
+
+            // Apply the shake within a limited range around the original position
+            transform.localPosition = originalPosition + new Vector3(x, y, 0);
+
+            shakeTimeRemaining -= Time.deltaTime;
+            yield return null;
+        }
+
+        // Restore the original position after shaking
+        transform.localPosition = originalPosition;
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "GameTimer.cs - Game Management",
+            content: `using TMPro;
+using UnityEngine;
+
+public class GameTimer : MonoBehaviour
+{
+    public TextMeshProUGUI timerText; // Assign a UI Text element to display the timer.
+    private float elapsedTime = 0f;   // Tracks the elapsed time.
+    private bool isPaused = false;    // Tracks whether the timer is paused.
+
+    void Update()
+    {
+        if (!isPaused && Time.timeScale > 0)
+        {
+            elapsedTime += Time.deltaTime;
+            UpdateTimerDisplay();
+        }
+    }
+
+    public void PauseTimer()
+    {
+        isPaused = true;
+    }
+
+    public void ResumeTimer()
+    {
+        isPaused = false;
+    }
+
+    private void UpdateTimerDisplay()
+    {
+        int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60f);
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    public void SaveElapsedTime()
+    {
+        GameData.TotalTime = elapsedTime; // Save the total elapsed time
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "GameData.cs - Data Management",
+            content: `using UnityEngine;
+
+public static class GameData
+{
+    public static float TotalTime = 0f; // Store total elapsed time
+    public static int TotalScore = 0;   // Store total score
+}`
+          },
+          {
+            language: "C#",
+            title: "Interactable.cs - Interaction System",
+            content: `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public abstract class Interactable : MonoBehaviour
+{
+    // add or remove events to gameobject
+    public bool useEvents;
+    // display message when near interactable
+    [SerializeField]
+    public string promptMessage;
+
+    // called from player
+    public void BaseInteract()
+    {
+        if (useEvents)
+            GetComponent<InteractionEvents>().OnInteract.Invoke();
+        Interact();
+    }
+
+    protected virtual void Interact()
+    {
+       
+    }
+}`
+          }
+        ],
         liveDemo: "#",
         sourceCode: "#"
       },
