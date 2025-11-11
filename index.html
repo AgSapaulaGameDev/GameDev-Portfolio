@@ -2928,95 +2928,29 @@ character.data.materials.append(material)`
       },
       {
         id: 4,
-        title: "Puzzle Platformer",
-        description: "2D puzzle game with innovative mechanics and stylized art.",
+        title: "Card Matching Game",
+        description: "A strategic memory puzzle game where players match cards and score points.",
         category: "Games",
-        image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&q=80",
-        tags: ["Unity", "C#"],
-        fullDescription: "An innovative 2D puzzle platformer that challenges players with gravity-defying mechanics and mind-bending level design. Features hand-drawn art style and a compelling narrative about perception and reality.",
+        image: "MG3.jpg",
+        tags: ["C#", "Visual Studio Code", "Memory Game"],
+        fullDescription: "Card Match Challenge is an engaging 2D puzzle game that tests your memory and strategy skills. Flip cards to find pairs, uncover hidden patterns, and climb the leaderboard as the challenge intensifies. With colorful visuals and a simple yet addictive design, every move counts as you aim for the highest score.",
         features: [
-          "40 unique puzzle levels",
-          "Gravity manipulation mechanics",
-          "Hand-drawn artistic style",
-          "Environmental storytelling",
-          "Dynamic difficulty adjustment",
-          "Speedrun mode with leaderboards"
+          "Classic card-matching gameplay",
+          "Dynamic scoring system",
+          "Polished 2D visuals with smooth animations",
+          "Progressively challenging levels",
+          "Relaxing background music",
+          "Built with Unity using C#"
         ],
         images: [
-          "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&q=80",
-          "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80",
-          "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80"
+          "MG1.jpg",
+          "MG2.jpg",
+          "MG3.jpg",
+          "MG4.jpg",
+          "MG5.jpg"
         ],
-        code: [
-          {
-            language: "C#",
-            title: "Gravity Controller",
-            content: `public class GravityController : MonoBehaviour
-{
-    public static GravityController Instance;
-    
-    [SerializeField] private float gravityStrength = 9.81f;
-    private Vector2 currentGravity = Vector2.down;
-    private List<Rigidbody2D> affectedBodies = new List<Rigidbody2D>();
-    
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-    
-    void Start()
-    {
-        Physics2D.gravity = currentGravity * gravityStrength;
-    }
-    
-    public void RotateGravity(float angle)
-    {
-        float radians = angle * Mathf.Deg2Rad;
-        currentGravity = new Vector2(
-            Mathf.Sin(radians),
-            -Mathf.Cos(radians)
-        );
-        
-        Physics2D.gravity = currentGravity * gravityStrength;
-        OnGravityChanged();
-    }
-    
-    private void OnGravityChanged()
-    {
-        // Notify all gravity-affected objects
-        foreach (var body in affectedBodies)
-        {
-            if (body != null)
-            {
-                var gravityAffected = body.GetComponent<GravityAffected>();
-                gravityAffected?.OnGravityChange(currentGravity);
-            }
-        }
-    }
-    
-    public void RegisterBody(Rigidbody2D body)
-    {
-        if (!affectedBodies.Contains(body))
-        {
-            affectedBodies.Add(body);
-        }
-    }
-    
-    public void UnregisterBody(Rigidbody2D body)
-    {
-        affectedBodies.Remove(body);
-    }
-}`
-          }
-        ],
+        video: `<iframe src="https://drive.google.com/file/d/1dkgv5AIgh5xst3APH1VeCloFIrYqYScV/preview" allow="autoplay" allowfullscreen></iframe>`,
+        code: [],
         liveDemo: "https://example.com/puzzle-game",
         sourceCode: "https://github.com/example/puzzle-platformer"
       },
@@ -3041,102 +2975,7 @@ character.data.materials.append(material)`
           "V3.jpg",
           "V4.jpg"
         ],
-        code: [
-          {
-            language: "Python",
-            title: "Asset Batch Processor",
-            content: `import bpy
-import os
-from mathutils import Vector
-
-def batch_process_assets():
-    """Process all assets in the scene for game optimization"""
-    
-    assets_path = "D:/GameAssets/Environment/"
-    export_path = "D:/GameAssets/Processed/"
-    
-    # Ensure export directory exists
-    os.makedirs(export_path, exist_ok=True)
-    
-    for obj in bpy.context.scene.objects:
-        if obj.type == 'MESH':
-            process_mesh_asset(obj, export_path)
-    
-    print("Batch processing complete!")
-
-def process_mesh_asset(obj, export_path):
-    """Process individual mesh asset"""
-    
-    # Select only this object
-    bpy.ops.object.select_all(action='DESELECT')
-    obj.select_set(True)
-    bpy.context.view_layer.objects.active = obj
-    
-    # Apply modifiers
-    apply_modifiers(obj)
-    
-    # Optimize geometry
-    optimize_mesh(obj)
-    
-    # Generate LODs
-    generate_lods(obj)
-    
-    # Setup materials
-    setup_game_materials(obj)
-    
-    # Export
-    filename = f"{obj.name}.fbx"
-    filepath = os.path.join(export_path, filename)
-    
-    bpy.ops.export_scene.fbx(
-        filepath=filepath,
-        use_selection=True,
-        object_types={'MESH'},
-        use_mesh_modifiers=True
-    )
-
-def optimize_mesh(obj):
-    """Optimize mesh for game performance"""
-    
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.mode_set(mode='EDIT')
-    
-    # Remove doubles
-    bpy.ops.mesh.remove_doubles(threshold=0.001)
-    
-    # Recalculate normals
-    bpy.ops.mesh.normals_make_consistent(inside=False)
-    
-    # Triangulate for consistency
-    bpy.ops.mesh.quads_convert_to_tris()
-    
-    bpy.ops.object.mode_set(mode='OBJECT')
-
-def generate_lods(obj):
-    """Generate Level of Detail variants"""
-    
-    lod_levels = [0.75, 0.5, 0.25]  # Reduction ratios
-    
-    for i, ratio in enumerate(lod_levels):
-        # Duplicate object for LOD
-        lod_obj = obj.copy()
-        lod_obj.data = obj.data.copy()
-        lod_obj.name = f"{obj.name}_LOD{i+1}"
-        
-        bpy.context.collection.objects.link(lod_obj)
-        
-        # Apply decimation
-        bpy.context.view_layer.objects.active = lod_obj
-        modifier = lod_obj.modifiers.new(name="Decimate", type='DECIMATE')
-        modifier.ratio = ratio
-        
-        # Apply modifier
-        bpy.ops.object.modifier_apply(modifier="Decimate")
-
-# Execute batch processing
-batch_process_assets()`
-          }
-        ],
+        code: [],
         liveDemo: "https://example.com/environment-showcase",
         sourceCode: "https://github.com/example/environment-assets"
       },
@@ -3356,7 +3195,7 @@ batch_process_assets()`
         title: "Minatamis",
         description: "A culturally inspired PC simulation game where players prepare and sell traditional Filipino desserts.",
         category: "Games",
-        image: "MPreview.png",
+        image: "M2.png",
         tags: ["Unity", "Simulation", "PC Game", "Filipino Culture"],
         fullDescription: "MinaTamis is a culturally inspired PC simulation game that celebrates traditional Filipino desserts. Players take on the role of a local vendor preparing and selling classic sweets such as hotcakes and other delicacies. Combining engaging gameplay with cultural learning, the game promotes appreciation of Filipino culinary heritage through interactive storytelling and immersive mechanics. Inspired by titles like Fast Food Simulator, Cooking Simulator, and Cooking Mama, MinaTamis balances fast-paced action with strategy and creativity in a vibrant street setting. The game also serves an educational purpose—enhancing engagement, critical thinking, and cultural awareness through play.",
         features: [
