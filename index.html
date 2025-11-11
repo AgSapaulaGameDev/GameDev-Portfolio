@@ -2515,6 +2515,10 @@
         <div id="overviewTab" class="tab-content active">
           <img id="modalMainImage" src="" alt="" class="project-detail-image">
           <p id="modalDescription" class="text-lg mb-4" style="color: var(--muted-foreground);"></p>
+          <div id="modalContribution" class="mb-4" style="display: none;">
+            <h4 class="text-xl font-semibold mb-2" style="color: var(--primary);">Contribution:</h4>
+            <p class="text-base" style="color: var(--muted-foreground);"></p>
+          </div>
           <div id="modalTags" class="project-tags mb-4"></div>
           <div id="modalFeatures"></div>
           <div class="project-links">
@@ -6236,6 +6240,15 @@ public class DreamController : MonoBehaviour
       mainImage.onclick = () => openImagePreview(project.image);
       mainImage.style.cursor = 'pointer';
       document.getElementById('modalDescription').textContent = project.fullDescription || project.description;
+      
+      // Update contribution field
+      const contributionContainer = document.getElementById('modalContribution');
+      if (project.contribution) {
+        contributionContainer.style.display = 'block';
+        contributionContainer.querySelector('p').textContent = project.contribution;
+      } else {
+        contributionContainer.style.display = 'none';
+      }
       
       // Update tags with staggered animation
       const tagsContainer = document.getElementById('modalTags');
