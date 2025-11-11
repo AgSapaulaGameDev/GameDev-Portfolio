@@ -2950,7 +2950,442 @@ character.data.materials.append(material)`
           "MG5.jpg"
         ],
         video: `<iframe src="https://drive.google.com/file/d/1dkgv5AIgh5xst3APH1VeCloFIrYqYScV/preview" allow="autoplay" allowfullscreen></iframe>`,
-        code: [],
+        code: [
+          {
+            language: "C#",
+            title: "Form1.cs - Main Game Logic (Advanced Version)",
+            content: `using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Media;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace CardMatchingGame
+{
+    public partial class Form1 : Form
+    {
+        private List<Image> cardImages = new List<Image>();
+        private PictureBox firstClicked = null;
+        private PictureBox secondClicked = null;
+        private int score = 0;
+        private Random random = new Random();
+        private string imagePath = @"C:\\Users\\angel\\OneDrive - feutech.edu.ph\\Desktop\\PNG-cards-1.3";
+        private SoundPlayer flipSound;
+        private SoundPlayer winSound;
+
+        public Form1()
+        {
+            InitializeComponent();
+            LoadCardImages();
+            AssignImagesToCards();
+            SetPictureBoxSizeMode();
+            LoadFlipSound();
+            LoadWinSound();
+        }
+
+        private void LoadCardImages()
+        {
+            try
+            {
+                var imageFiles = Directory.GetFiles(imagePath, "*.png");
+                foreach (var file in imageFiles.Take(18)) 
+                {
+                    var img = Image.FromFile(file);
+                    cardImages.Add(img);
+                    cardImages.Add(img); 
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading images: {ex.Message}");
+            }
+        }
+
+        private void LoadFlipSound()
+        {
+            try
+            {
+                flipSound = new SoundPlayer(@"C:\\Users\\angel\\OneDrive - feutech.edu.ph\\Desktop\\Sounds\\Flipcard.wav");
+                flipSound.Load();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading flip sound: {ex.Message}");
+            }
+        }
+
+        private void LoadWinSound()
+        {
+            try
+            {
+                winSound = new SoundPlayer(@"C:\\Users\\angel\\OneDrive - feutech.edu.ph\\Desktop\\Sounds\\Win.wav");
+                winSound.Load();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading win sound: {ex.Message}");
+            }
+        }
+
+        private void AssignImagesToCards()
+        {
+            var shuffledImages = cardImages.OrderBy(x => random.Next()).ToList();
+
+            int index = 0;
+            foreach (Control control in tableLayoutPanel1.Controls)
+            {
+                if (control is PictureBox)
+                {
+                    var picBox = (PictureBox)control;
+                    picBox.Tag = shuffledImages[index];
+                    picBox.Click += new EventHandler(PictureBox_Click);
+                    picBox.Image = null;
+                    index++;
+                }
+            }
+        }
+
+        private void SetPictureBoxSizeMode()
+        {
+            foreach (Control control in tableLayoutPanel1.Controls)
+            {
+                if (control is PictureBox pictureBox)
+                {
+                    pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                }
+            }
+        }
+
+        private async void PictureBox_Click(object sender, EventArgs e)
+        {
+            if (firstClicked != null && secondClicked != null)
+                return;
+
+            var clickedBox = sender as PictureBox;
+            if (clickedBox == null || clickedBox.Image != null)
+                return;
+
+            flipSound.Play(); 
+
+            clickedBox.Image = (Image)clickedBox.Tag;
+
+            if (firstClicked == null)
+            {
+                firstClicked = clickedBox;
+                return;
+            }
+
+            secondClicked = clickedBox;
+
+            if (firstClicked.Tag == secondClicked.Tag)
+            {
+                firstClicked = null;
+                secondClicked = null;
+                score += 5;
+                scoreLabel.Text = $"Score: {score}";
+                CheckForGameEnd();
+                return;
+            }
+
+            await Task.Delay(800);
+
+            firstClicked.Image = null;
+            secondClicked.Image = null;
+
+            firstClicked = null;
+            secondClicked = null;
+            if (score > 0) score--;
+            scoreLabel.Text = $"Score: {score}";
+        }
+
+        private void CheckForGameEnd()
+        {
+            foreach (Control control in tableLayoutPanel1.Controls)
+            {
+                if (control is PictureBox picBox && picBox.Image == null)
+                {
+                    return;
+                }
+            }
+
+            winSound.Play(); 
+            MessageBox.Show($"Congratulations! Your final score is: {score}");
+        }
+    }`
+          },
+          {
+            language: "C#",
+            title: "MatchingGame.cs - Simple Version",
+            content: `using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
+
+namespace MatchingGame
+{
+    public partial class Form1 : Form
+    {
+        Label firstClicked = null;
+        Label secondClicked = null;
+        Random random = new Random();
+        int score = 0;
+
+        // Initialize a list of 52 card values
+        List<string> icons = new List<string>
+        {
+            "!", "!", "N", "N", ",", ",", "k", "k",
+            "i", "i", "K", "K", "d", "d", "a", "a",
+            "b", "b", "v", "v", "w", "w", "z", "z",
+            "x", "x", "q", "q", "s", "s", "t", "t",
+            "u", "u", "o", "o", "p", "p", "l", "l",
+            "m", "m", "n", "n", "e", "e", "f", "f",
+            "g", "g", "h", "h"
+        };
+
+        public Form1()
+        {
+            InitializeComponent();
+            AssignIconsToSquares();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Initialize the form and start the game
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+            // Optional: Customize the table layout panel if needed
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            if (timer1.Enabled == true)
+                return;
+
+            Label clickedLabel = sender as Label;
+
+            if (clickedLabel != null)
+            {
+                if (clickedLabel.ForeColor == Color.Black)
+                    return;
+
+                if (firstClicked == null)
+                {
+                    firstClicked = clickedLabel;
+                    firstClicked.ForeColor = Color.Black;
+                    return;
+                }
+
+                secondClicked = clickedLabel;
+                secondClicked.ForeColor = Color.Black;
+
+                CheckForWinner();
+
+                if (firstClicked.Text == secondClicked.Text)
+                {
+                    score += 5;
+                    firstClicked = null;
+                    secondClicked = null;
+                    return;
+                }
+                else
+                {
+                    if (score > 0)
+                        score -= 1;
+                    timer1.Start();
+                }
+            }
+        }
+
+        private void AssignIconsToSquares()
+        {
+            foreach (Control control in tableLayoutPanel1.Controls)
+            {
+                Label iconLabel = control as Label;
+                if (iconLabel != null)
+                {
+                    int randomNumber = random.Next(icons.Count);
+                    iconLabel.Text = icons[randomNumber];
+                    iconLabel.ForeColor = iconLabel.BackColor;
+                    icons.RemoveAt(randomNumber);
+                }
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            timer1.Stop();
+            firstClicked.ForeColor = firstClicked.BackColor;
+            secondClicked.ForeColor = secondClicked.BackColor;
+            firstClicked = null;
+            secondClicked = null;
+        }
+
+        private void CheckForWinner()
+        {
+            foreach (Control control in tableLayoutPanel1.Controls)
+            {
+                Label iconLabel = control as Label;
+
+                if (iconLabel != null)
+                {
+                    if (iconLabel.ForeColor == iconLabel.BackColor)
+                        return;
+                }
+            }
+
+            MessageBox.Show($"You matched all the icons! Your score is {score}.", "Congratulations");
+            Close();
+        }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Form1.Designer.cs - UI Design",
+            content: `namespace CardMatchingGame
+{
+    partial class Form1
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            
+            // Initialize 36 PictureBox controls for the 6x6 grid
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            // ... (continue for all 36 picture boxes)
+            this.pictureBox36 = new System.Windows.Forms.PictureBox();
+            
+            this.scoreLabel = new System.Windows.Forms.Label();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            
+            this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            // ... (suspend layout for all picture boxes)
+            this.tableLayoutPanel2.SuspendLayout();
+            this.SuspendLayout();
+            
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.BackColor = System.Drawing.Color.SeaGreen;
+            this.tableLayoutPanel1.ColumnCount = 6;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            // ... (repeat for all 6 columns)
+            
+            this.tableLayoutPanel1.RowCount = 6;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            // ... (repeat for all 6 rows)
+            
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(748, 870);
+            this.tableLayoutPanel1.TabIndex = 0;
+            
+            // Configure all picture boxes with background images and properties
+            // ... (configuration for all 36 picture boxes)
+            
+            // 
+            // scoreLabel
+            // 
+            this.scoreLabel.AutoSize = true;
+            this.scoreLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.scoreLabel.Location = new System.Drawing.Point(754, 0);
+            this.scoreLabel.Name = "scoreLabel";
+            this.scoreLabel.Size = new System.Drawing.Size(70, 20);
+            this.scoreLabel.TabIndex = 1;
+            this.scoreLabel.Text = "Score: 0";
+            
+            // Set up the form
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1000, 870);
+            this.Controls.Add(this.tableLayoutPanel2);
+            this.Controls.Add(this.scoreLabel);
+            this.Controls.Add(this.tableLayoutPanel1);
+            this.Name = "Form1";
+            this.Text = "Card Matching Game";
+            this.Load += new System.EventHandler(this.Form1_Load);
+            
+            this.tableLayoutPanel1.ResumeLayout(false);
+            // ... (resume layout for all picture boxes)
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+        }
+
+        #endregion
+
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        // ... (declare all 36 picture boxes)
+        private System.Windows.Forms.PictureBox pictureBox36;
+        private System.Windows.Forms.Label scoreLabel;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.ProgressBar progressBar1;
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Program.cs - Application Entry Point",
+            content: `using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace CardMatchingGame
+{
+    internal static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
+        }
+    }
+}`
+          }
+        ],
         liveDemo: "https://example.com/puzzle-game",
         sourceCode: "https://github.com/example/puzzle-platformer"
       },
