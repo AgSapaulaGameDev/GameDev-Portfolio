@@ -3965,7 +3965,7 @@ namespace Space_Shooting_FINALS // Ensure this matches your project namespace
         title: "Hangman",
         description: "A C++-based word-guessing game with educational themes and progressive levels.",
         category: "Games",
-        image: "H1.jpg",
+        image: "HM1.jpg",
         tags: ["C++", "Educational Game", "PC Game"],
         fullDescription: "A classic Hangman game developed in C++ featuring multiple word categories, progressive difficulty, and educational value. Designed for PC, it uses ASCII visuals, color-coded feedback, and structured programming principles to create an engaging learning experience. The project highlights proficiency in control flow, data structures, and exception handling for interactive console-based applications.",
         features: [
@@ -3983,7 +3983,345 @@ namespace Space_Shooting_FINALS // Ensure this matches your project namespace
           "HM5.jpg"
         ],
         video: `<iframe src="https://drive.google.com/file/d/1N53ob5iLYfp57_f3UG8P8voLxh4pRQzT/preview" allow="autoplay" allowfullscreen></iframe>`,
-        code: [],
+        code: [
+          {
+            language: "C++",
+            title: "main.cpp - Complete Hangman Game",
+            content: `#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <stack>
+#include <queue>
+#include <limits>
+
+#ifdef _WIN32
+    #define CLEAR_SCREEN "cls"
+#else
+    #define CLEAR_SCREEN "clear"
+#endif
+
+// Function prototypes
+bool isGuessCorrect(const std::string& word, std::string& guessedWord, char guess);
+bool isGameWon(const std::string& word, const std::string& guessedWord);
+void displayHangman(int incorrectGuesses);
+void displayGuessedLettersStack(const std::stack<char>& guessedLettersStack);
+void displayGuessedLettersQueue(const std::queue<char>& guessedLettersQueue);
+void displayCategories();
+std::vector<std::string> getWordBank(int categoryChoice);
+bool playHangman(const std::vector<std::string>& wordBank, int currentLevel);
+
+bool isGuessCorrect(const std::string& word, std::string& guessedWord, char guess) {
+    bool correctGuess = false;
+    for (size_t i = 0; i < word.length(); ++i) {
+        if (word[i] == guess) {
+            guessedWord[i] = guess;
+            correctGuess = true;
+        }
+    }
+    return correctGuess;
+}
+
+bool isGameWon(const std::string& word, const std::string& guessedWord) {
+    return word == guessedWord;
+}
+
+void displayHangman(int incorrectGuesses) {
+    std::cout << " ___" << std::endl;
+    std::cout << " |     |" << std::endl;
+    switch (incorrectGuesses) {
+        case 0:
+            std::cout << " |" << std::endl;
+            std::cout << " |" << std::endl;
+            std::cout << " |" << std::endl;
+            std::cout << " |" << std::endl;
+            break;
+        case 1:
+            std::cout << " |     O" << std::endl;
+            std::cout << " |" << std::endl;
+            std::cout << " |" << std::endl;
+            std::cout << " |" << std::endl;
+            break;
+        case 2:
+            std::cout << " |     O" << std::endl;
+            std::cout << " |     |" << std::endl;
+            std::cout << " |" << std::endl;
+            std::cout << " |" << std::endl;
+            break;
+        case 3:
+            std::cout << " |     O" << std::endl;
+            std::cout << " |    /|" << std::endl;
+            std::cout << " |" << std::endl;
+            std::cout << " |" << std::endl;
+            break;
+        case 4:
+            std::cout << " |     O" << std::endl;
+            std::cout << " |    /|\\\\" << std::endl;
+            std::cout << " |" << std::endl;
+            std::cout << " |" << std::endl;
+            break;
+        case 5:
+            std::cout << " |     O" << std::endl;
+            std::cout << " |    /|\\\\" << std::endl;
+            std::cout << " |    /" << std::endl;
+            std::cout << " |" << std::endl;
+            break;
+        case 6:
+            std::cout << " |     O" << std::endl;
+            std::cout << " |    /|\\\\" << std::endl;
+            std::cout << " |    / \\\\" << std::endl;
+            std::cout << " |" << std::endl;
+            break;
+        default:
+            break;
+    }
+    std::cout << " |" << std::endl;
+    std::cout << "==========" << std::endl;
+}
+
+void displayGuessedLettersStack(const std::stack<char>& guessedLettersStack) {
+    std::stack<char> tempStack = guessedLettersStack;
+    while (!tempStack.empty()) {
+        std::cout << tempStack.top() << " ";
+        tempStack.pop();
+    }
+}
+
+void displayGuessedLettersQueue(const std::queue<char>& guessedLettersQueue) {
+    std::queue<char> tempQueue = guessedLettersQueue;
+    while (!tempQueue.empty()) {
+        std::cout << tempQueue.front() << " ";
+        tempQueue.pop();
+    }
+}
+
+void displayColoredLetters(const std::string& word, const std::string& guessedWord, const std::string& guessedLetters) {
+    for (size_t i = 0; i < word.length(); ++i) {
+        if (guessedWord[i] == word[i]) {
+            std::cout << "\\033[32m" << guessedWord[i] << "\\033[0m ";
+        } else {
+            if (guessedLetters.find(word[i]) != std::string::npos) {
+                std::cout << "\\033[31m" << guessedWord[i] << "\\033[0m ";
+            } else {
+                std::cout << guessedWord[i] << " ";
+            }
+        }
+    }
+    std::cout << std::endl;
+}
+
+void displayAlphabet(const std::string& guessedLetters) {
+    std::cout << "Available letters: ";
+    for (char c = 'a'; c <= 'z'; ++c) {
+        if (guessedLetters.find(c) != std::string::npos) {
+            std::cout << "\\033[31m" << c << "\\033[0m ";
+        } else {
+            std::cout << "\\033[32m" << c << "\\033[0m ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+void displayCategories() {
+    std::cout << "\\033[32m"; // Set text color to green
+    std::cout << "=====================" << std::endl;
+    std::cout << "       HANGMAN" << std::endl;
+    std::cout << "=====================" << std::endl;
+    std::cout << "\\033[0m";  // Reset colors to default
+    std::cout << "\\033[92m1. Animals\\033[0m" << std::endl;
+    std::cout << "\\033[92m2. Countries\\033[0m" << std::endl;
+    std::cout << "\\033[92m3. Food\\033[0m" << std::endl;
+    std::cout << "\\033[92m4. Sports\\033[0m" << std::endl;
+
+    std::cout << "\\033[32m\\nEnter the corresponding number: \\033[0m";
+}
+
+std::vector<std::string> getWordBank(int categoryChoice) {
+    std::vector<std::string> wordBank;
+    switch (categoryChoice) {
+        case 1:
+            wordBank = {"lion", "The king of the jungle", "elephant", "The largest land animal", "tiger", "A big cat with stripes", "giraffe", "Tall-necked animal", "monkey", "Primate known for swinging"};
+            break;
+        case 2:
+            wordBank = {"japan", "Land of the rising sun", "canada", "Home to maple syrup", "australia", "Country of kangaroos", "brazil", "Famous for the Amazon rainforest", "france", "Known for the Eiffel Tower"};
+            break;
+        case 3:
+            wordBank = {"pizza", "Popular Italian dish", "hamburger", "Classic fast food", "sushi", "Japanese cuisine with raw fish", "pasta", "Italian noodle dish", "chocolate", "Sweet treat made from cocoa"};
+            break;
+        case 4:
+            wordBank = {"soccer", "Global sport also known as football", "basketball", "Game with hoops and a ball", "tennis", "Racket sport played on a court", "golf", "Sport played with clubs and balls", "swimming", "Activity done in water"};
+            break;
+        default:
+            break;
+    }
+    return wordBank;
+}
+
+bool playHangman(const std::vector<std::string>& wordBank, int currentLevel) {
+    static int totalScore = 0;  // Declare totalScore as static to retain its value across function calls
+    int levelScore = 0;
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
+    std::string selectedWord = wordBank[(currentLevel - 1) * 2];
+    std::string guessedWord(selectedWord.length(), '-');
+
+    int incorrectGuesses = 0;
+    std::string guessedLetters;
+    std::stack<char> guessedLettersStack;
+    std::queue<char> guessedLettersQueue;
+    
+
+    while (incorrectGuesses < 6) {
+        std::system(CLEAR_SCREEN);
+
+        std::cout << "================" << std::endl;
+        std::cout << "==   LEVEL " << currentLevel << "  ==" << std::endl;
+        std::cout << "================" << std::endl;
+        std::cout << "Clue: " << wordBank[(currentLevel - 1) * 2 + 1] << std::endl;
+        std::cout << "Guessed Word: " << guessedWord << std::endl;
+        std::cout << "Incorrect Guesses: " << incorrectGuesses << "/6" << std::endl;
+        displayHangman(incorrectGuesses);
+        std::cout << std::endl;
+        displayAlphabet(guessedLetters);
+
+        std::cout << "Guess a letter: ";
+
+        char guess;
+        std::cin >> guess;
+
+        try {
+            if (!std::isalpha(guess)) {
+                throw std::invalid_argument("Invalid guess. Please enter a letter.");
+            }
+
+            guess = std::tolower(guess);
+
+            if (guessedLetters.find(guess) != std::string::npos) {
+                throw std::invalid_argument("You have already guessed that letter. Try again.");
+            }
+
+            guessedLetters += guess;
+            guessedLettersStack.push(guess);
+            guessedLettersQueue.push(guess);
+
+            if (isGuessCorrect(selectedWord, guessedWord, guess)) {
+                std::cout << "Correct guess!" << std::endl;
+                if (isGameWon(selectedWord, guessedWord)) {
+                    std::system(CLEAR_SCREEN);
+                    std::cout << "======================================" << std::endl;
+                    std::cout << "CONGRATULATIONS! YOU GUESSED IT RIGHT!" << std::endl;
+                    std::cout << "          The word is: " << selectedWord << std::endl;
+                    levelScore = 20 - incorrectGuesses;
+                    std::cout << "            Level score: " << levelScore << std::endl;
+                    totalScore += levelScore;  // Accumulate the level score to the total score
+                    std::cout << "            Total score: " << totalScore << std::endl;
+                    std::cout << "======================================" << std::endl;
+                    std::cout << "\\nLetters guessed in stack order: ";
+                    displayGuessedLettersStack(guessedLettersStack);
+                    std::cout << std::endl;
+                    std::cout << "\\nLetters guessed in queue order: ";
+                    displayGuessedLettersQueue(guessedLettersQueue);
+                    std::cout << std::endl;
+
+                    char choice;
+                    bool validChoice = false;
+
+                    while (!validChoice) {
+                        std::cout << "\\nDo you want to move to the next level? (y/n): ";
+
+                        try {
+                            std::cin >> choice;
+                            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\\n');  // Clear input buffer
+
+                            choice = std::tolower(choice);
+
+                            if (choice != 'y' && choice != 'n') {
+                                throw std::runtime_error("Invalid choice. Please enter 'y' or 'n'.");
+                                std::cin.clear();
+                            }
+
+                            validChoice = true;
+                        } catch (const std::exception& e) {
+                            std::cout << "Error: " << e.what() << std::endl;
+                            std::cin.clear();
+                            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\\n');
+                        }
+                    }
+
+                    return (choice == 'y');
+                }
+            } else {
+                std::cout << "Incorrect guess!" << std::endl;
+                ++incorrectGuesses;
+            }
+        } catch (const std::exception& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\\n');
+        }
+    }
+
+    std::system(CLEAR_SCREEN);
+    std::cout << "You lost! The word was: " << selectedWord << std::endl;
+    std::cout << "\\n _____" << std::endl;
+    std::cout << " |     |" << std::endl;
+    std::cout << " |     O" << std::endl;
+    std::cout << " |    /|\\\\" << std::endl;
+    std::cout << " |    / \\\\" << std::endl;
+    std::cout << " |" << std::endl;
+    std::cout << " |" << std::endl;
+    std::cout << "==========" << std::endl;
+
+    char choice;
+    std::cout << "Do you want to try again? (y/n): ";
+    std::cin >> choice;
+
+    return (tolower(choice) == 'y');
+}
+
+int main() {
+    int categoryChoice = 0;
+    bool playAgain = true;
+    int currentLevel = 1;
+
+    while (playAgain && currentLevel <= 5) {
+        std::system(CLEAR_SCREEN);
+
+        if (currentLevel == 1) {
+            displayCategories();
+            std::cin >> categoryChoice;
+
+            try {
+                if (categoryChoice < 1 || categoryChoice > 4) {
+                    throw std::out_of_range("Invalid category choice. Please try again.");
+                }
+            } catch (const std::exception& e) {
+                std::cout << "Error: " << e.what() << std::endl;
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\\n');
+                continue;
+            }
+        }
+
+        std::vector<std::string> wordBank = getWordBank(categoryChoice);
+
+        std::cout << "=====================" << std::endl;
+        std::cout << "==   LEVEL " << currentLevel << " START   ==" << std::endl;
+        std::cout << "=====================" << std::endl;
+
+        playAgain = playHangman(wordBank, currentLevel);
+        if (playAgain) {
+            ++currentLevel;
+        }
+    }
+
+    std::cout << "Oops! That is the last level! Thank you for playing Hangman!" << std::endl;
+
+    return 0;
+}`
+          }
+        ],
         liveDemo: "#",
         sourceCode: "#"
       }
