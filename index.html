@@ -738,6 +738,95 @@
       color: var(--primary-foreground);
     }
 
+    /* Enhanced Skills Section */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .skill-category-card {
+      background: linear-gradient(145deg, 
+        hsla(220, 25%, 10%, 0.95), 
+        hsla(220, 25%, 12%, 0.9)
+      );
+      border: 1px solid hsla(188, 95%, 50%, 0.2);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .skill-category-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, 
+        transparent,
+        var(--primary),
+        transparent
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .skill-category-card:hover {
+      border-color: var(--primary);
+      box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.3),
+        0 0 30px hsla(188, 95%, 50%, 0.15);
+      transform: translateY(-5px);
+    }
+
+    .skill-category-card:hover::before {
+      opacity: 1;
+    }
+
+    .skill-category-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      color: var(--foreground);
+      text-align: center;
+      position: relative;
+      padding-bottom: 0.75rem;
+    }
+
+    .skill-category-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    @media (max-width: 768px) {
+      .skills-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .skill-category-card {
+        padding: 1.5rem;
+      }
+      
+      .skill-category-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+    }
+
     /* Contact Section */
     .contact-content {
       display: grid;
@@ -2575,9 +2664,9 @@
         Technical <span class="primary">Skills</span>
       </h2>
 
-      <div class="grid grid-2 mb-12">
-        <div class="card">
-          <h3 class="text-2xl font-bold mb-6">Game Engines</h3>
+      <div class="skills-grid mb-12">
+        <div class="skill-category-card">
+          <h3 class="skill-category-title">Game Engines</h3>
           <div class="skill-progress">
             <div class="skill-header">
               <span class="skill-name">Unity</span>
@@ -2607,8 +2696,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <h3 class="text-2xl font-bold mb-6">3D Software</h3>
+        <div class="skill-category-card">
+          <h3 class="skill-category-title">3D Software</h3>
           <div class="skill-progress">
             <div class="skill-header">
               <span class="skill-name">Blender</span>
@@ -2638,8 +2727,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <h3 class="text-2xl font-bold mb-6">Programming</h3>
+        <div class="skill-category-card">
+          <h3 class="skill-category-title">Programming</h3>
           <div class="skill-progress">
             <div class="skill-header">
               <span class="skill-name">C#</span>
@@ -2669,8 +2758,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <h3 class="text-2xl font-bold mb-6">Design</h3>
+        <div class="skill-category-card">
+          <h3 class="skill-category-title">Design</h3>
           <div class="skill-progress">
             <div class="skill-header">
               <span class="skill-name">Game Design</span>
