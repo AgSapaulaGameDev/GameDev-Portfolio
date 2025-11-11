@@ -3356,7 +3356,7 @@ batch_process_assets()`
         title: "Minatamis",
         description: "A culturally inspired PC simulation game where players prepare and sell traditional Filipino desserts.",
         category: "Games",
-        image: "M2.png",
+        image: "MPreview.png",
         tags: ["Unity", "Simulation", "PC Game", "Filipino Culture"],
         fullDescription: "MinaTamis is a culturally inspired PC simulation game that celebrates traditional Filipino desserts. Players take on the role of a local vendor preparing and selling classic sweets such as hotcakes and other delicacies. Combining engaging gameplay with cultural learning, the game promotes appreciation of Filipino culinary heritage through interactive storytelling and immersive mechanics. Inspired by titles like Fast Food Simulator, Cooking Simulator, and Cooking Mama, MinaTamis balances fast-paced action with strategy and creativity in a vibrant street setting. The game also serves an educational purpose—enhancing engagement, critical thinking, and cultural awareness through play.",
         features: [
@@ -3472,7 +3472,337 @@ batch_process_assets()`
           "PZ14.jpg"
         ],
         video: '<iframe src="https://drive.google.com/file/d/1EyNT7vtar1VHJm5wV0ESRMCBf1kkAvFp/preview" width="100%" height="400" allow="autoplay" allowfullscreen></iframe>',
-        code: [],
+        code: [
+          {
+            language: "C#",
+            title: "PlayerMovement.cs - Player Controller",
+            content: `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerMovement : MonoBehaviour
+{
+    public Rigidbody2D rb;
+    public Animator animator;
+    bool isFacingRight = true;
+    public ParticleSystem smokeFX;
+
+    [Header("Movement")]
+    public float moveSpeed = 5f;
+    float horizontalMovement;
+
+    [Header("Jumping")]
+    public float jumpPower = 10f;
+    public int maxJumps = 2;
+    int jumpsRemaining;
+
+    [Header("GroundCheck")]
+    public Transform groundCheckPos;
+    public Vector2 groundCheckSize = new Vector2(0.5f, 0.5f);
+    public LayerMask groundLayer;
+    bool isGrounded;
+
+    [Header("Gravity")]
+    public float baseGravity = 2f;
+    public float maxFallSpeed = 18f;
+    public float fallSpeedMultiplier = 2f;
+
+    [Header("WallCheck")]
+    public Transform wallCheckPos;
+    public Vector2 wallCheckSize = new Vector2(0.5f, 0.5f);
+    public LayerMask wallLayer;
+
+    [Header("WallMovement")]
+    public float wallSlideSpeed = 2f;
+    bool isWallSliding;
+
+    //Wall Jumping
+    bool isWallJumping;
+    float wallJumpDirection;
+    float wallJumpTime = 0.5f;
+    float wallJumpTimer;
+    public Vector2 wallJumpPower = new Vector2(5f, 10f);
+
+    void Update()
+    {
+        GroundCheck();
+        ProcessGravity();
+        ProcessWallSlide();
+        ProcessWallJump(); 
+
+        if(!isWallJumping)
+        {
+            rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, rb.linearVelocity.y);
+            flip();
+        }
+        animator.SetFloat("yVelocity", rb.linearVelocity.y);
+        animator.SetFloat("magnitude", rb.linearVelocity.magnitude);
+        animator.SetBool("isWallSliding", isWallSliding);
+    }
+
+    public void Move(InputAction.CallbackContext context)
+    {
+        horizontalMovement = context.ReadValue<Vector2>().x;
+    }
+
+    public void Jump(InputAction.CallbackContext context)
+    {
+        if (jumpsRemaining > 0)
+        {
+            if (context.performed)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+                jumpsRemaining--;
+                JumpFX();
+            }
+            else if (context.canceled)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
+                jumpsRemaining--;
+                JumpFX();
+            }
+        }
+
+        //Wall Jump
+        if (context.performed && wallJumpTimer > 0f)
+        {
+            isWallJumping = true;
+            rb.linearVelocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
+            wallJumpTimer = 0f;
+            JumpFX();
+
+            //Force flip
+            if (transform.localScale.x != wallJumpDirection)
+            {
+                isFacingRight = !isFacingRight;
+                Vector3 ls = transform.localScale;
+                ls.x *= -1f;
+                transform.localScale = ls;
+            }
+
+            Invoke(nameof(CancelWallJump), wallJumpTime + 0.1f);
+        }
+    }
+
+    private void JumpFX()
+    {
+        animator.SetTrigger("jump");
+        smokeFX.Play();
+    }
+
+    private void GroundCheck()
+    { 
+        if (Physics2D.OverlapBox(groundCheckPos.position, groundCheckSize, 0, groundLayer))
+        {
+            jumpsRemaining = maxJumps;
+            isGrounded = true;
+        }
+        else
+        {
+            isGrounded = false;
+        }
+    }
+
+    private bool WallCheck()
+    {
+        return Physics2D.OverlapBox(wallCheckPos.position, wallCheckSize, 0, wallLayer);
+    }
+
+    private void ProcessGravity()
+    {
+        if (rb.linearVelocity.y < 0)
+        {
+            rb.gravityScale = baseGravity * fallSpeedMultiplier;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y - maxFallSpeed));
+        }
+        else
+        {
+            rb.gravityScale = baseGravity;
+        }
+    }
+
+    private void ProcessWallSlide()
+    {
+        if (!isGrounded & WallCheck() & horizontalMovement != 0)
+        {
+            isWallSliding = true;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -wallSlideSpeed));
+        }
+        else
+        {
+            isWallSliding = false;
+        }
+    }
+
+    private void ProcessWallJump()
+    {
+        if(isWallSliding)
+        {
+            wallJumpDirection = -transform.localScale.x;
+            wallJumpTimer = wallJumpTime;
+
+            CancelInvoke(nameof(CancelWallJump));
+        }
+        else if (wallJumpTimer > 0f)
+        {
+            wallJumpTimer -= Time.deltaTime;
+        }
+    }
+
+    private void CancelWallJump()
+    {
+        isWallJumping = false;
+    }
+
+    private void flip()
+    {
+        if (isFacingRight && horizontalMovement < 0 || !isFacingRight && horizontalMovement > 0)
+        {
+            isFacingRight = !isFacingRight;
+            Vector3 ls = transform.localScale;
+            ls.x *= -1f;
+            transform.localScale = ls;
+
+            if (rb.linearVelocity.y == 0f)
+            {
+                smokeFX.Play();
+            } 
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireCube(groundCheckPos.position, groundCheckSize);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(wallCheckPos.position, wallCheckSize);
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "GameController.cs - Game Management",
+            content: `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using TMPro;
+
+public class GameController : MonoBehaviour
+{
+    int progressAmount;
+    public Slider progressSlider;
+    public GameObject gameOverScreen;
+
+    void OnEnable()
+    {
+        PlayerHealth.OnPlayerDied += GameOverScreen;
+    }
+
+    void OnDisable()
+    {
+        PlayerHealth.OnPlayerDied -= GameOverScreen;
+    }
+
+    void Start()
+    {
+        progressAmount = 0;
+        progressSlider.value = 0;
+        gameOverScreen.SetActive(false);
+
+        Gem.OnGemCollect += IncreaseProgressAmount;
+        HoldToLoadLevel.OnHoldComplete += LoadNextLevel;
+    }
+
+    void GameOverScreen()
+    {
+        gameOverScreen.SetActive(true);
+        Time.timeScale = 0; // Pause the game
+    }
+
+    public void ResetGame()
+    {
+        Time.timeScale = 1; // Resume the game
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // Reloads the current level
+    }
+
+    void IncreaseProgressAmount(int amount)
+    {
+        progressAmount += amount;
+        progressSlider.value = progressAmount;
+        if (progressAmount >= 100)
+        {
+            Debug.Log("Level Complete");
+        }
+    }
+
+    void LoadNextLevel()
+    {
+        if (progressAmount >= 100)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+        else
+        {
+            Debug.Log("You need 100% progress to proceed!");
+        }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Gem.cs - Collectible System",
+            content: `using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Gem : MonoBehaviour, IITem
+{
+    public static event Action<int> OnGemCollect;
+    public int worth = 5;
+    
+    public void Collect()
+    {
+        OnGemCollect.Invoke(worth); 
+        Destroy(gameObject);
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "Collector.cs - Item Collection Handler",
+            content: `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Collector : MonoBehaviour
+{
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        IITem item = collision.GetComponent<IITem>();
+        if (item != null )
+        {
+            item.Collect();
+        }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "IITem.cs - Item Interface",
+            content: `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public interface IITem
+{
+    public void Collect();
+}`
+          }
+        ],
         liveDemo: "#",
         sourceCode: "#"
       },
