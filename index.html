@@ -2911,6 +2911,14 @@
     </div>
   </section>
 
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function(){
+        emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your actual EmailJS public key
+    })();
+  </script>
+
   <script>
     // Projects data
     const projects = [
@@ -6774,16 +6782,49 @@ public class DreamController : MonoBehaviour
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const message = document.getElementById('message').value;
+      const submitButton = event.target.querySelector('button[type="submit"]');
 
-      // Simple form validation and feedback
-      if (name && email && message) {
-        alert('Message sent successfully! I\'ll get back to you soon.');
-
-        // Reset form
-        document.getElementById('name').value = '';
-        document.getElementById('email').value = '';
-        document.getElementById('message').value = '';
+      // Simple form validation
+      if (!name || !email || !message) {
+        alert('Please fill in all fields.');
+        return;
       }
+
+      // Disable submit button and show loading state
+      const originalText = submitButton.textContent;
+      submitButton.textContent = 'Sending...';
+      submitButton.disabled = true;
+
+      // EmailJS parameters
+      const templateParams = {
+        from_name: name,
+        from_email: email,
+        message: message,
+        to_email: 'agsapaula@outlook.com'
+      };
+
+      // Send email using EmailJS
+      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+        .then(function(response) {
+          console.log('SUCCESS!', response.status, response.text);
+          alert('Message sent successfully! I\'ll get back to you soon.');
+          
+          // Reset form
+          document.getElementById('name').value = '';
+          document.getElementById('email').value = '';
+          document.getElementById('message').value = '';
+          
+          // Reset button
+          submitButton.textContent = originalText;
+          submitButton.disabled = false;
+        }, function(error) {
+          console.log('FAILED...', error);
+          alert('Failed to send message. Please try again or contact me directly at agsapaula@outlook.com');
+          
+          // Reset button
+          submitButton.textContent = originalText;
+          submitButton.disabled = false;
+        });
     }
 
     // Mario-style Platform Game Animation
