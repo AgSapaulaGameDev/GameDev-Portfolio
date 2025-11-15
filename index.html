@@ -2915,7 +2915,7 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script type="text/javascript">
     (function(){
-        emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your actual EmailJS public key
+        emailjs.init("bsUprxuMEbabIhUuZ"); // EmailJS public key
     })();
   </script>
 
@@ -6804,7 +6804,7 @@ public class DreamController : MonoBehaviour
       };
 
       // Send email using EmailJS
-      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+      emailjs.send('service_7jj43f9', 'template_1p7gmvo', templateParams)
         .then(function(response) {
           console.log('SUCCESS!', response.status, response.text);
           alert('Message sent successfully! I\'ll get back to you soon.');
