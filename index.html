@@ -3902,7 +3902,934 @@ namespace CardMatchingGame
           "Tusok10.png"
         ],
         video: '<iframe src="https://drive.google.com/file/d/1OUx6uEUlgSv9ZW9gHh36zDy1_Jc92suJ/preview" allow="autoplay" allowfullscreen></iframe>',
-        code: [],
+        code: [
+          {
+            language: "C#",
+            title: "GameManager.cs - Core Game Management",
+            content: `using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using TMPro;
+
+public class GameManager : MonoBehaviour
+{
+    [Header("Game Settings")]
+    public float gameTime = 120f;
+    public int targetScore = 100;
+    public int lives = 3;
+    
+    [Header("Level Settings")]
+    public int currentLevel = 1;
+    public bool isEndlessMode = false;
+    
+    [Header("UI Elements")]
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI livesText;
+    public GameObject gameOverPanel;
+    public GameOverPanel gameOverPanelScript;
+    public GameObject pausePanel;
+    public Button pauseButton;
+    public Button resumeButton;
+    public Button restartButton;
+    public Button quitButton;
+    
+    [Header("Scene Settings")]
+    public string gameLevelsSceneName = "GameLevels";
+    
+    [Header("Audio Settings")]
+    public AudioClip buttonClickSound;
+    public AudioClip pauseButtonSound;
+    public AudioClip resumeQuitButtonSound;
+    public AudioClip gameOverSound;
+    [Range(0f, 1f)]
+    public float buttonSoundVolume = 0.8f;
+    
+    [Header("Dialogue System")]
+    public DialogueScript dialogueScript;
+    
+    // Game State
+    private int currentScore = 0;
+    private float currentTime;
+    private bool isGameActive = false;
+    private bool isPaused = false;
+    private int currentLives;
+    private int bombsCaught = 0;
+    private bool isRestarting = false;
+    
+    public static GameManager Instance;
+    
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            
+            if (FoodManager.Instance != null)
+            {
+                Debug.Log("[GameManager] Cleaning FoodManager on fresh GameManager start");
+                FoodManager.Instance.StopSpawning();
+                FoodManager.Instance.CleanupSpawnedItems();
+                FoodManager.Instance.ResetSpawnHistory();
+            }
+        }
+        else
+        {
+            Debug.Log("[GameManager] Destroying duplicate GameManager instance");
+            Destroy(gameObject);
+            return;
+        }
+    }
+    
+    void Start()
+    {
+        Debug.Log("[GameManager] === GameManager.Start() Called ===");
+        InitializeGame();
+    }
+    
+    void Update()
+    {
+        if (isGameActive && !isPaused)
+        {
+            UpdateTimer();
+            UpdateUI();
+        }
+    }
+    
+    void PlayButtonClickSound()
+    {
+        if (buttonClickSound != null)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX(buttonClickSound.name, buttonSoundVolume);
+            }
+            else
+            {
+                AudioSource.PlayClipAtPoint(buttonClickSound, Camera.main.transform.position, buttonSoundVolume);
+            }
+        }
+    }
+    
+    public void AddScore(int points)
+    {
+        currentScore += points;
+        Debug.Log($"Score added: {points}. Current score: {currentScore}");
+        
+        if (currentScore >= targetScore && !isEndlessMode)
+        {
+            EndGame(true);
+        }
+    }
+    
+    public void LoseLife()
+    {
+        currentLives--;
+        Debug.Log($"Life lost. Current lives: {currentLives}");
+        
+        if (HeartUIManager.Instance != null)
+        {
+            HeartUIManager.Instance.RemoveHeart();
+        }
+        
+        if (currentLives <= 0 && !isRestarting)
+        {
+            EndGame(false);
+        }
+    }
+    
+    public void CatchBomb()
+    {
+        bombsCaught++;
+        Debug.Log($"Bomb caught! Total bombs: {bombsCaught}");
+        
+        if (bombsCaught >= 2)
+        {
+            bombsCaught = 0;
+            LoseLife();
+        }
+        else
+        {
+            if (HeartUIManager.Instance != null)
+            {
+                HeartUIManager.Instance.DamageHeart();
+            }
+        }
+    }
+    
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0f : 1f;
+        
+        if (pausePanel != null)
+            pausePanel.SetActive(isPaused);
+            
+        PlayPauseButtonSound();
+    }
+    
+    public void ResumeGame()
+    {
+        isPaused = false;
+        Time.timeScale = 1f;
+        
+        if (pausePanel != null)
+            pausePanel.SetActive(false);
+            
+        PlayResumeQuitButtonSound();
+    }
+    
+    public void RestartGame()
+    {
+        isRestarting = true;
+        PlayButtonClickSound();
+        
+        Time.timeScale = 1f;
+        
+        if (FoodManager.Instance != null)
+        {
+            FoodManager.Instance.StopSpawning();
+            FoodManager.Instance.CleanupSpawnedItems();
+            FoodManager.Instance.ResetSpawnHistory();
+        }
+        
+        if (HeartUIManager.Instance != null)
+        {
+            HeartUIManager.Instance.ResetHearts();
+        }
+        
+        InitializeGame(true);
+        isRestarting = false;
+    }
+    
+    void InitializeGame(bool forceRestart = false)
+    {
+        Debug.Log("[GameManager] Initializing game...");
+        LoadLevelFromPlayerPrefs();
+        
+        currentScore = 0;
+        currentTime = gameTime;
+        currentLives = lives;
+        isGameActive = false;
+        isPaused = false;
+        bombsCaught = 0;
+        
+        if (FoodManager.Instance != null)
+        {
+            FoodManager.Instance.StopSpawning();
+            FoodManager.Instance.CleanupSpawnedItems();
+            FoodManager.Instance.ResetSpawnHistory();
+        }
+        
+        SetupUI();
+        
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
+            
+        if (gameOverPanelScript != null)
+        {
+            gameOverPanelScript.gameObject.SetActive(false);
+        }
+            
+        if (pausePanel != null)
+        {
+            pausePanel.SetActive(false);
+        }
+        
+        if (HeartUIManager.Instance != null)
+        {
+            HeartUIManager.Instance.ResetHearts();
+        }
+        
+        if (dialogueScript != null && !forceRestart)
+        {
+            dialogueScript.OnDialogueComplete.RemoveAllListeners();
+            dialogueScript.OnDialogueComplete.AddListener(OnDialogueComplete);
+            dialogueScript.StartDialogue();
+        }
+        else
+        {
+            StartGameplay();
+        }
+        
+        StartBackgroundMusic();
+    }
+    
+    void StartGameplay()
+    {
+        Debug.Log("[GameManager] Starting gameplay...");
+        isGameActive = true;
+        
+        ConfigureLevelSettings(currentLevel);
+        
+        if (FoodManager.Instance != null)
+        {
+            FoodManager.Instance.StopSpawning();
+            FoodManager.Instance.CleanupSpawnedItems();
+            StartCoroutine(StartSpawningAfterDelay());
+        }
+        else
+        {
+            Debug.LogError("[GameManager] FoodManager.Instance is null when starting gameplay!");
+        }
+        
+        UpdateUI();
+        Debug.Log("[GameManager] Game started successfully");
+    }
+    
+    void UpdateTimer()
+    {
+        currentTime -= Time.deltaTime;
+        
+        if (currentTime <= 0 && !isRestarting)
+        {
+            currentTime = 0;
+            EndGame(false);
+        }
+    }
+    
+    void UpdateUI()
+    {
+        if (scoreText != null)
+            scoreText.text = "Score: " + currentScore;
+            
+        if (timerText != null)
+        {
+            int minutes = Mathf.FloorToInt(currentTime / 60f);
+            int seconds = Mathf.FloorToInt(currentTime % 60f);
+            timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        }
+        
+        if (livesText != null)
+            livesText.text = "Lives: " + currentLives;
+    }
+    
+    void EndGame(bool won = false)
+    {
+        Debug.Log($"[GameManager] EndGame called - Won: {won}, IsRestarting: {isRestarting}");
+        if (isRestarting)
+        {
+            Debug.Log("[GameManager] Ignoring EndGame call during restart");
+            return;
+        }
+        
+        isGameActive = false;
+        isPaused = false;
+        Time.timeScale = 1f;
+        
+        if (FoodManager.Instance != null)
+        {
+            FoodManager.Instance.StopSpawning();
+        }
+        
+        PlayGameOverSound();
+        
+        if (gameOverPanelScript != null)
+        {
+            gameOverPanelScript.ShowGameOver(won, currentScore, Mathf.FloorToInt(gameTime - currentTime));
+        }
+        else if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+        
+        if (FoodManager.Instance != null)
+        {
+            FoodManager.Instance.CleanupSpawnedItems();
+        }
+        
+        Debug.Log($"[GameManager] Game ended - Final Score: {currentScore}");
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "MainMenu.cs - Menu Management System",
+            content: `using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using TMPro;
+
+public class MainMenu : MonoBehaviour
+{
+    [Header("Main Menu Buttons")]
+    public Button playButton;
+    public Button optionsButton;
+    public Button quitButton;
+    
+    [Header("Options Panel")]
+    public GameObject optionsPanel;
+    public Button confirmButton;
+    public Button returnButton;
+    
+    [Header("Settings Integration")]
+    public Settings settingsScript;
+    
+    [Header("Scene Settings")]
+    public string gameLevelsSceneName = "GameLevels";
+    
+    [Header("Background Music")]
+    public AudioClip backgroundMusicClip;
+    public AudioClip inGameMusicClip;
+    public bool persistMusicAcrossScenes = true;
+    [Range(0f, 1f)]
+    public float musicVolume = 0.7f;
+    
+    [Header("Button Sounds")]
+    public AudioClip buttonClickSound;
+    [Range(0f, 1f)]
+    public float buttonSoundVolume = 0.8f;
+    
+    [Header("Scene Music Settings")]
+    public string[] menuScenes = {"MainMenu", "GameLevels"};
+    public string[] gameScenes = {"GameScene", "Level1", "Level2", "Level3"};
+    
+    private AudioSource backgroundAudioSource;
+    private static MainMenu musicInstance;
+    private string currentScene;
+    private bool isInGameScene = false;
+    
+    void Awake()
+    {
+        HandleMusicPersistence();
+        Debug.Log("[MainMenu] MainMenu Awake - Finding scene references");
+        FindMissingReferences();
+        SetupBackgroundAudioSource();
+    }
+    
+    void HandleMusicPersistence()
+    {
+        if (persistMusicAcrossScenes)
+        {
+            if (musicInstance == null)
+            {
+                musicInstance = this;
+                DontDestroyOnLoad(gameObject);
+                Debug.Log("[MainMenu] Created persistent music instance");
+            }
+            else if (musicInstance != this)
+            {
+                Debug.Log("[MainMenu] Destroying duplicate MainMenu, keeping persistent music");
+                Destroy(gameObject);
+                return;
+            }
+        }
+    }
+    
+    void SetupBackgroundAudioSource()
+    {
+        backgroundAudioSource = GetComponent<AudioSource>();
+        if (backgroundAudioSource == null)
+        {
+            backgroundAudioSource = gameObject.AddComponent<AudioSource>();
+            Debug.Log("[MainMenu] Created new AudioSource component");
+        }
+        
+        backgroundAudioSource.loop = true;
+        backgroundAudioSource.playOnAwake = false;
+        backgroundAudioSource.volume = musicVolume;
+        backgroundAudioSource.spatialBlend = 0f;
+        
+        Debug.Log($"[MainMenu] AudioSource configured - Ready for dynamic clip assignment, Volume: {musicVolume}");
+    }
+    
+    void PlayButtonClickSound()
+    {
+        if (buttonClickSound != null)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX(buttonClickSound.name, buttonSoundVolume);
+                Debug.Log($"[MainMenu] Playing button click sound via AudioManager: {buttonClickSound.name}");
+            }
+            else
+            {
+                AudioSource.PlayClipAtPoint(buttonClickSound, Camera.main.transform.position, buttonSoundVolume);
+                Debug.Log($"[MainMenu] Playing button click sound via PlayClipAtPoint: {buttonClickSound.name}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[MainMenu] Button click sound is null!");
+        }
+    }
+    
+    System.Collections.IEnumerator PlayButtonSoundAndLoadScene(string sceneName, int fallbackBuildIndex = -1)
+    {
+        PlayButtonClickSound();
+        yield return new WaitForSeconds(0.15f);
+        
+        try
+        {
+            SceneManager.LoadScene(sceneName);
+            Debug.Log($"[MainMenu] Successfully loaded scene: {sceneName}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[MainMenu] Failed to load scene '{sceneName}': {e.Message}");
+            if (fallbackBuildIndex >= 0)
+            {
+                SceneManager.LoadScene(fallbackBuildIndex);
+                Debug.Log($"[MainMenu] Loaded fallback scene at build index: {fallbackBuildIndex}");
+            }
+        }
+    }
+    
+    void Start()
+    {
+        Debug.Log("[MainMenu] MainMenu Start called");
+        RestoreMainMenuReferences();
+        SetupButtons();
+        SetupOptionsPanel();
+        EnsureSettingsPanelClosed();
+        LoadSettings();
+        CheckCurrentSceneAndStartMusic();
+        ForceCloseAllPanels();
+    }
+    
+    void FindMissingReferences()
+    {
+        Debug.Log("[MainMenu] Finding missing references...");
+        
+        if (settingsScript == null)
+        {
+            GameObject settingsGO = GameObject.Find("Settings");
+            if (settingsGO == null)
+            {
+                Settings[] allSettings = FindObjectsByType<Settings>(FindObjectsSortMode.None);
+                if (allSettings.Length > 0)
+                {
+                    settingsScript = allSettings[0];
+                    Debug.Log("[MainMenu] Found Settings component via FindObjectsByType");
+                }
+            }
+            else
+            {
+                settingsScript = settingsGO.GetComponent<Settings>();
+                Debug.Log("[MainMenu] Found Settings component via GameObject.Find");
+            }
+        }
+        
+        if (playButton == null)
+        {
+            GameObject playGO = GameObject.Find("PlayButton");
+            if (playGO != null)
+            {
+                playButton = playGO.GetComponent<Button>();
+                Debug.Log("[MainMenu] Found PlayButton via GameObject.Find");
+            }
+        }
+        
+        if (optionsButton == null)
+        {
+            GameObject optionsGO = GameObject.Find("OptionsButton");
+            if (optionsGO != null)
+            {
+                optionsButton = optionsGO.GetComponent<Button>();
+                Debug.Log("[MainMenu] Found OptionsButton via GameObject.Find");
+            }
+        }
+        
+        if (quitButton == null)
+        {
+            GameObject quitGO = GameObject.Find("QuitButton");
+            if (quitGO != null)
+            {
+                quitButton = quitGO.GetComponent<Button>();
+                Debug.Log("[MainMenu] Found QuitButton via GameObject.Find");
+            }
+        }
+    }
+    
+    void SetupButtons()
+    {
+        Debug.Log("[MainMenu] Setting up button listeners...");
+        if (playButton != null)
+            playButton.onClick.AddListener(OnPlayClicked);
+            
+        if (optionsButton != null)
+            optionsButton.onClick.AddListener(OnOptionsClicked);
+            
+        if (quitButton != null)
+            quitButton.onClick.AddListener(OnQuitClicked);
+            
+        if (confirmButton != null)
+            confirmButton.onClick.AddListener(OnConfirmClicked);
+            
+        if (returnButton != null)
+            returnButton.onClick.AddListener(OnReturnClicked);
+    }
+    
+    // Button Event Handlers
+    public void OnPlayClicked()
+    {
+        Debug.Log("[MainMenu] Play button clicked");
+        StartCoroutine(PlayButtonSoundAndLoadScene(gameLevelsSceneName, 1));
+    }
+    
+    public void OnOptionsClicked()
+    {
+        Debug.Log("[MainMenu] Options button clicked");
+        PlayButtonClickSound();
+        
+        if (settingsScript == null || optionsPanel == null)
+        {
+            FindMissingReferences();
+        }
+        
+        if (settingsScript != null)
+        {
+            Debug.Log("[MainMenu] Opening settings panel via Settings script");
+            settingsScript.OpenSettings();
+            
+            if (settingsScript.settingsPanel != null)
+            {
+                settingsScript.settingsPanel.SetActive(true);
+            }
+        }
+        else if (optionsPanel != null)
+        {
+            Debug.Log("[MainMenu] Opening options panel directly");
+            optionsPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("[MainMenu] No options panel or settings script available!");
+            GameObject optionsGO = GameObject.Find("OptionsPanel");
+            if (optionsPanel != null)
+            {
+                optionsPanel.SetActive(true);
+            }
+        }
+    }
+    
+    public void OnQuitClicked()
+    {
+        Debug.Log("[MainMenu] Quit button clicked");
+        PlayButtonClickSound();
+        
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+            Debug.Log("[MainMenu] Quit game in editor");
+        #else
+            Application.Quit();
+            Debug.Log("[MainMenu] Quit application");
+        #endif
+    }
+    
+    public void OnConfirmClicked()
+    {
+        Debug.Log("[MainMenu] Confirm button clicked");
+        PlayButtonClickSound();
+        
+        if (settingsScript != null)
+        {
+            settingsScript.SaveSettings();
+        }
+        else if (optionsPanel != null)
+        {
+            Debug.Log("[MainMenu] Closing options panel directly");
+            optionsPanel.SetActive(false);
+        }
+    }
+    
+    public void OnReturnClicked()
+    {
+        Debug.Log("[MainMenu] Return button clicked");
+        PlayButtonClickSound();
+        
+        if (settingsScript != null)
+        {
+            settingsScript.CloseSettings();
+        }
+        else if (optionsPanel != null)
+        {
+            Debug.Log("[MainMenu] Closing options panel directly via return");
+            optionsPanel.SetActive(false);
+        }
+    }
+    
+    void StartBackgroundMusic()
+    {
+        if (backgroundAudioSource != null && backgroundMusicClip != null)
+        {
+            Debug.Log("[MainMenu] Starting background music");
+            if (backgroundAudioSource.isPlaying)
+            {
+                backgroundAudioSource.Stop();
+            }
+            
+            backgroundAudioSource.clip = backgroundMusicClip;
+            backgroundAudioSource.volume = musicVolume;
+            backgroundAudioSource.Play();
+            
+            Debug.Log($"[MainMenu] Background music started: {backgroundMusicClip.name}");
+        }
+        else if (backgroundMusicClip == null)
+        {
+            Debug.LogWarning("[MainMenu] Background music clip is null - checking AudioManager");
+            if (AudioManager.Instance != null)
+            {
+                Debug.Log("[MainMenu] Delegating music to AudioManager");
+            }
+        }
+        else
+        {
+            Debug.LogError("[MainMenu] AudioSource is null - cannot play background music");
+        }
+    }
+}`
+          },
+          {
+            language: "C#",
+            title: "StickController.cs - Player Input and Movement",
+            content: `using UnityEngine;
+
+public class StickController : MonoBehaviour
+{
+    [Header("Movement Settings")]
+    public float moveSpeed = 100f;
+    public float leftBound = -4f;
+    public float rightBound = 4f;
+    public bool useMouseInput = true;
+    public bool useTouchInput = true;
+    
+    [Header("Components")]
+    public Transform stickTransform;
+    
+    private Camera mainCamera;
+    private bool isDragging = false;
+    private Vector3 offset;
+    private float stickY;
+    private bool allowClamping = false;
+    
+    void Start()
+    {
+        mainCamera = Camera.main;
+        if (mainCamera == null)
+            mainCamera = FindFirstObjectByType<Camera>();
+            
+        if (stickTransform == null)
+            stickTransform = transform;
+            
+        stickY = stickTransform.localPosition.y;
+        
+        // Calculate bounds based on parent canvas/screen size
+        if (stickTransform.parent != null)
+        {
+            RectTransform parentRect = stickTransform.parent.GetComponent<RectTransform>();
+            if (parentRect != null)
+            {
+                float parentWidth = parentRect.rect.width;
+                leftBound = -parentWidth / 2f + 50f;
+                rightBound = parentWidth / 2f - 50f;
+                Debug.Log($"Using parent RectTransform width: {parentWidth}, bounds: {leftBound} to {rightBound}");
+            }
+            else
+            {
+                leftBound = -1000f;
+                rightBound = 1000f;
+                Debug.Log($"No RectTransform found, using wide fallback bounds: {leftBound} to {rightBound}");
+            }
+        }
+        else
+        {
+            if (mainCamera != null)
+            {
+                float cameraWidth = mainCamera.orthographicSize * 2f * mainCamera.aspect;
+                leftBound = -cameraWidth / 2f + 0.5f;
+                rightBound = cameraWidth / 2f - 0.5f;
+                Debug.Log($"Using camera-based bounds: {leftBound} to {rightBound}");
+            }
+            else
+            {
+                leftBound = -10f;
+                rightBound = 10f;
+                Debug.Log($"Using default bounds: {leftBound} to {rightBound}");
+            }
+        }
+        
+        // Center the stick horizontally at start
+        Vector3 centerPosition = stickTransform.localPosition;
+        centerPosition.x = 0f;
+        centerPosition.y = stickY;
+        stickTransform.localPosition = centerPosition;
+        
+        Debug.Log($"Positioned stick at local position: {centerPosition}");
+        
+        // Setup collider for catching items
+        Collider2D existingCollider = GetComponent<Collider2D>();
+        if (existingCollider == null)
+        {
+            BoxCollider2D boxCollider = gameObject.AddComponent<BoxCollider2D>();
+            boxCollider.isTrigger = true;
+            boxCollider.size = new Vector2(2f, 0.5f);
+            Debug.Log("Added BoxCollider2D to stick");
+        }
+        else
+        {
+            existingCollider.isTrigger = true;
+            Debug.Log("Using existing collider: " + existingCollider.GetType().Name);
+        }
+        
+        if (!gameObject.CompareTag("Player"))
+        {
+            gameObject.tag = "Player";
+            Debug.Log("Set stick tag to Player");
+        }
+        
+        Debug.Log("Stick initialized at position: " + stickTransform.position);
+        Debug.Log("Camera found: " + (mainCamera != null));
+        Debug.Log($"Movement bounds set to: Left={leftBound}, Right={rightBound}");
+        
+        Invoke("EnableClamping", 0.1f);
+    }
+    
+    void EnableClamping()
+    {
+        allowClamping = true;
+        Debug.Log("Clamping enabled - stick should now stay within bounds when moving");
+    }
+    
+    void Update()
+    {
+        HandleInput();
+        ClampPosition();
+    }
+    
+    void HandleInput()
+    {
+        bool touchHandled = false;
+        
+        // Touch input for mobile - optimized for Unity Remote
+        if (useTouchInput && Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            
+            Vector2 screenPos = touch.position;
+            float screenWidth = Screen.width;
+            float screenPercent = (screenPos.x / screenWidth) - 0.5f; // -0.5 to 0.5
+            
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    isDragging = true;
+                    touchHandled = true;
+                    break;
+                    
+                case TouchPhase.Moved:
+                case TouchPhase.Stationary:
+                    if (isDragging)
+                    {
+                        float targetX = screenPercent * (rightBound - leftBound);
+                        Vector3 newLocalPosition = stickTransform.localPosition;
+                        newLocalPosition.x = targetX;
+                        newLocalPosition.y = stickY;
+                        
+                        stickTransform.localPosition = newLocalPosition;
+                        touchHandled = true;
+                    }
+                    break;
+                    
+                case TouchPhase.Ended:
+                case TouchPhase.Canceled:
+                    isDragging = false;
+                    touchHandled = true;
+                    break;
+            }
+        }
+        
+        // Mouse input for PC testing - only if touch wasn't handled
+        if (useMouseInput && !touchHandled)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                mouseWorldPos.z = 0;
+                
+                isDragging = true;
+                Vector3 localMousePos = stickTransform.parent.InverseTransformPoint(mouseWorldPos);
+                offset = stickTransform.localPosition - localMousePos;
+            }
+            
+            if (Input.GetMouseButton(0) && isDragging)
+            {
+                Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                mouseWorldPos.z = 0;
+                
+                Vector3 localMousePos = stickTransform.parent.InverseTransformPoint(mouseWorldPos);
+                Vector3 newLocalPosition = localMousePos + offset;
+                newLocalPosition.y = stickY;
+                
+                stickTransform.localPosition = newLocalPosition;
+            }
+            
+            if (Input.GetMouseButtonUp(0))
+            {
+                isDragging = false;
+            }
+        }
+        
+        // Keyboard input as alternative (for testing)
+        if (!isDragging)
+        {
+            float horizontal = Input.GetAxis("Horizontal");
+            if (Mathf.Abs(horizontal) > 0.1f)
+            {
+                Vector3 movement = Vector3.right * horizontal * moveSpeed * Time.deltaTime;
+                stickTransform.localPosition += movement;
+            }
+        }
+    }
+    
+    void ClampPosition()
+    {
+        if (!allowClamping) return;
+        
+        Vector3 localPosition = stickTransform.localPosition;
+        float originalX = localPosition.x;
+        
+        localPosition.x = Mathf.Clamp(localPosition.x, leftBound, rightBound);
+        localPosition.y = stickY;
+        
+        stickTransform.localPosition = localPosition;
+        
+        if (Mathf.Abs(originalX - localPosition.x) > 0.01f)
+        {
+            Debug.LogWarning($"CLAMPING: Stick moved from X={originalX:F2} to X={localPosition.x:F2} (bounds: {leftBound:F2} to {rightBound:F2})");
+        }
+    }
+    
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        FallingItem item = other.GetComponent<FallingItem>();
+        if (item != null)
+        {
+            // The FallingItem script will handle the logic
+        }
+    }
+    
+    // Public methods for external control
+    public void SetBounds(float left, float right)
+    {
+        leftBound = left;
+        rightBound = right;
+    }
+    
+    public void SetMoveSpeed(float speed)
+    {
+        moveSpeed = speed;
+    }
+    
+    public Vector3 GetStickPosition()
+    {
+        return stickTransform.localPosition;
+    }
+}`
+          }
+        ],
         liveDemo: "#",
         sourceCode: "#"
       },
